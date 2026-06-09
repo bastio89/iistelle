@@ -111,9 +111,9 @@ export default function Sidebar() {
       </nav>
 
       <div className="mt-4 rounded-xl bg-white/5 p-3 text-xs text-petrol-300">
-        <p className="font-semibold text-white">Recruiting-Fokus aktiv</p>
+        <p className="font-semibold text-white">Alle Module aktiv</p>
         <p className="mt-1">
-          Weitere Module folgen – die Grundlage steht.
+          Recruiting, Personalakte, Abwesenheiten, Gehalt & Performance.
         </p>
       </div>
     </aside>

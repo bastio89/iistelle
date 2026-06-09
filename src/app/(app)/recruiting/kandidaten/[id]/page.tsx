@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   Application,
   Candidate,
+  Employee,
   Evaluation,
   INTERVIEW_TYPE_LABEL,
   Interview,
@@ -31,6 +32,7 @@ import {
   Pencil,
   Phone,
   Star,
+  UserPlus,
 } from "lucide-react";
 
 type Tab = "profil" | "interviews" | "bewertungen" | "notizen";
@@ -47,16 +49,20 @@ export default function CandidateDetailPage() {
   const [showInterview, setShowInterview] = useState(false);
   const [showEval, setShowEval] = useState(false);
   const [notes, setNotes] = useState("");
+  const [employeeRecord, setEmployeeRecord] = useState<Employee | null>(null);
+  const [converting, setConverting] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    const [c, a] = await Promise.all([
+    const [c, a, emp] = await Promise.all([
       supabase.from("candidates").select("*").eq("id", id).single(),
       supabase
         .from("applications")
         .select("*, job:jobs(*)")
         .eq("candidate_id", id),
+      supabase.from("employees").select("*").eq("candidate_id", id).maybeSingle(),
     ]);
+    setEmployeeRecord((emp.data as Employee) ?? null);
     const candApps = (a.data as Application[]) ?? [];
     setCandidate(c.data as Candidate);
     setApps(candApps);
@@ -104,6 +110,34 @@ export default function CandidateDetailPage() {
     if (apps[0]) {
       await supabase.from("applications").update({ notes }).eq("id", apps[0].id);
       load();
+    }
+  }
+
+  async function convertToEmployee() {
+    if (!candidate) return;
+    const hiredApp = apps.find((a) => a.stage === "eingestellt");
+    setConverting(true);
+    const { data, error } = await supabase
+      .from("employees")
+      .insert({
+        first_name: candidate.first_name,
+        last_name: candidate.last_name,
+        email: candidate.email,
+        phone: candidate.phone ?? "",
+        position: hiredApp?.job?.title ?? "Neue Position",
+        department: hiredApp?.job?.department ?? "Allgemein",
+        location: hiredApp?.job?.location ?? candidate.city ?? "",
+        employment_type: hiredApp?.job?.employment_type ?? "Vollzeit",
+        status: "onboarding",
+        hire_date: new Date().toISOString().slice(0, 10),
+        manager: hiredApp?.job?.recruiter ?? "",
+        candidate_id: candidate.id,
+      })
+      .select()
+      .single();
+    setConverting(false);
+    if (!error && data) {
+      setEmployeeRecord(data as Employee);
     }
   }
 
@@ -171,6 +205,22 @@ export default function CandidateDetailPage() {
               <span className="flex items-center gap-1 rounded-lg bg-amber-50 px-3 py-1.5 text-sm font-bold text-amber-700">
                 <Star className="h-4 w-4 fill-amber-400 text-amber-400" /> {avgScore} / 5
               </span>
+            )}
+            {employeeRecord ? (
+              <Link href={`/mitarbeiter/${employeeRecord.id}`} className="btn-secondary">
+                <UserPlus className="h-4 w-4" /> Zur Personalakte
+              </Link>
+            ) : (
+              apps.some((a) => a.stage === "eingestellt") && (
+                <button
+                  className="btn-primary"
+                  onClick={convertToEmployee}
+                  disabled={converting}
+                >
+                  <UserPlus className="h-4 w-4" />
+                  {converting ? "Übernehme…" : "Als Mitarbeiter übernehmen"}
+                </button>
+              )
             )}
             <button className="btn-secondary" onClick={() => setShowEdit(true)}>
               <Pencil className="h-4 w-4" /> Bearbeiten

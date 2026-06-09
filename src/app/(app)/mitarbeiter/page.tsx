@@ -1,5 +1,145 @@
-import ComingSoon from "@/components/ComingSoon";
+"use client";
 
-export default function Page() {
-  return <ComingSoon title="Mitarbeiter" />;
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { EMPLOYEE_STATUS_META, Employee } from "@/lib/types";
+import { Avatar, EmptyState, PageHeader, StatCard, formatDate } from "@/components/ui";
+import EmployeeFormModal from "@/components/EmployeeFormModal";
+import { Plus, Search } from "lucide-react";
+
+export default function EmployeesPage() {
+  const supabase = createClient();
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [query, setQuery] = useState("");
+  const [deptFilter, setDeptFilter] = useState("alle");
+  const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    const { data } = await supabase
+      .from("employees")
+      .select("*")
+      .order("last_name");
+    setEmployees((data as Employee[]) ?? []);
+    setLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const departments = Array.from(new Set(employees.map((e) => e.department))).sort();
+
+  const filtered = employees.filter((e) => {
+    const matchesQuery = `${e.first_name} ${e.last_name} ${e.email} ${e.position}`
+      .toLowerCase()
+      .includes(query.toLowerCase());
+    const matchesDept = deptFilter === "alle" || e.department === deptFilter;
+    return matchesQuery && matchesDept;
+  });
+
+  const active = employees.filter((e) => e.status === "aktiv").length;
+  const onboarding = employees.filter((e) => e.status === "onboarding").length;
+
+  if (loading) {
+    return <p className="py-20 text-center text-petrol-400">Lade Mitarbeiter…</p>;
+  }
+
+  return (
+    <div>
+      <PageHeader
+        title="Mitarbeiter"
+        subtitle="Digitale Personalakte deines Teams."
+        action={
+          <button className="btn-primary" onClick={() => setShowForm(true)}>
+            <Plus className="h-4 w-4" /> Mitarbeiter:in anlegen
+          </button>
+        }
+      />
+
+      <div className="mb-6 grid grid-cols-3 gap-4">
+        <StatCard label="Aktiv" value={active} />
+        <StatCard label="Im Onboarding" value={onboarding} accent />
+        <StatCard label="Abteilungen" value={departments.length} />
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="card flex min-w-64 flex-1 items-center gap-2 px-4 py-2.5">
+          <Search className="h-4 w-4 text-petrol-400" />
+          <input
+            className="w-full bg-transparent text-sm outline-none placeholder:text-petrol-300"
+            placeholder="Nach Name, E-Mail oder Position suchen…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+        <select
+          className="input w-auto"
+          value={deptFilter}
+          onChange={(e) => setDeptFilter(e.target.value)}
+        >
+          <option value="alle">Alle Abteilungen</option>
+          {departments.map((d) => (
+            <option key={d}>{d}</option>
+          ))}
+        </select>
+      </div>
+
+      {filtered.length === 0 ? (
+        <EmptyState title="Keine Mitarbeiter:innen gefunden" />
+      ) : (
+        <div className="card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-petrol-100 bg-petrol-50/50 text-left text-xs font-bold uppercase tracking-wide text-petrol-500">
+                <th className="px-5 py-3">Name</th>
+                <th className="px-5 py-3">Position</th>
+                <th className="px-5 py-3">Abteilung</th>
+                <th className="px-5 py-3">Eintritt</th>
+                <th className="px-5 py-3">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-petrol-50">
+              {filtered.map((e) => {
+                const meta = EMPLOYEE_STATUS_META[e.status];
+                return (
+                  <tr key={e.id} className="transition hover:bg-petrol-50/40">
+                    <td className="px-5 py-3">
+                      <Link href={`/mitarbeiter/${e.id}`} className="flex items-center gap-3">
+                        <Avatar name={`${e.first_name} ${e.last_name}`} />
+                        <div>
+                          <p className="font-semibold text-petrol-900">
+                            {e.first_name} {e.last_name}
+                          </p>
+                          <p className="text-xs text-petrol-400">{e.email}</p>
+                        </div>
+                      </Link>
+                    </td>
+                    <td className="px-5 py-3 text-petrol-700">{e.position}</td>
+                    <td className="px-5 py-3">
+                      <span className="rounded-full bg-petrol-50 px-2.5 py-0.5 text-xs font-semibold text-petrol-600">
+                        {e.department}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3 text-petrol-500">{formatDate(e.hire_date)}</td>
+                    <td className="px-5 py-3">
+                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${meta.color}`}>
+                        {meta.label}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {showForm && (
+        <EmployeeFormModal onClose={() => setShowForm(false)} onSaved={load} />
+      )}
+    </div>
+  );
 }
