@@ -14,6 +14,8 @@ import {
   Wallet,
   TrendingUp,
   Settings,
+  Mail,
+  Globe,
 } from "lucide-react";
 
 const mainNav = [
@@ -25,6 +27,7 @@ const recruitingNav = [
   { href: "/recruiting/bewerbungen", label: "Bewerbungen", icon: KanbanSquare },
   { href: "/recruiting/kandidaten", label: "Kandidaten", icon: Users },
   { href: "/recruiting/interviews", label: "Interviews", icon: CalendarClock },
+  { href: "/recruiting/vorlagen", label: "E-Mail-Vorlagen", icon: Mail },
   { href: "/recruiting/auswertungen", label: "Auswertungen", icon: BarChart3 },
 ];
 
@@ -110,12 +113,17 @@ export default function Sidebar() {
         </div>
       </nav>
 
-      <div className="mt-4 rounded-xl bg-white/5 p-3 text-xs text-petrol-300">
-        <p className="font-semibold text-white">Alle Module aktiv</p>
-        <p className="mt-1">
-          Recruiting, Personalakte, Abwesenheiten, Gehalt & Performance.
-        </p>
-      </div>
+      <a
+        href="/karriere"
+        target="_blank"
+        className="mt-4 flex items-center gap-2.5 rounded-xl bg-white/5 p-3 text-xs text-petrol-300 transition hover:bg-white/10"
+      >
+        <Globe className="h-4 w-4 shrink-0 text-coral-400" />
+        <span>
+          <span className="block font-semibold text-white">Karriereseite</span>
+          öffentliche Stellen ansehen
+        </span>
+      </a>
     </aside>
   );
 }

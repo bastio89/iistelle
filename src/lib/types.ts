@@ -208,6 +208,51 @@ export interface CompanySettings {
   updated_at: string;
 }
 
+export interface OnboardingTask {
+  id: string;
+  employee_id: string;
+  title: string;
+  done: boolean;
+  due_date: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
+export type TemplateType =
+  | "einladung"
+  | "zusage"
+  | "absage"
+  | "eingangsbestaetigung"
+  | "sonstige";
+
+export interface EmailTemplate {
+  id: string;
+  name: string;
+  template_type: TemplateType;
+  subject: string;
+  body: string;
+  created_at: string;
+}
+
+export const TEMPLATE_TYPE_META: Record<TemplateType, { label: string; color: string }> = {
+  eingangsbestaetigung: { label: "Eingangsbestätigung", color: "bg-sky-100 text-sky-800" },
+  einladung: { label: "Einladung", color: "bg-violet-100 text-violet-800" },
+  zusage: { label: "Zusage", color: "bg-emerald-100 text-emerald-800" },
+  absage: { label: "Absage", color: "bg-rose-100 text-rose-700" },
+  sonstige: { label: "Sonstige", color: "bg-slate-100 text-slate-700" },
+};
+
+export const DEFAULT_ONBOARDING_TASKS = [
+  "Arbeitsvertrag unterschrieben zurückerhalten",
+  "Hardware bestellen (Laptop, Monitor, Zubehör)",
+  "Accounts anlegen (E-Mail, Slack, HR-Tool)",
+  "Buddy / Patin zuweisen",
+  "Onboarding-Plan für Woche 1 erstellen",
+  "Team über Start informieren",
+  "Erster Arbeitstag: Begrüßung & Rundgang",
+  "Feedbackgespräch nach 30 Tagen einplanen",
+];
+
 export function formatEuro(amount: number) {
   return new Intl.NumberFormat("de-DE", {
     style: "currency",

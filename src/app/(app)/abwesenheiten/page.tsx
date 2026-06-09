@@ -19,7 +19,7 @@ import {
   StatCard,
   formatDate,
 } from "@/components/ui";
-import { Check, Plus, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 
 function workdaysBetween(start: string, end: string) {
   const s = new Date(start);
@@ -40,6 +40,7 @@ export default function AbsencesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>("alle");
   const [showForm, setShowForm] = useState(false);
+  const [view, setView] = useState<"liste" | "kalender">("liste");
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -132,28 +133,52 @@ export default function AbsencesPage() {
         </div>
       )}
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        {[
-          ["alle", "Alle"],
-          ["beantragt", "Beantragt"],
-          ["genehmigt", "Genehmigt"],
-          ["abgelehnt", "Abgelehnt"],
-        ].map(([key, label]) => (
-          <button
-            key={key}
-            onClick={() => setStatusFilter(key)}
-            className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
-              statusFilter === key
-                ? "bg-petrol-800 text-white"
-                : "bg-white text-petrol-600 shadow-card hover:bg-petrol-50"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-2">
+          {[
+            ["alle", "Alle"],
+            ["beantragt", "Beantragt"],
+            ["genehmigt", "Genehmigt"],
+            ["abgelehnt", "Abgelehnt"],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setStatusFilter(key)}
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
+                statusFilter === key
+                  ? "bg-petrol-800 text-white"
+                  : "bg-white text-petrol-600 shadow-card hover:bg-petrol-50"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="flex rounded-lg border border-petrol-200 bg-white p-0.5">
+          {(
+            [
+              ["liste", "Liste"],
+              ["kalender", "Team-Kalender"],
+            ] as const
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setView(key)}
+              className={`rounded-md px-3 py-1.5 text-sm font-semibold transition ${
+                view === key
+                  ? "bg-petrol-800 text-white"
+                  : "text-petrol-600 hover:bg-petrol-50"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {view === "kalender" ? (
+        <TeamCalendar absences={absences} employees={employees} />
+      ) : filtered.length === 0 ? (
         <EmptyState title="Keine Abwesenheiten in dieser Ansicht" />
       ) : (
         <div className="card overflow-hidden">
@@ -240,6 +265,159 @@ export default function AbsencesPage() {
           }}
         />
       )}
+    </div>
+  );
+}
+
+const MONTH_NAMES = [
+  "Januar", "Februar", "März", "April", "Mai", "Juni",
+  "Juli", "August", "September", "Oktober", "November", "Dezember",
+];
+
+const CAL_COLORS: Record<string, string> = {
+  urlaub: "bg-teal-400",
+  krank: "bg-rose-400",
+  sonderurlaub: "bg-violet-400",
+  unbezahlt: "bg-slate-400",
+};
+
+function toISO(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate()
+  ).padStart(2, "0")}`;
+}
+
+function TeamCalendar({
+  absences,
+  employees,
+}: {
+  absences: Absence[];
+  employees: Employee[];
+}) {
+  const now = new Date();
+  const [year, setYear] = useState(now.getFullYear());
+  const [month, setMonth] = useState(now.getMonth());
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const days = Array.from({ length: daysInMonth }, (_, i) => {
+    const d = new Date(year, month, i + 1);
+    return { day: i + 1, iso: toISO(d), weekend: d.getDay() === 0 || d.getDay() === 6 };
+  });
+  const todayIso = toISO(now);
+
+  function prev() {
+    if (month === 0) {
+      setMonth(11);
+      setYear((y) => y - 1);
+    } else setMonth((m) => m - 1);
+  }
+  function next() {
+    if (month === 11) {
+      setMonth(0);
+      setYear((y) => y + 1);
+    } else setMonth((m) => m + 1);
+  }
+
+  const relevant = absences.filter((a) => a.status !== "abgelehnt");
+
+  return (
+    <div className="card overflow-hidden">
+      <div className="flex items-center justify-between border-b border-petrol-100 px-5 py-3">
+        <h2 className="font-bold text-petrol-900">
+          {MONTH_NAMES[month]} {year}
+        </h2>
+        <div className="flex items-center gap-4">
+          <div className="hidden items-center gap-3 text-xs text-petrol-500 md:flex">
+            {Object.entries(ABSENCE_TYPE_META).map(([key, meta]) => (
+              <span key={key} className="flex items-center gap-1.5">
+                <span className={`h-2.5 w-2.5 rounded-sm ${CAL_COLORS[key]}`} />
+                {meta.label}
+              </span>
+            ))}
+          </div>
+          <div className="flex gap-1">
+            <button onClick={prev} className="rounded-lg p-1.5 text-petrol-500 transition hover:bg-petrol-50">
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button onClick={next} className="rounded-lg p-1.5 text-petrol-500 transition hover:bg-petrol-50">
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-xs">
+          <thead>
+            <tr>
+              <th className="sticky left-0 z-10 min-w-44 bg-petrol-50/80 px-4 py-2 text-left font-bold uppercase tracking-wide text-petrol-500">
+                Mitarbeiter:in
+              </th>
+              {days.map((d) => (
+                <th
+                  key={d.day}
+                  className={`min-w-7 px-0.5 py-2 text-center font-semibold ${
+                    d.iso === todayIso
+                      ? "bg-coral-500 text-white"
+                      : d.weekend
+                        ? "bg-petrol-100/60 text-petrol-400"
+                        : "bg-petrol-50/80 text-petrol-500"
+                  }`}
+                >
+                  {d.day}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-petrol-50">
+            {employees.map((emp) => {
+              const empAbs = relevant.filter((a) => a.employee_id === emp.id);
+              return (
+                <tr key={emp.id}>
+                  <td className="sticky left-0 z-10 bg-white px-4 py-2">
+                    <Link
+                      href={`/mitarbeiter/${emp.id}`}
+                      className="flex items-center gap-2"
+                    >
+                      <Avatar name={`${emp.first_name} ${emp.last_name}`} size="sm" />
+                      <span className="whitespace-nowrap text-sm font-semibold text-petrol-900">
+                        {emp.first_name} {emp.last_name}
+                      </span>
+                    </Link>
+                  </td>
+                  {days.map((d) => {
+                    const abs = empAbs.find(
+                      (a) => a.start_date <= d.iso && a.end_date >= d.iso
+                    );
+                    return (
+                      <td
+                        key={d.day}
+                        className={`h-9 px-0.5 ${d.weekend ? "bg-petrol-50/60" : ""}`}
+                        title={
+                          abs
+                            ? `${ABSENCE_TYPE_META[abs.absence_type].label} (${ABSENCE_STATUS_META[abs.status].label})`
+                            : undefined
+                        }
+                      >
+                        {abs && !d.weekend && (
+                          <div
+                            className={`h-5 w-full rounded ${CAL_COLORS[abs.absence_type]} ${
+                              abs.status === "beantragt" ? "opacity-40" : ""
+                            }`}
+                          />
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="border-t border-petrol-50 px-5 py-2.5 text-xs text-petrol-400">
+        Halbtransparente Balken = noch nicht genehmigt. Wochenenden sind ausgegraut.
+      </p>
     </div>
   );
 }

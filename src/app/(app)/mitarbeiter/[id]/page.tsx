@@ -8,10 +8,12 @@ import {
   ABSENCE_STATUS_META,
   ABSENCE_TYPE_META,
   Absence,
+  DEFAULT_ONBOARDING_TASKS,
   EMPLOYEE_STATUS_META,
   Employee,
   GOAL_STATUS_META,
   Goal,
+  OnboardingTask,
   Review,
   Salary,
   formatEuro,
@@ -37,7 +39,7 @@ import {
   User,
 } from "lucide-react";
 
-type Tab = "profil" | "abwesenheiten" | "gehalt" | "performance";
+type Tab = "profil" | "onboarding" | "abwesenheiten" | "gehalt" | "performance";
 
 export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -48,6 +50,8 @@ export default function EmployeeDetailPage() {
   const [salaries, setSalaries] = useState<Salary[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [obTasks, setObTasks] = useState<OnboardingTask[]>([]);
+  const [newTask, setNewTask] = useState("");
   const [tab, setTab] = useState<Tab>("profil");
   const [showEdit, setShowEdit] = useState(false);
   const [showSalary, setShowSalary] = useState(false);
@@ -55,13 +59,15 @@ export default function EmployeeDetailPage() {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    const [e, a, s, g, r] = await Promise.all([
+    const [e, a, s, g, r, ob] = await Promise.all([
       supabase.from("employees").select("*").eq("id", id).single(),
       supabase.from("absences").select("*").eq("employee_id", id).order("start_date", { ascending: false }),
       supabase.from("salaries").select("*").eq("employee_id", id).order("effective_from", { ascending: false }),
       supabase.from("goals").select("*").eq("employee_id", id).order("created_at", { ascending: false }),
       supabase.from("reviews").select("*").eq("employee_id", id).order("created_at", { ascending: false }),
+      supabase.from("onboarding_tasks").select("*").eq("employee_id", id).order("sort_order"),
     ]);
+    setObTasks((ob.data as OnboardingTask[]) ?? []);
     setEmployee(e.data as Employee);
     setAbsences((a.data as Absence[]) ?? []);
     setSalaries((s.data as Salary[]) ?? []);
@@ -74,6 +80,42 @@ export default function EmployeeDetailPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  async function toggleTask(task: OnboardingTask) {
+    await supabase
+      .from("onboarding_tasks")
+      .update({ done: !task.done })
+      .eq("id", task.id);
+    load();
+  }
+
+  async function addTask(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newTask.trim()) return;
+    await supabase.from("onboarding_tasks").insert({
+      employee_id: id,
+      title: newTask.trim(),
+      sort_order: obTasks.length,
+    });
+    setNewTask("");
+    load();
+  }
+
+  async function deleteTask(taskId: string) {
+    await supabase.from("onboarding_tasks").delete().eq("id", taskId);
+    load();
+  }
+
+  async function insertDefaultChecklist() {
+    await supabase.from("onboarding_tasks").insert(
+      DEFAULT_ONBOARDING_TASKS.map((title, i) => ({
+        employee_id: id,
+        title,
+        sort_order: obTasks.length + i,
+      }))
+    );
+    load();
+  }
 
   async function deleteEmployee() {
     if (!confirm("Mitarbeiter:in und alle zugehörigen Daten wirklich löschen?")) return;
@@ -98,8 +140,16 @@ export default function EmployeeDetailPage() {
     .reduce((s, a) => s + Number(a.days), 0);
   const currentSalary = salaries[0];
 
+  const doneCount = obTasks.filter((t) => t.done).length;
+
   const tabs: { key: Tab; label: string }[] = [
     { key: "profil", label: "Profil" },
+    {
+      key: "onboarding",
+      label: obTasks.length
+        ? `Onboarding (${doneCount}/${obTasks.length})`
+        : "Onboarding",
+    },
     { key: "abwesenheiten", label: "Abwesenheiten" },
     { key: "gehalt", label: "Gehalt" },
     { key: "performance", label: "Performance" },
@@ -232,6 +282,88 @@ export default function EmployeeDetailPage() {
                 </Link>
               </p>
             )}
+          </div>
+        )}
+
+        {tab === "onboarding" && (
+          <div className="card p-6">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <h3 className="font-bold text-petrol-900">Onboarding-Checkliste</h3>
+              {obTasks.length > 0 && (
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-36 overflow-hidden rounded-full bg-petrol-50">
+                    <div
+                      className="h-full rounded-full bg-emerald-500 transition-all"
+                      style={{
+                        width: `${obTasks.length ? (doneCount / obTasks.length) * 100 : 0}%`,
+                      }}
+                    />
+                  </div>
+                  <span className="text-xs font-bold text-petrol-600">
+                    {doneCount}/{obTasks.length} erledigt
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {obTasks.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-petrol-200 p-8 text-center">
+                <p className="text-sm text-petrol-500">
+                  Noch keine Checkliste vorhanden.
+                </p>
+                <button className="btn-primary mt-4" onClick={insertDefaultChecklist}>
+                  Standard-Checkliste einfügen
+                </button>
+              </div>
+            ) : (
+              <ul className="space-y-1.5">
+                {obTasks.map((t) => (
+                  <li
+                    key={t.id}
+                    className="group flex items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-petrol-50/60"
+                  >
+                    <button
+                      onClick={() => toggleTask(t)}
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition ${
+                        t.done
+                          ? "border-emerald-500 bg-emerald-500 text-white"
+                          : "border-petrol-300 bg-white hover:border-petrol-500"
+                      }`}
+                    >
+                      {t.done && <span className="text-[10px] font-black">✓</span>}
+                    </button>
+                    <span
+                      className={`flex-1 text-sm ${
+                        t.done
+                          ? "text-petrol-300 line-through"
+                          : "font-medium text-petrol-800"
+                      }`}
+                    >
+                      {t.title}
+                    </span>
+                    <button
+                      onClick={() => deleteTask(t.id)}
+                      className="rounded p-1 text-petrol-300 opacity-0 transition hover:bg-rose-50 hover:text-rose-500 group-hover:opacity-100"
+                      title="Aufgabe entfernen"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <form onSubmit={addTask} className="mt-4 flex gap-2 border-t border-petrol-50 pt-4">
+              <input
+                className="input"
+                value={newTask}
+                onChange={(e) => setNewTask(e.target.value)}
+                placeholder="Neue Aufgabe hinzufügen…"
+              />
+              <button className="btn-primary shrink-0" disabled={!newTask.trim()}>
+                <Plus className="h-4 w-4" /> Hinzufügen
+              </button>
+            </form>
           </div>
         )}
 

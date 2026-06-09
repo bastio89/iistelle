@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 import {
   Application,
   Candidate,
+  DEFAULT_ONBOARDING_TASKS,
+  EmailTemplate,
   Employee,
   Evaluation,
   INTERVIEW_TYPE_LABEL,
@@ -31,6 +33,7 @@ import {
   MapPin,
   Pencil,
   Phone,
+  Send,
   Star,
   UserPlus,
 } from "lucide-react";
@@ -51,6 +54,7 @@ export default function CandidateDetailPage() {
   const [notes, setNotes] = useState("");
   const [employeeRecord, setEmployeeRecord] = useState<Employee | null>(null);
   const [converting, setConverting] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -137,6 +141,14 @@ export default function CandidateDetailPage() {
       .single();
     setConverting(false);
     if (!error && data) {
+      // Standard-Onboarding-Checkliste anlegen
+      await supabase.from("onboarding_tasks").insert(
+        DEFAULT_ONBOARDING_TASKS.map((title, i) => ({
+          employee_id: (data as Employee).id,
+          title,
+          sort_order: i,
+        }))
+      );
       setEmployeeRecord(data as Employee);
     }
   }
@@ -222,6 +234,9 @@ export default function CandidateDetailPage() {
                 </button>
               )
             )}
+            <button className="btn-secondary" onClick={() => setShowEmail(true)}>
+              <Send className="h-4 w-4" /> E-Mail
+            </button>
             <button className="btn-secondary" onClick={() => setShowEdit(true)}>
               <Pencil className="h-4 w-4" /> Bearbeiten
             </button>
@@ -466,7 +481,137 @@ export default function CandidateDetailPage() {
           }}
         />
       )}
+
+      {showEmail && (
+        <EmailModal
+          candidate={candidate}
+          apps={apps}
+          onClose={() => setShowEmail(false)}
+        />
+      )}
     </div>
+  );
+}
+
+function EmailModal({
+  candidate,
+  apps,
+  onClose,
+}: {
+  candidate: Candidate;
+  apps: Application[];
+  onClose: () => void;
+}) {
+  const supabase = createClient();
+  const [templates, setTemplates] = useState<EmailTemplate[]>([]);
+  const [templateId, setTemplateId] = useState<string>("");
+  const [appId, setAppId] = useState<string>(apps[0]?.id ?? "");
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    supabase
+      .from("email_templates")
+      .select("*")
+      .order("created_at")
+      .then(({ data }) => setTemplates((data as EmailTemplate[]) ?? []));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function fill(text: string) {
+    const app = apps.find((a) => a.id === appId);
+    return text
+      .replaceAll("{{vorname}}", candidate.first_name)
+      .replaceAll("{{nachname}}", candidate.last_name)
+      .replaceAll("{{stelle}}", app?.job?.title ?? "")
+      .replaceAll("{{firma}}", "iistelle GmbH")
+      .replaceAll("{{absender}}", app?.job?.recruiter || "Dein Recruiting-Team");
+  }
+
+  function applyTemplate(tid: string) {
+    setTemplateId(tid);
+    const t = templates.find((x) => x.id === tid);
+    if (t) {
+      setSubject(fill(t.subject));
+      setBody(fill(t.body));
+    }
+  }
+
+  async function copy() {
+    await navigator.clipboard.writeText(`Betreff: ${subject}\n\n${body}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  const mailto = `mailto:${candidate.email}?subject=${encodeURIComponent(
+    subject
+  )}&body=${encodeURIComponent(body)}`;
+
+  return (
+    <Modal title={`E-Mail an ${candidate.first_name}`} onClose={onClose} wide>
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="label">Vorlage</label>
+            <select
+              className="input"
+              value={templateId}
+              onChange={(e) => applyTemplate(e.target.value)}
+            >
+              <option value="">– Vorlage wählen –</option>
+              {templates.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label">Bezug auf Stelle</label>
+            <select
+              className="input"
+              value={appId}
+              onChange={(e) => setAppId(e.target.value)}
+            >
+              {apps.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.job?.title}
+                </option>
+              ))}
+              {apps.length === 0 && <option value="">Keine Bewerbung</option>}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label className="label">Betreff</label>
+          <input
+            className="input"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="label">Text</label>
+          <textarea
+            className="input min-h-56"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center justify-between gap-2 pt-1">
+          <span className="text-xs text-petrol-400">An: {candidate.email}</span>
+          <div className="flex gap-2">
+            <button type="button" className="btn-secondary" onClick={copy}>
+              {copied ? "Kopiert ✓" : "Text kopieren"}
+            </button>
+            <a className="btn-primary" href={mailto}>
+              <Send className="h-4 w-4" /> Im Mail-Programm öffnen
+            </a>
+          </div>
+        </div>
+      </div>
+    </Modal>
   );
 }
 
