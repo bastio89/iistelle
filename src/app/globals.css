@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sidebar-bg: #0f2e34;
+  --sidebar-hover: #1a4b53;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  background: #f6f8f9;
+  color: #15282d;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c4d2d5;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl2 shadow-card border border-petrol-100/60;
+  }
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-lg bg-petrol-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-petrol-700 disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 rounded-lg border border-petrol-200 bg-white px-4 py-2 text-sm font-semibold text-petrol-800 transition hover:bg-petrol-50;
+  }
+  .btn-danger {
+    @apply inline-flex items-center gap-2 rounded-lg bg-coral-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-coral-600;
+  }
+  .input {
+    @apply w-full rounded-lg border border-petrol-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-petrol-500 focus:ring-2 focus:ring-petrol-100;
+  }
+  .label {
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-petrol-600;
+  }
+}
