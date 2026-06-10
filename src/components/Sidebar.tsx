@@ -16,7 +16,9 @@ import {
   Settings,
   Mail,
   Globe,
+  Network,
 } from "lucide-react";
+import { useRole } from "@/lib/useRole";
 
 const mainNav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -33,8 +35,9 @@ const recruitingNav = [
 
 const moreNav = [
   { href: "/mitarbeiter", label: "Mitarbeiter", icon: UserCircle },
+  { href: "/organigramm", label: "Organigramm", icon: Network },
   { href: "/abwesenheiten", label: "Abwesenheiten", icon: Plane },
-  { href: "/gehalt", label: "Gehalt", icon: Wallet },
+  { href: "/gehalt", label: "Gehalt", icon: Wallet, adminOnly: true },
   { href: "/performance", label: "Performance", icon: TrendingUp },
   { href: "/einstellungen", label: "Einstellungen", icon: Settings },
 ];
@@ -72,6 +75,8 @@ function NavLink({
 }
 
 export default function Sidebar() {
+  const { isAdmin } = useRole();
+  const visibleMoreNav = moreNav.filter((item) => !item.adminOnly || isAdmin);
   return (
     <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col bg-petrol-950 px-3 py-5">
       <Link href="/dashboard" className="mb-6 flex items-center gap-2 px-2">
@@ -106,8 +111,8 @@ export default function Sidebar() {
             Weitere Module
           </p>
           <div className="space-y-1">
-            {moreNav.map((item) => (
-              <NavLink key={item.href} {...item} />
+            {visibleMoreNav.map(({ href, label, icon }) => (
+              <NavLink key={href} href={href} label={label} icon={icon} />
             ))}
           </div>
         </div>

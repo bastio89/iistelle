@@ -9,15 +9,20 @@ import {
   ABSENCE_TYPE_META,
   Absence,
   DEFAULT_ONBOARDING_TASKS,
+  DOC_CATEGORY_META,
+  DocCategory,
   EMPLOYEE_STATUS_META,
   Employee,
   GOAL_STATUS_META,
   Goal,
+  HrDocument,
   OnboardingTask,
   Review,
   Salary,
+  formatBytes,
   formatEuro,
 } from "@/lib/types";
+import { useRole } from "@/lib/useRole";
 import {
   Avatar,
   Modal,
@@ -30,16 +35,25 @@ import {
   ArrowLeft,
   Briefcase,
   CalendarDays,
+  Download,
+  FileText,
   Mail,
   MapPin,
   Pencil,
   Phone,
   Plus,
   Trash2,
+  Upload,
   User,
 } from "lucide-react";
 
-type Tab = "profil" | "onboarding" | "abwesenheiten" | "gehalt" | "performance";
+type Tab =
+  | "profil"
+  | "onboarding"
+  | "dokumente"
+  | "abwesenheiten"
+  | "gehalt"
+  | "performance";
 
 export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -52,6 +66,10 @@ export default function EmployeeDetailPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [obTasks, setObTasks] = useState<OnboardingTask[]>([]);
   const [newTask, setNewTask] = useState("");
+  const [docs, setDocs] = useState<HrDocument[]>([]);
+  const [docCategory, setDocCategory] = useState<DocCategory>("sonstige");
+  const [uploading, setUploading] = useState(false);
+  const { isAdmin } = useRole();
   const [tab, setTab] = useState<Tab>("profil");
   const [showEdit, setShowEdit] = useState(false);
   const [showSalary, setShowSalary] = useState(false);
@@ -68,6 +86,12 @@ export default function EmployeeDetailPage() {
       supabase.from("onboarding_tasks").select("*").eq("employee_id", id).order("sort_order"),
     ]);
     setObTasks((ob.data as OnboardingTask[]) ?? []);
+    const { data: docData } = await supabase
+      .from("documents")
+      .select("*")
+      .eq("employee_id", id)
+      .order("created_at", { ascending: false });
+    setDocs((docData as HrDocument[]) ?? []);
     setEmployee(e.data as Employee);
     setAbsences((a.data as Absence[]) ?? []);
     setSalaries((s.data as Salary[]) ?? []);
@@ -80,6 +104,42 @@ export default function EmployeeDetailPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  async function uploadDoc(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const path = `${id}/${Date.now()}-${file.name}`;
+    const { error: upErr } = await supabase.storage
+      .from("dokumente")
+      .upload(path, file);
+    if (!upErr) {
+      await supabase.from("documents").insert({
+        employee_id: id,
+        name: file.name,
+        category: docCategory,
+        storage_path: path,
+        size_bytes: file.size,
+      });
+    }
+    setUploading(false);
+    e.target.value = "";
+    load();
+  }
+
+  async function downloadDoc(doc: HrDocument) {
+    const { data } = await supabase.storage
+      .from("dokumente")
+      .createSignedUrl(doc.storage_path, 60);
+    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+  }
+
+  async function deleteDoc(doc: HrDocument) {
+    if (!confirm(`„${doc.name}“ wirklich löschen?`)) return;
+    await supabase.storage.from("dokumente").remove([doc.storage_path]);
+    await supabase.from("documents").delete().eq("id", doc.id);
+    load();
+  }
 
   async function toggleTask(task: OnboardingTask) {
     await supabase
@@ -150,8 +210,9 @@ export default function EmployeeDetailPage() {
         ? `Onboarding (${doneCount}/${obTasks.length})`
         : "Onboarding",
     },
+    { key: "dokumente", label: `Dokumente (${docs.length})` },
     { key: "abwesenheiten", label: "Abwesenheiten" },
-    { key: "gehalt", label: "Gehalt" },
+    ...(isAdmin ? ([{ key: "gehalt", label: "Gehalt" }] as { key: Tab; label: string }[]) : []),
     { key: "performance", label: "Performance" },
   ];
 
@@ -364,6 +425,81 @@ export default function EmployeeDetailPage() {
                 <Plus className="h-4 w-4" /> Hinzufügen
               </button>
             </form>
+          </div>
+        )}
+
+        {tab === "dokumente" && (
+          <div className="card p-6">
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+              <h3 className="font-bold text-petrol-900">Dokumente</h3>
+              <div className="flex items-center gap-2">
+                <select
+                  className="input w-auto py-1.5"
+                  value={docCategory}
+                  onChange={(e) => setDocCategory(e.target.value as DocCategory)}
+                >
+                  {Object.entries(DOC_CATEGORY_META).map(([key, meta]) => (
+                    <option key={key} value={key}>
+                      {meta.label}
+                    </option>
+                  ))}
+                </select>
+                <label className={`btn-primary cursor-pointer ${uploading ? "opacity-50" : ""}`}>
+                  <Upload className="h-4 w-4" />
+                  {uploading ? "Lädt hoch…" : "Hochladen"}
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={uploadDoc}
+                    disabled={uploading}
+                  />
+                </label>
+              </div>
+            </div>
+
+            {docs.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-petrol-200 p-8 text-center text-sm text-petrol-500">
+                Noch keine Dokumente. Wähle eine Kategorie und lade die erste Datei hoch.
+              </div>
+            ) : (
+              <ul className="divide-y divide-petrol-50">
+                {docs.map((d) => {
+                  const meta = DOC_CATEGORY_META[d.category];
+                  return (
+                    <li key={d.id} className="flex items-center gap-3 py-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-petrol-50 text-petrol-500">
+                        <FileText className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-petrol-900">
+                          {d.name}
+                        </p>
+                        <p className="text-xs text-petrol-400">
+                          {formatBytes(d.size_bytes)} · {formatDate(d.created_at)}
+                        </p>
+                      </div>
+                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${meta.color}`}>
+                        {meta.label}
+                      </span>
+                      <button
+                        onClick={() => downloadDoc(d)}
+                        className="rounded-lg p-2 text-petrol-500 transition hover:bg-petrol-50"
+                        title="Herunterladen"
+                      >
+                        <Download className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => deleteDoc(d)}
+                        className="rounded-lg p-2 text-petrol-300 transition hover:bg-rose-50 hover:text-rose-500"
+                        title="Löschen"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
         )}
 

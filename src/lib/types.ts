@@ -253,6 +253,46 @@ export const DEFAULT_ONBOARDING_TASKS = [
   "Feedbackgespräch nach 30 Tagen einplanen",
 ];
 
+export type DocCategory = "vertrag" | "zeugnis" | "bescheinigung" | "sonstige";
+
+export interface HrDocument {
+  id: string;
+  employee_id: string;
+  name: string;
+  category: DocCategory;
+  storage_path: string;
+  size_bytes: number;
+  created_at: string;
+}
+
+export const DOC_CATEGORY_META: Record<DocCategory, { label: string; color: string }> = {
+  vertrag: { label: "Vertrag", color: "bg-petrol-100 text-petrol-700" },
+  zeugnis: { label: "Zeugnis", color: "bg-violet-100 text-violet-800" },
+  bescheinigung: { label: "Bescheinigung", color: "bg-sky-100 text-sky-800" },
+  sonstige: { label: "Sonstige", color: "bg-slate-100 text-slate-700" },
+};
+
+export type UserRole = "admin" | "manager" | "mitarbeiter";
+
+export interface UserRoleRow {
+  user_id: string;
+  email: string;
+  role: UserRole;
+  created_at: string;
+}
+
+export const ROLE_META: Record<UserRole, { label: string; color: string }> = {
+  admin: { label: "Admin", color: "bg-coral-500 text-white" },
+  manager: { label: "Manager", color: "bg-petrol-700 text-white" },
+  mitarbeiter: { label: "Mitarbeiter", color: "bg-petrol-100 text-petrol-700" },
+};
+
+export function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
 export function formatEuro(amount: number) {
   return new Intl.NumberFormat("de-DE", {
     style: "currency",

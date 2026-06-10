@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { CompanySettings } from "@/lib/types";
+import { CompanySettings, ROLE_META, UserRole, UserRoleRow } from "@/lib/types";
+import { useRole } from "@/lib/useRole";
 import { PageHeader } from "@/components/ui";
-import { Building2, KeyRound, UserCircle } from "lucide-react";
+import { Building2, KeyRound, ShieldCheck, UserCircle } from "lucide-react";
 
 export default function SettingsPage() {
   const supabase = createClient();
@@ -13,6 +14,8 @@ export default function SettingsPage() {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [roles, setRoles] = useState<UserRoleRow[]>([]);
+  const { isAdmin } = useRole();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,6 +27,11 @@ export default function SettingsPage() {
       setSettings(s as CompanySettings);
       setEmail(u.user?.email ?? "");
       setProfileName((u.user?.user_metadata?.full_name as string) ?? "");
+      const { data: r } = await supabase
+        .from("user_roles")
+        .select("*")
+        .order("created_at");
+      setRoles((r as UserRoleRow[]) ?? []);
       setLoading(false);
     }
     load();
@@ -59,6 +67,21 @@ export default function SettingsPage() {
         ? { type: "err", text: error.message }
         : { type: "ok", text: "Profil aktualisiert." }
     );
+  }
+
+  async function changeRole(userId: string, role: UserRole) {
+    const { error } = await supabase
+      .from("user_roles")
+      .update({ role })
+      .eq("user_id", userId);
+    if (!error) {
+      setRoles((prev) =>
+        prev.map((r) => (r.user_id === userId ? { ...r, role } : r))
+      );
+      setMsg({ type: "ok", text: "Rolle aktualisiert." });
+    } else {
+      setMsg({ type: "err", text: error.message });
+    }
   }
 
   async function changePassword(e: React.FormEvent) {
@@ -209,6 +232,49 @@ export default function SettingsPage() {
           </form>
         </div>
       </div>
+
+      {/* Rollenverwaltung (nur Admins) */}
+      {isAdmin && (
+        <div className="card mt-6 p-6">
+          <div className="mb-4 flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-petrol-50 text-petrol-600">
+              <ShieldCheck className="h-4 w-4" />
+            </div>
+            <div>
+              <h2 className="font-bold text-petrol-900">Benutzer & Rollen</h2>
+              <p className="text-xs text-petrol-400">
+                Admins sehen Gehaltsdaten und verwalten Rollen. Manager und
+                Mitarbeiter haben keinen Zugriff auf Gehälter.
+              </p>
+            </div>
+          </div>
+          <div className="divide-y divide-petrol-50">
+            {roles.map((r) => {
+              const meta = ROLE_META[r.role];
+              return (
+                <div key={r.user_id} className="flex items-center justify-between gap-3 py-3">
+                  <div>
+                    <p className="text-sm font-semibold text-petrol-900">{r.email}</p>
+                    <span className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${meta.color}`}>
+                      {meta.label}
+                    </span>
+                  </div>
+                  <select
+                    className="input w-auto py-1.5"
+                    value={r.role}
+                    onChange={(e) => changeRole(r.user_id, e.target.value as UserRole)}
+                    disabled={r.email === email}
+                  >
+                    <option value="admin">Admin</option>
+                    <option value="manager">Manager</option>
+                    <option value="mitarbeiter">Mitarbeiter</option>
+                  </select>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -4,13 +4,16 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Employee, Salary, formatEuro } from "@/lib/types";
+import { useRole } from "@/lib/useRole";
 import { Avatar, EmptyState, PageHeader, StatCard, formatDate } from "@/components/ui";
+import { ShieldAlert } from "lucide-react";
 
 export default function SalariesPage() {
   const supabase = createClient();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [salaries, setSalaries] = useState<Salary[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isAdmin, loading: roleLoading } = useRole();
 
   useEffect(() => {
     async function load() {
@@ -26,8 +29,23 @@ export default function SalariesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (loading) {
+  if (loading || roleLoading) {
     return <p className="py-20 text-center text-petrol-400">Lade Gehaltsdaten…</p>;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-petrol-50 text-petrol-400">
+          <ShieldAlert className="h-8 w-8" />
+        </div>
+        <h1 className="mt-5 text-2xl font-bold text-petrol-900">Kein Zugriff</h1>
+        <p className="mt-2 max-w-md text-sm text-petrol-500">
+          Gehaltsdaten sind nur für Admins sichtbar. Bitte wende dich an eine
+          Administratorin oder einen Administrator, falls du Zugriff benötigst.
+        </p>
+      </div>
+    );
   }
 
   // Aktuelles Gehalt pro Mitarbeiter (jüngster Eintrag)
