@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { Employee, Salary, formatEuro } from "@/lib/types";
 import { useRole } from "@/lib/useRole";
 import { Avatar, EmptyState, PageHeader, StatCard, formatDate } from "@/components/ui";
-import { ShieldAlert } from "lucide-react";
+import { downloadCsv } from "@/lib/csv";
+import { Download, ShieldAlert } from "lucide-react";
 
 export default function SalariesPage() {
   const supabase = createClient();
@@ -67,6 +68,31 @@ export default function SalariesPage() {
       <PageHeader
         title="Gehalt"
         subtitle="Aktuelle Vergütung und Historie. Anpassungen erfasst du in der Personalakte."
+        action={
+          <button
+            className="btn-secondary"
+            onClick={() =>
+              downloadCsv(
+                "gehaelter.csv",
+                current.map(({ emp, salary }) => ({
+                  Vorname: emp.first_name,
+                  Nachname: emp.last_name,
+                  Position: emp.position,
+                  Abteilung: emp.department,
+                  Betrag: salary?.amount ?? "",
+                  Intervall: salary
+                    ? salary.pay_interval === "monatlich"
+                      ? "Monatlich"
+                      : "Jährlich"
+                    : "",
+                  "Gültig ab": salary ? formatDate(salary.effective_from) : "",
+                }))
+              )
+            }
+          >
+            <Download className="h-4 w-4" /> CSV
+          </button>
+        }
       />
 
       <div className="mb-6 grid grid-cols-3 gap-4">

@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
+  Absence,
   Application,
+  Employee,
   Interview,
   Job,
   STAGES,
@@ -16,18 +18,27 @@ import {
   StageBadge,
   formatDateTime,
 } from "@/components/ui";
-import { ArrowRight, CalendarClock, Briefcase } from "lucide-react";
+import {
+  ArrowRight,
+  Briefcase,
+  CalendarClock,
+  KanbanSquare,
+  Plane,
+  UserPlus,
+} from "lucide-react";
 
 export default function DashboardPage() {
   const supabase = createClient();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [apps, setApps] = useState<Application[]>([]);
   const [interviews, setInterviews] = useState<Interview[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [absences, setAbsences] = useState<Absence[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const [j, a, i] = await Promise.all([
+      const [j, a, i, e, ab] = await Promise.all([
         supabase.from("jobs").select("*"),
         supabase.from("applications").select("*, candidate:candidates(*), job:jobs(*)"),
         supabase
@@ -37,10 +48,14 @@ export default function DashboardPage() {
           .gte("scheduled_at", new Date().toISOString())
           .order("scheduled_at")
           .limit(5),
+        supabase.from("employees").select("*"),
+        supabase.from("absences").select("*"),
       ]);
       setJobs((j.data as Job[]) ?? []);
       setApps((a.data as Application[]) ?? []);
       setInterviews((i.data as Interview[]) ?? []);
+      setEmployees((e.data as Employee[]) ?? []);
+      setAbsences((ab.data as Absence[]) ?? []);
       setLoading(false);
     }
     load();
@@ -54,6 +69,14 @@ export default function DashboardPage() {
   const hired = apps.filter((a) => a.stage === "eingestellt").length;
   const newThisWeek = apps.filter(
     (a) => Date.now() - new Date(a.applied_at).getTime() < 7 * 86400000
+  ).length;
+
+  const activeEmployees = employees.filter((e) => e.status === "aktiv").length;
+  const onboardingCount = employees.filter((e) => e.status === "onboarding").length;
+  const pendingAbsences = absences.filter((a) => a.status === "beantragt").length;
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const absentToday = absences.filter(
+    (a) => a.status === "genehmigt" && a.start_date <= todayIso && a.end_date >= todayIso
   ).length;
 
   const recentApps = [...apps]
@@ -81,6 +104,34 @@ export default function DashboardPage() {
         />
         <StatCard label="Geplante Interviews" value={interviews.length} sub="nächste Termine" />
         <StatCard label="Einstellungen" value={hired} sub="in diesem Zeitraum" />
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard label="Aktive Mitarbeiter" value={activeEmployees} sub={`${onboardingCount} im Onboarding`} />
+        <StatCard label="Offene Anträge" value={pendingAbsences} sub="Abwesenheiten" accent={pendingAbsences > 0} />
+        <StatCard label="Heute abwesend" value={absentToday} sub="genehmigt" />
+        <StatCard label="Kandidaten-Pool" value={apps.length} sub="Bewerbungen gesamt" />
+      </div>
+
+      {/* Schnellaktionen */}
+      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {[
+          { href: "/recruiting", label: "Stelle anlegen", icon: Briefcase },
+          { href: "/recruiting/bewerbungen", label: "Pipeline öffnen", icon: KanbanSquare },
+          { href: "/abwesenheiten", label: "Antrag stellen", icon: Plane },
+          { href: "/mitarbeiter", label: "Mitarbeiter anlegen", icon: UserPlus },
+        ].map(({ href, label, icon: Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            className="card flex items-center gap-3 px-4 py-3 transition hover:shadow-cardHover"
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-petrol-50 text-petrol-600">
+              <Icon className="h-4 w-4" />
+            </span>
+            <span className="text-sm font-semibold text-petrol-900">{label}</span>
+          </Link>
+        ))}
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">

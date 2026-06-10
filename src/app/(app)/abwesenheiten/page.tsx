@@ -19,7 +19,8 @@ import {
   StatCard,
   formatDate,
 } from "@/components/ui";
-import { Check, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
+import { downloadCsv } from "@/lib/csv";
+import { Check, ChevronLeft, ChevronRight, Download, Plus, X } from "lucide-react";
 
 function workdaysBetween(start: string, end: string) {
   const s = new Date(start);
@@ -87,9 +88,31 @@ export default function AbsencesPage() {
         title="Abwesenheiten"
         subtitle="Anträge stellen, genehmigen und den Überblick behalten."
         action={
-          <button className="btn-primary" onClick={() => setShowForm(true)}>
-            <Plus className="h-4 w-4" /> Antrag stellen
-          </button>
+          <div className="flex gap-2">
+            <button
+              className="btn-secondary"
+              onClick={() =>
+                downloadCsv(
+                  "abwesenheiten.csv",
+                  filtered.map((a) => ({
+                    Vorname: a.employee?.first_name,
+                    Nachname: a.employee?.last_name,
+                    Art: ABSENCE_TYPE_META[a.absence_type].label,
+                    Von: a.start_date,
+                    Bis: a.end_date,
+                    Tage: a.days,
+                    Status: ABSENCE_STATUS_META[a.status].label,
+                    Kommentar: a.comment,
+                  }))
+                )
+              }
+            >
+              <Download className="h-4 w-4" /> CSV
+            </button>
+            <button className="btn-primary" onClick={() => setShowForm(true)}>
+              <Plus className="h-4 w-4" /> Antrag stellen
+            </button>
+          </div>
         }
       />
 

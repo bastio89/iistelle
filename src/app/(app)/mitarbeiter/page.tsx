@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { EMPLOYEE_STATUS_META, Employee } from "@/lib/types";
 import { Avatar, EmptyState, PageHeader, StatCard, formatDate } from "@/components/ui";
 import EmployeeFormModal from "@/components/EmployeeFormModal";
-import { Plus, Search } from "lucide-react";
+import { downloadCsv } from "@/lib/csv";
+import { Download, Plus, Search } from "lucide-react";
 
 export default function EmployeesPage() {
   const supabase = createClient();
@@ -53,9 +54,34 @@ export default function EmployeesPage() {
         title="Mitarbeiter"
         subtitle="Digitale Personalakte deines Teams."
         action={
-          <button className="btn-primary" onClick={() => setShowForm(true)}>
-            <Plus className="h-4 w-4" /> Mitarbeiter:in anlegen
-          </button>
+          <div className="flex gap-2">
+            <button
+              className="btn-secondary"
+              onClick={() =>
+                downloadCsv(
+                  "mitarbeiter.csv",
+                  filtered.map((e) => ({
+                    Vorname: e.first_name,
+                    Nachname: e.last_name,
+                    "E-Mail": e.email,
+                    Position: e.position,
+                    Abteilung: e.department,
+                    Standort: e.location,
+                    Anstellungsart: e.employment_type,
+                    Status: EMPLOYEE_STATUS_META[e.status].label,
+                    Eintritt: e.hire_date,
+                    "Vorgesetzte:r": e.manager,
+                    "Urlaubstage/Jahr": e.vacation_days_per_year,
+                  }))
+                )
+              }
+            >
+              <Download className="h-4 w-4" /> CSV
+            </button>
+            <button className="btn-primary" onClick={() => setShowForm(true)}>
+              <Plus className="h-4 w-4" /> Mitarbeiter:in anlegen
+            </button>
+          </div>
         }
       />
 

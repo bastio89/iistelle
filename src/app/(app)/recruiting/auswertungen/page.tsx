@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Application, Candidate, Job, STAGES } from "@/lib/types";
-import { PageHeader, StatCard } from "@/components/ui";
+import { PageHeader, StatCard, formatDate } from "@/components/ui";
+import { downloadCsv } from "@/lib/csv";
+import { Download } from "lucide-react";
 
 export default function ReportsPage() {
   const supabase = createClient();
@@ -85,6 +87,25 @@ export default function ReportsPage() {
       <PageHeader
         title="Auswertungen"
         subtitle="Kennzahlen für ein schnelleres, schlankeres Recruiting."
+        action={
+          <button
+            className="btn-secondary"
+            onClick={() =>
+              downloadCsv(
+                "bewerbungen.csv",
+                apps.map((a) => ({
+                  Stelle: a.job?.title,
+                  Phase: STAGES.find((s) => s.key === a.stage)?.label,
+                  Bewertung: a.rating ?? "",
+                  "Beworben am": formatDate(a.applied_at),
+                  Gehaltswunsch: a.salary_expectation,
+                }))
+              )
+            }
+          >
+            <Download className="h-4 w-4" /> Bewerbungen als CSV
+          </button>
+        }
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
