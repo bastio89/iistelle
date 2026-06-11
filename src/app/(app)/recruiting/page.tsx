@@ -11,7 +11,7 @@ import {
   StatCard,
 } from "@/components/ui";
 import JobFormModal from "@/components/JobFormModal";
-import { MapPin, Users, Plus, Megaphone } from "lucide-react";
+import { Copy, MapPin, Users, Plus, Megaphone } from "lucide-react";
 
 export default function JobsPage() {
   const supabase = createClient();
@@ -36,6 +36,22 @@ export default function JobsPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  async function duplicateJob(job: Job) {
+    await supabase.from("jobs").insert({
+      title: `${job.title} (Kopie)`,
+      department: job.department,
+      location: job.location,
+      employment_type: job.employment_type,
+      seniority: job.seniority,
+      status: "entwurf",
+      description: job.description,
+      recruiter: job.recruiter,
+      target_hires: job.target_hires,
+      channels: job.channels,
+    });
+    load();
+  }
 
   const filtered =
     filter === "alle" ? jobs : jobs.filter((j) => j.status === filter);
@@ -139,7 +155,14 @@ export default function JobsPage() {
                   <span className="text-xs text-petrol-400">
                     {job.employment_type} · Recruiter: {job.recruiter || "–"}
                   </span>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      className="rounded p-1 text-petrol-400 transition hover:bg-petrol-50 hover:text-petrol-700"
+                      onClick={() => duplicateJob(job)}
+                      title="Stelle duplizieren"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </button>
                     <button
                       className="text-sm font-semibold text-petrol-600 hover:text-petrol-800"
                       onClick={() => setEditJob(job)}

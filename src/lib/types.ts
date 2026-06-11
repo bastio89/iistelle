@@ -53,14 +53,29 @@ export interface Candidate {
   created_at: string;
 }
 
+export type Plan = "starter" | "professional" | "enterprise";
+
 export interface Company {
   id: string;
   name: string;
   slug: string;
   default_vacation_days: number;
   probation_months: number;
+  plan: Plan;
+  plan_status: "aktiv" | "gekuendigt" | "zahlung_offen";
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
   created_at: string;
 }
+
+export const PLAN_META: Record<
+  Plan,
+  { label: string; color: string; maxEmployees: number | null }
+> = {
+  starter: { label: "Starter", color: "bg-slate-100 text-slate-700", maxEmployees: 10 },
+  professional: { label: "Professional", color: "bg-coral-500 text-white", maxEmployees: null },
+  enterprise: { label: "Enterprise", color: "bg-petrol-800 text-white", maxEmployees: null },
+};
 
 export interface Application {
   id: string;

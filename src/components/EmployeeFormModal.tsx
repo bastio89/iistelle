@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Employee, EmployeeStatus } from "@/lib/types";
+import { Employee, EmployeeStatus, PLAN_META } from "@/lib/types";
+import { useRole } from "@/lib/useRole";
 import { Modal } from "@/components/ui";
 
 export default function EmployeeFormModal({
@@ -31,6 +33,8 @@ export default function EmployeeFormModal({
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [limitReached, setLimitReached] = useState(false);
+  const { company } = useRole();
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -40,6 +44,23 @@ export default function EmployeeFormModal({
     e.preventDefault();
     setSaving(true);
     setError(null);
+
+    // Plan-Limit prüfen (nur beim Anlegen)
+    if (!employee && company) {
+      const limit = PLAN_META[company.plan].maxEmployees;
+      if (limit !== null) {
+        const { count } = await supabase
+          .from("employees")
+          .select("*", { count: "exact", head: true })
+          .neq("status", "ausgeschieden");
+        if ((count ?? 0) >= limit) {
+          setLimitReached(true);
+          setSaving(false);
+          return;
+        }
+      }
+    }
+
     const payload = {
       ...form,
       vacation_days_per_year: Number(form.vacation_days_per_year) || 28,
@@ -128,6 +149,16 @@ export default function EmployeeFormModal({
 
         {error && (
           <div className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</div>
+        )}
+
+        {limitReached && (
+          <div className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Dein Starter-Plan umfasst bis zu 10 aktive Mitarbeiter.{" "}
+            <Link href="/abrechnung" className="font-bold underline">
+              Jetzt auf Professional upgraden
+            </Link>{" "}
+            für unbegrenzte Mitarbeiter.
+          </div>
         )}
 
         <div className="flex justify-end gap-2 pt-2">

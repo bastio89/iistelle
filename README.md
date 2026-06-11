@@ -33,6 +33,21 @@ App läuft dann auf http://localhost:3000. Die Supabase-Zugangsdaten liegen in `
 
 Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS · Supabase (Auth + Postgres, Region Frankfurt) · Vercel
 
+## Bezahlpläne (Stripe)
+
+Die Abrechnung ist vollständig vorbereitet (Checkout, Kundenportal, Webhook, Plan-Limits). Zum Aktivieren in Vercel diese Umgebungsvariablen setzen:
+
+```
+STRIPE_SECRET_KEY=sk_live_…            # Stripe → Entwickler → API-Schlüssel
+STRIPE_PRICE_PROFESSIONAL=price_…      # Preis-ID des Professional-Plans (Abo, monatlich)
+STRIPE_WEBHOOK_SECRET=whsec_…          # Stripe → Webhooks → Endpoint-Secret
+SUPABASE_SERVICE_ROLE_KEY=…            # Supabase → Project Settings → API (geheim halten!)
+```
+
+Im Stripe-Dashboard einen Webhook-Endpoint anlegen: `https://<deine-domain>/api/stripe/webhook` mit den Events `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`.
+
+Solange die Keys fehlen, zeigt der Upgrade-Button eine Hinweismeldung — die App funktioniert normal weiter. Plan-Logik: Starter = max. 10 aktive Mitarbeiter, Professional/Enterprise = unbegrenzt.
+
 ## Hinweis zur Registrierung
 
 Neue Konten benötigen eine E-Mail-Bestätigung (Supabase-Standard). Das lässt sich im Supabase-Dashboard unter Authentication → Providers → Email („Confirm email“) deaktivieren.

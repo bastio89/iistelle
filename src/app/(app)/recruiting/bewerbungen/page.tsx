@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Application, Job, STAGES, Stage } from "@/lib/types";
-import { Avatar, PageHeader, RatingStars, formatDate } from "@/components/ui";
+import { Avatar, Modal, PageHeader, RatingStars, formatDate } from "@/components/ui";
 import { GripVertical } from "lucide-react";
 
 export default function PipelinePage() {
@@ -14,6 +14,8 @@ export default function PipelinePage() {
   const [jobFilter, setJobFilter] = useState<string>("alle");
   const [dragId, setDragId] = useState<string | null>(null);
   const [overStage, setOverStage] = useState<Stage | null>(null);
+  const [rejectApp, setRejectApp] = useState<Application | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -44,6 +46,13 @@ export default function PipelinePage() {
     setDragId(null);
     if (!app || app.stage === stage) return;
 
+    // Beim Ablehnen nach dem Grund fragen
+    if (stage === "abgelehnt") {
+      setRejectApp(app);
+      setRejectReason("");
+      return;
+    }
+
     // Optimistisches Update
     setApps((prev) =>
       prev.map((a) => (a.id === app.id ? { ...a, stage } : a))
@@ -53,6 +62,26 @@ export default function PipelinePage() {
       .update({ stage, updated_at: new Date().toISOString() })
       .eq("id", app.id);
     if (error) load();
+  }
+
+  async function confirmReject() {
+    if (!rejectApp) return;
+    setApps((prev) =>
+      prev.map((a) =>
+        a.id === rejectApp.id
+          ? { ...a, stage: "abgelehnt" as Stage, rejected_reason: rejectReason }
+          : a
+      )
+    );
+    await supabase
+      .from("applications")
+      .update({
+        stage: "abgelehnt",
+        rejected_reason: rejectReason,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", rejectApp.id);
+    setRejectApp(null);
   }
 
   if (loading) {
@@ -163,6 +192,59 @@ export default function PipelinePage() {
           );
         })}
       </div>
+
+      {rejectApp && (
+        <Modal
+          title={`Absage: ${rejectApp.candidate?.first_name} ${rejectApp.candidate?.last_name}`}
+          onClose={() => setRejectApp(null)}
+        >
+          <div className="space-y-4">
+            <p className="text-sm text-petrol-500">
+              Stelle: <strong>{rejectApp.job?.title}</strong>. Der Grund wird
+              intern gespeichert und hilft bei Auswertungen.
+            </p>
+            <div>
+              <label className="label">Ablehnungsgrund</label>
+              <div className="mb-2 flex flex-wrap gap-2">
+                {[
+                  "Erfahrung passt nicht",
+                  "Gehaltsvorstellung",
+                  "Anderer Kandidat eingestellt",
+                  "Kultureller Fit",
+                  "Bewerbung zurückgezogen",
+                ].map((r) => (
+                  <button
+                    type="button"
+                    key={r}
+                    onClick={() => setRejectReason(r)}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                      rejectReason === r
+                        ? "border-petrol-800 bg-petrol-800 text-white"
+                        : "border-petrol-200 bg-white text-petrol-500 hover:bg-petrol-50"
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+              <textarea
+                className="input min-h-20"
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder="Grund eintragen oder oben auswählen…"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <button className="btn-secondary" onClick={() => setRejectApp(null)}>
+                Abbrechen
+              </button>
+              <button className="btn-danger" onClick={confirmReject}>
+                Absage bestätigen
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
