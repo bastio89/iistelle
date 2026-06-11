@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("demo@iistelle.de");
   const [password, setPassword] = useState("iistelle2026");
   const [name, setName] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -35,7 +36,7 @@ export default function LoginPage() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: name } },
+        options: { data: { full_name: name, company_name: companyName } },
       });
       if (error) {
         setError("Registrierung fehlgeschlagen: " + error.message);
@@ -117,16 +118,32 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               {mode === "register" && (
-                <div>
-                  <label className="label">Vollständiger Name</label>
-                  <input
-                    className="input"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Max Mustermann"
-                    required
-                  />
-                </div>
+                <>
+                  <div>
+                    <label className="label">Vollständiger Name</label>
+                    <input
+                      className="input"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Max Mustermann"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Firmenname</label>
+                    <input
+                      className="input"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      placeholder="z. B. Musterfirma GmbH"
+                      required
+                    />
+                    <p className="mt-1 text-xs text-petrol-400">
+                      Für dein Unternehmen wird ein eigener, getrennter Bereich
+                      inkl. Karriereseite angelegt.
+                    </p>
+                  </div>
+                </>
               )}
               <div>
                 <label className="label">E-Mail</label>

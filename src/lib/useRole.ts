@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { UserRole } from "@/lib/types";
+import { Company, UserRole } from "@/lib/types";
 
-/** Liefert die Rolle des angemeldeten Nutzers (admin | manager | mitarbeiter). */
+/** Liefert Rolle und Firma des angemeldeten Nutzers. */
 export function useRole() {
   const [role, setRole] = useState<UserRole | null>(null);
+  const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,13 +19,21 @@ export function useRole() {
       }
       const { data: row } = await supabase
         .from("user_roles")
-        .select("role")
+        .select("role, company_id")
         .eq("user_id", data.user.id)
         .maybeSingle();
       setRole((row?.role as UserRole) ?? "mitarbeiter");
+      if (row?.company_id) {
+        const { data: c } = await supabase
+          .from("companies")
+          .select("*")
+          .eq("id", row.company_id)
+          .maybeSingle();
+        setCompany((c as Company) ?? null);
+      }
       setLoading(false);
     });
   }, []);
 
-  return { role, isAdmin: role === "admin", loading };
+  return { role, isAdmin: role === "admin", company, loading };
 }

@@ -28,6 +28,7 @@ import CandidateFormModal from "@/components/CandidateFormModal";
 import {
   ArrowLeft,
   CalendarPlus,
+  FileText,
   Linkedin,
   Mail,
   MapPin,
@@ -37,6 +38,7 @@ import {
   Star,
   UserPlus,
 } from "lucide-react";
+import { useRole } from "@/lib/useRole";
 
 type Tab = "profil" | "interviews" | "bewertungen" | "notizen";
 
@@ -115,6 +117,14 @@ export default function CandidateDetailPage() {
       await supabase.from("applications").update({ notes }).eq("id", apps[0].id);
       load();
     }
+  }
+
+  async function openCv() {
+    if (!candidate?.cv_path) return;
+    const { data } = await supabase.storage
+      .from("bewerbungen")
+      .createSignedUrl(candidate.cv_path, 60);
+    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
   }
 
   async function convertToEmployee() {
@@ -217,6 +227,11 @@ export default function CandidateDetailPage() {
               <span className="flex items-center gap-1 rounded-lg bg-amber-50 px-3 py-1.5 text-sm font-bold text-amber-700">
                 <Star className="h-4 w-4 fill-amber-400 text-amber-400" /> {avgScore} / 5
               </span>
+            )}
+            {candidate.cv_path && (
+              <button className="btn-secondary" onClick={openCv}>
+                <FileText className="h-4 w-4" /> Lebenslauf
+              </button>
             )}
             {employeeRecord ? (
               <Link href={`/mitarbeiter/${employeeRecord.id}`} className="btn-secondary">
@@ -503,6 +518,7 @@ function EmailModal({
   onClose: () => void;
 }) {
   const supabase = createClient();
+  const { company } = useRole();
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [templateId, setTemplateId] = useState<string>("");
   const [appId, setAppId] = useState<string>(apps[0]?.id ?? "");
@@ -525,7 +541,7 @@ function EmailModal({
       .replaceAll("{{vorname}}", candidate.first_name)
       .replaceAll("{{nachname}}", candidate.last_name)
       .replaceAll("{{stelle}}", app?.job?.title ?? "")
-      .replaceAll("{{firma}}", "iistelle GmbH")
+      .replaceAll("{{firma}}", company?.name ?? "unser Unternehmen")
       .replaceAll("{{absender}}", app?.job?.recruiter || "Dein Recruiting-Team");
   }
 

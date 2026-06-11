@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { CompanySettings, ROLE_META, UserRole, UserRoleRow } from "@/lib/types";
+import { Company, ROLE_META, UserRole, UserRoleRow } from "@/lib/types";
 import { useRole } from "@/lib/useRole";
 import { PageHeader } from "@/components/ui";
-import { Building2, KeyRound, ShieldCheck, UserCircle } from "lucide-react";
+import { Building2, Globe, KeyRound, ShieldCheck, UserCircle } from "lucide-react";
 
 export default function SettingsPage() {
   const supabase = createClient();
-  const [settings, setSettings] = useState<CompanySettings | null>(null);
+  const [settings, setSettings] = useState<Company | null>(null);
   const [profileName, setProfileName] = useState("");
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -21,10 +21,10 @@ export default function SettingsPage() {
   useEffect(() => {
     async function load() {
       const [{ data: s }, { data: u }] = await Promise.all([
-        supabase.from("company_settings").select("*").eq("id", 1).single(),
+        supabase.from("companies").select("*").maybeSingle(),
         supabase.auth.getUser(),
       ]);
-      setSettings(s as CompanySettings);
+      setSettings(s as Company);
       setEmail(u.user?.email ?? "");
       setProfileName((u.user?.user_metadata?.full_name as string) ?? "");
       const { data: r } = await supabase
@@ -42,14 +42,13 @@ export default function SettingsPage() {
     e.preventDefault();
     if (!settings) return;
     const { error } = await supabase
-      .from("company_settings")
+      .from("companies")
       .update({
-        company_name: settings.company_name,
+        name: settings.name,
         default_vacation_days: settings.default_vacation_days,
         probation_months: settings.probation_months,
-        updated_at: new Date().toISOString(),
       })
-      .eq("id", 1);
+      .eq("id", settings.id);
     setMsg(
       error
         ? { type: "err", text: error.message }
@@ -130,11 +129,24 @@ export default function SettingsPage() {
                 <label className="label">Firmenname</label>
                 <input
                   className="input"
-                  value={settings.company_name}
+                  value={settings.name}
                   onChange={(e) =>
-                    setSettings({ ...settings, company_name: e.target.value })
+                    setSettings({ ...settings, name: e.target.value })
                   }
                 />
+              </div>
+              <div className="flex items-center gap-2 rounded-lg bg-petrol-50 px-4 py-3 text-sm text-petrol-600">
+                <Globe className="h-4 w-4 shrink-0" />
+                <span>
+                  Deine Karriereseite:{" "}
+                  <a
+                    href={`/karriere/${settings.slug}`}
+                    target="_blank"
+                    className="font-semibold text-petrol-800 underline"
+                  >
+                    /karriere/{settings.slug}
+                  </a>
+                </span>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>

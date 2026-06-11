@@ -75,7 +75,7 @@ function NavLink({
 }
 
 export default function Sidebar() {
-  const { isAdmin } = useRole();
+  const { isAdmin, company } = useRole();
   const visibleMoreNav = moreNav.filter((item) => !item.adminOnly || isAdmin);
   return (
     <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col bg-petrol-950 px-3 py-5">
@@ -119,14 +119,14 @@ export default function Sidebar() {
       </nav>
 
       <a
-        href="/karriere"
+        href={company ? `/karriere/${company.slug}` : "/karriere"}
         target="_blank"
         className="mt-4 flex items-center gap-2.5 rounded-xl bg-white/5 p-3 text-xs text-petrol-300 transition hover:bg-white/10"
       >
         <Globe className="h-4 w-4 shrink-0 text-coral-400" />
         <span>
           <span className="block font-semibold text-white">Karriereseite</span>
-          öffentliche Stellen ansehen
+          {company ? company.name : "öffentliche Stellen ansehen"}
         </span>
       </a>
     </aside>

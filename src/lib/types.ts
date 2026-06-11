@@ -49,6 +49,16 @@ export interface Candidate {
   linkedin: string | null;
   source: string | null;
   cv_summary: string | null;
+  cv_path: string | null;
+  created_at: string;
+}
+
+export interface Company {
+  id: string;
+  name: string;
+  slug: string;
+  default_vacation_days: number;
+  probation_months: number;
   created_at: string;
 }
 
@@ -200,13 +210,6 @@ export interface Review {
   employee?: Employee;
 }
 
-export interface CompanySettings {
-  id: number;
-  company_name: string;
-  default_vacation_days: number;
-  probation_months: number;
-  updated_at: string;
-}
 
 export interface OnboardingTask {
   id: string;
