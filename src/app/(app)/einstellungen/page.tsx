@@ -2,10 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Company, ROLE_META, UserRole, UserRoleRow } from "@/lib/types";
+import { Company, Invitation, ROLE_META, UserRole, UserRoleRow } from "@/lib/types";
 import { useRole } from "@/lib/useRole";
-import { PageHeader } from "@/components/ui";
-import { Building2, Globe, KeyRound, ShieldCheck, UserCircle } from "lucide-react";
+import { PageHeader, formatDate } from "@/components/ui";
+import {
+  Building2,
+  Copy,
+  Globe,
+  KeyRound,
+  ShieldCheck,
+  Trash2,
+  UserCircle,
+  UserPlus,
+} from "lucide-react";
 
 export default function SettingsPage() {
   const supabase = createClient();
@@ -15,6 +24,10 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState("");
   const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [roles, setRoles] = useState<UserRoleRow[]>([]);
+  const [invites, setInvites] = useState<Invitation[]>([]);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<UserRole>("mitarbeiter");
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const { isAdmin } = useRole();
   const [loading, setLoading] = useState(true);
 
@@ -27,11 +40,12 @@ export default function SettingsPage() {
       setSettings(s as Company);
       setEmail(u.user?.email ?? "");
       setProfileName((u.user?.user_metadata?.full_name as string) ?? "");
-      const { data: r } = await supabase
-        .from("user_roles")
-        .select("*")
-        .order("created_at");
+      const [{ data: r }, { data: inv }] = await Promise.all([
+        supabase.from("user_roles").select("*").order("created_at"),
+        supabase.from("invitations").select("*").order("created_at", { ascending: false }),
+      ]);
       setRoles((r as UserRoleRow[]) ?? []);
+      setInvites((inv as Invitation[]) ?? []);
       setLoading(false);
     }
     load();
@@ -81,6 +95,34 @@ export default function SettingsPage() {
     } else {
       setMsg({ type: "err", text: error.message });
     }
+  }
+
+  async function createInvite(e: React.FormEvent) {
+    e.preventDefault();
+    const { data, error } = await supabase
+      .from("invitations")
+      .insert({ email: inviteEmail.trim(), role: inviteRole })
+      .select()
+      .single();
+    if (error) {
+      setMsg({ type: "err", text: error.message });
+      return;
+    }
+    setInvites((prev) => [data as Invitation, ...prev]);
+    setInviteEmail("");
+    setMsg({ type: "ok", text: "Einladung erstellt – Link kopieren und teilen." });
+  }
+
+  async function deleteInvite(id: string) {
+    await supabase.from("invitations").delete().eq("id", id);
+    setInvites((prev) => prev.filter((i) => i.id !== id));
+  }
+
+  async function copyInviteLink(inv: Invitation) {
+    const link = `${window.location.origin}/login?einladung=${inv.token}`;
+    await navigator.clipboard.writeText(link);
+    setCopiedId(inv.id);
+    setTimeout(() => setCopiedId(null), 2000);
   }
 
   async function changePassword(e: React.FormEvent) {
@@ -244,6 +286,94 @@ export default function SettingsPage() {
           </form>
         </div>
       </div>
+
+      {/* Team einladen (nur Admins) */}
+      {isAdmin && (
+        <div className="card mt-6 p-6">
+          <div className="mb-4 flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-petrol-50 text-petrol-600">
+              <UserPlus className="h-4 w-4" />
+            </div>
+            <div>
+              <h2 className="font-bold text-petrol-900">Team einladen</h2>
+              <p className="text-xs text-petrol-400">
+                Erstelle einen Einladungslink und teile ihn – die Person tritt
+                bei der Registrierung automatisch deiner Firma bei. Links sind
+                14 Tage gültig.
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={createInvite} className="flex flex-wrap items-end gap-3">
+            <div className="min-w-56 flex-1">
+              <label className="label">E-Mail der Person</label>
+              <input
+                className="input"
+                type="email"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                placeholder="kollegin@firma.de"
+                required
+              />
+            </div>
+            <div>
+              <label className="label">Rolle</label>
+              <select
+                className="input w-auto"
+                value={inviteRole}
+                onChange={(e) => setInviteRole(e.target.value as UserRole)}
+              >
+                <option value="mitarbeiter">Mitarbeiter</option>
+                <option value="manager">Manager</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <button className="btn-primary">Einladung erstellen</button>
+          </form>
+
+          {invites.length > 0 && (
+            <div className="mt-5 divide-y divide-petrol-50 border-t border-petrol-50">
+              {invites.map((inv) => (
+                <div key={inv.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                  <div>
+                    <p className="text-sm font-semibold text-petrol-900">{inv.email}</p>
+                    <p className="text-xs text-petrol-400">
+                      {ROLE_META[inv.role].label} · erstellt am {formatDate(inv.created_at)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        inv.status === "angenommen"
+                          ? "bg-emerald-100 text-emerald-800"
+                          : "bg-amber-100 text-amber-800"
+                      }`}
+                    >
+                      {inv.status === "angenommen" ? "Angenommen" : "Offen"}
+                    </span>
+                    {inv.status === "offen" && (
+                      <button
+                        className="btn-secondary py-1.5"
+                        onClick={() => copyInviteLink(inv)}
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                        {copiedId === inv.id ? "Kopiert ✓" : "Link kopieren"}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => deleteInvite(inv.id)}
+                      className="rounded-lg p-2 text-petrol-300 transition hover:bg-rose-50 hover:text-rose-500"
+                      title="Einladung löschen"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Rollenverwaltung (nur Admins) */}
       {isAdmin && (

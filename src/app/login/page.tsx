@@ -1,9 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Briefcase, KanbanSquare, CalendarClock, BarChart3 } from "lucide-react";
+import {
+  Briefcase,
+  KanbanSquare,
+  CalendarClock,
+  BarChart3,
+  UserPlus,
+} from "lucide-react";
+
+interface InviteInfo {
+  token: string;
+  company_name: string;
+  email: string;
+  role: string;
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,9 +26,33 @@ export default function LoginPage() {
   const [password, setPassword] = useState("iistelle2026");
   const [name, setName] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [invite, setInvite] = useState<InviteInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Einladungs-Token aus der URL prüfen
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get("einladung");
+    if (!token) return;
+    supabase
+      .rpc("get_invitation", { invite_token: token })
+      .then(({ data }) => {
+        const row = Array.isArray(data) ? data[0] : data;
+        if (row) {
+          setInvite({
+            token,
+            company_name: row.company_name,
+            email: row.email,
+            role: row.role,
+          });
+          setMode("register");
+          setEmail(row.email);
+          setPassword("");
+        }
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -36,7 +73,11 @@ export default function LoginPage() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: name, company_name: companyName } },
+        options: {
+          data: invite
+            ? { full_name: name, invite_token: invite.token }
+            : { full_name: name, company_name: companyName },
+        },
       });
       if (error) {
         setError("Registrierung fehlgeschlagen: " + error.message);
@@ -117,6 +158,16 @@ export default function LoginPage() {
             </p>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              {mode === "register" && invite && (
+                <div className="flex items-start gap-3 rounded-lg bg-petrol-50 px-4 py-3">
+                  <UserPlus className="mt-0.5 h-4 w-4 shrink-0 text-coral-500" />
+                  <p className="text-sm text-petrol-700">
+                    Du wurdest zu <strong>{invite.company_name}</strong>{" "}
+                    eingeladen und trittst dem Team nach der Registrierung
+                    automatisch bei.
+                  </p>
+                </div>
+              )}
               {mode === "register" && (
                 <>
                   <div>
@@ -129,20 +180,22 @@ export default function LoginPage() {
                       required
                     />
                   </div>
-                  <div>
-                    <label className="label">Firmenname</label>
-                    <input
-                      className="input"
-                      value={companyName}
-                      onChange={(e) => setCompanyName(e.target.value)}
-                      placeholder="z. B. Musterfirma GmbH"
-                      required
-                    />
-                    <p className="mt-1 text-xs text-petrol-400">
-                      Für dein Unternehmen wird ein eigener, getrennter Bereich
-                      inkl. Karriereseite angelegt.
-                    </p>
-                  </div>
+                  {!invite && (
+                    <div>
+                      <label className="label">Firmenname</label>
+                      <input
+                        className="input"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        placeholder="z. B. Musterfirma GmbH"
+                        required
+                      />
+                      <p className="mt-1 text-xs text-petrol-400">
+                        Für dein Unternehmen wird ein eigener, getrennter Bereich
+                        inkl. Karriereseite angelegt.
+                      </p>
+                    </div>
+                  )}
                 </>
               )}
               <div>

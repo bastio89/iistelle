@@ -290,6 +290,16 @@ export const ROLE_META: Record<UserRole, { label: string; color: string }> = {
   mitarbeiter: { label: "Mitarbeiter", color: "bg-petrol-100 text-petrol-700" },
 };
 
+export interface Invitation {
+  id: string;
+  company_id: string;
+  email: string;
+  role: UserRole;
+  token: string;
+  status: "offen" | "angenommen";
+  created_at: string;
+}
+
 export function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
