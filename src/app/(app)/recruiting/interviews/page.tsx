@@ -5,7 +5,37 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { INTERVIEW_TYPE_LABEL, Interview } from "@/lib/types";
 import { Avatar, EmptyState, PageHeader, formatDateTime } from "@/components/ui";
-import { CalendarClock, MapPin, Phone, Video } from "lucide-react";
+import { CalendarClock, CalendarPlus, MapPin, Phone, Video } from "lucide-react";
+
+/** Erzeugt eine .ics-Datei für einen Interview-Termin und lädt sie herunter. */
+function downloadIcs(iv: Interview) {
+  const start = new Date(iv.scheduled_at);
+  const end = new Date(start.getTime() + iv.duration_min * 60000);
+  const fmt = (d: Date) =>
+    d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const cand = iv.application?.candidate;
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//iistelle HR//DE",
+    "BEGIN:VEVENT",
+    `UID:${iv.id}@iistelle`,
+    `DTSTAMP:${fmt(new Date())}`,
+    `DTSTART:${fmt(start)}`,
+    `DTEND:${fmt(end)}`,
+    `SUMMARY:${iv.title} – ${cand?.first_name ?? ""} ${cand?.last_name ?? ""}`,
+    `DESCRIPTION:${INTERVIEW_TYPE_LABEL[iv.interview_type]} · Interviewer:in: ${iv.interviewer}`,
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ];
+  const blob = new Blob([lines.join("\r\n")], { type: "text/calendar" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `interview-${(cand?.last_name ?? "termin").toLowerCase()}.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const TYPE_ICON = { telefon: Phone, video: Video, vor_ort: MapPin } as const;
 
@@ -108,6 +138,13 @@ export default function InterviewsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   {cand && <Avatar name={`${cand.first_name} ${cand.last_name}`} size="sm" />}
+                  <button
+                    onClick={() => downloadIcs(iv)}
+                    className="rounded-lg p-2 text-petrol-500 transition hover:bg-petrol-50"
+                    title="In Kalender übernehmen (.ics)"
+                  >
+                    <CalendarPlus className="h-4 w-4" />
+                  </button>
                   <select
                     className="input w-auto py-1.5"
                     value={iv.status}

@@ -168,6 +168,9 @@ export default function ReportsPage() {
           </div>
         </div>
 
+        {/* Ablehnungsgründe */}
+        <RejectionReasons apps={apps} />
+
         {/* Bewerbungen pro Stelle */}
         <div className="card p-6 lg:col-span-2">
           <h2 className="mb-5 font-bold text-petrol-900">Bewerbungen pro Stelle</h2>
@@ -191,6 +194,50 @@ export default function ReportsPage() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function RejectionReasons({ apps }: { apps: Application[] }) {
+  const rejected = apps.filter((a) => a.stage === "abgelehnt");
+  const reasons = rejected.reduce<Record<string, number>>((acc, a) => {
+    const key = a.rejected_reason?.trim() || "Ohne Angabe";
+    acc[key] = (acc[key] ?? 0) + 1;
+    return acc;
+  }, {});
+  const entries = Object.entries(reasons).sort((a, b) => b[1] - a[1]);
+  const max = Math.max(...entries.map(([, v]) => v), 1);
+
+  return (
+    <div className="card p-6">
+      <h2 className="mb-1 font-bold text-petrol-900">Ablehnungsgründe</h2>
+      <p className="mb-5 text-xs text-petrol-400">
+        {rejected.length} Absagen insgesamt
+      </p>
+      {entries.length === 0 ? (
+        <p className="py-4 text-center text-sm text-petrol-400">
+          Noch keine Absagen erfasst.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {entries.map(([reason, count]) => (
+            <div key={reason} className="flex items-center gap-3">
+              <span className="w-44 shrink-0 truncate text-xs font-medium text-petrol-600">
+                {reason}
+              </span>
+              <div className="h-5 flex-1 overflow-hidden rounded-md bg-petrol-50">
+                <div
+                  className="h-full rounded-md bg-rose-400"
+                  style={{ width: `${(count / max) * 100}%` }}
+                />
+              </div>
+              <span className="w-6 text-right text-xs font-bold text-petrol-700">
+                {count}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

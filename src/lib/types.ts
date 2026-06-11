@@ -50,6 +50,23 @@ export interface Candidate {
   source: string | null;
   cv_summary: string | null;
   cv_path: string | null;
+  tags: string[];
+  created_at: string;
+}
+
+export interface Activity {
+  id: string;
+  candidate_id: string;
+  description: string;
+  created_at: string;
+}
+
+export interface HrTask {
+  id: string;
+  title: string;
+  assignee: string | null;
+  due_date: string | null;
+  done: boolean;
   created_at: string;
 }
 
@@ -137,6 +154,7 @@ export interface Employee {
   employment_type: string;
   status: EmployeeStatus;
   hire_date: string;
+  birth_date: string | null;
   manager: string | null;
   vacation_days_per_year: number;
   candidate_id: string | null;

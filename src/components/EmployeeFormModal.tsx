@@ -28,6 +28,7 @@ export default function EmployeeFormModal({
     employment_type: employee?.employment_type ?? "Vollzeit",
     status: (employee?.status ?? "onboarding") as EmployeeStatus,
     hire_date: employee?.hire_date ?? new Date().toISOString().slice(0, 10),
+    birth_date: employee?.birth_date ?? "",
     manager: employee?.manager ?? "",
     vacation_days_per_year: employee?.vacation_days_per_year ?? 28,
   });
@@ -63,6 +64,7 @@ export default function EmployeeFormModal({
 
     const payload = {
       ...form,
+      birth_date: form.birth_date || null,
       vacation_days_per_year: Number(form.vacation_days_per_year) || 28,
     };
     const res = employee
@@ -128,6 +130,10 @@ export default function EmployeeFormModal({
           <div>
             <label className="label">Eintrittsdatum</label>
             <input className="input" type="date" value={form.hire_date} onChange={(e) => set("hire_date", e.target.value)} required />
+          </div>
+          <div>
+            <label className="label">Geburtsdatum</label>
+            <input className="input" type="date" value={form.birth_date} onChange={(e) => set("birth_date", e.target.value)} />
           </div>
           <div>
             <label className="label">Vorgesetzte:r</label>

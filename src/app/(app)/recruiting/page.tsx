@@ -120,6 +120,8 @@ export default function JobsPage() {
             const active = jobApps.filter(
               (a) => !["eingestellt", "abgelehnt"].includes(a.stage)
             ).length;
+            const hired = jobApps.filter((a) => a.stage === "eingestellt").length;
+            const target = Math.max(job.target_hires, 1);
             return (
               <div
                 key={job.id}
@@ -149,6 +151,21 @@ export default function JobsPage() {
                       <Megaphone className="h-4 w-4" /> {job.channels.length} Kanäle
                     </span>
                   )}
+                </div>
+
+                {/* Besetzungs-Fortschritt */}
+                <div className="mt-4 flex items-center gap-3">
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-petrol-50">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        hired >= target ? "bg-emerald-500" : "bg-petrol-600"
+                      }`}
+                      style={{ width: `${Math.min((hired / target) * 100, 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-bold text-petrol-600">
+                    {hired}/{target} besetzt
+                  </span>
                 </div>
 
                 <div className="mt-4 flex items-center justify-between border-t border-petrol-50 pt-3">

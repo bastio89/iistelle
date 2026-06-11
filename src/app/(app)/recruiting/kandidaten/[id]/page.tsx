@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
+  Activity,
   Application,
   Candidate,
   DEFAULT_ONBOARDING_TASKS,
@@ -16,6 +17,7 @@ import {
   STAGES,
   Stage,
 } from "@/lib/types";
+import { logActivity } from "@/lib/activity";
 import {
   Avatar,
   Modal,
@@ -40,7 +42,7 @@ import {
 } from "lucide-react";
 import { useRole } from "@/lib/useRole";
 
-type Tab = "profil" | "interviews" | "bewertungen" | "notizen";
+type Tab = "profil" | "interviews" | "bewertungen" | "notizen" | "verlauf";
 
 export default function CandidateDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -49,6 +51,7 @@ export default function CandidateDetailPage() {
   const [apps, setApps] = useState<Application[]>([]);
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [evals, setEvals] = useState<Evaluation[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [tab, setTab] = useState<Tab>("profil");
   const [showEdit, setShowEdit] = useState(false);
   const [showInterview, setShowInterview] = useState(false);
@@ -91,6 +94,12 @@ export default function CandidateDetailPage() {
       setInterviews((iv.data as Interview[]) ?? []);
       setEvals((ev.data as Evaluation[]) ?? []);
     }
+    const { data: act } = await supabase
+      .from("activities")
+      .select("*")
+      .eq("candidate_id", id)
+      .order("created_at", { ascending: false });
+    setActivities((act as Activity[]) ?? []);
     setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -104,6 +113,8 @@ export default function CandidateDetailPage() {
       .from("applications")
       .update({ stage, updated_at: new Date().toISOString() })
       .eq("id", appId);
+    const label = STAGES.find((s) => s.key === stage)?.label ?? stage;
+    await logActivity(id, `Phase geändert auf „${label}“`);
     load();
   }
 
@@ -159,7 +170,9 @@ export default function CandidateDetailPage() {
           sort_order: i,
         }))
       );
+      await logActivity(id, "Als Mitarbeiter:in übernommen – Onboarding gestartet");
       setEmployeeRecord(data as Employee);
+      load();
     }
   }
 
@@ -178,6 +191,7 @@ export default function CandidateDetailPage() {
     { key: "interviews", label: "Interviews", count: interviews.length },
     { key: "bewertungen", label: "Bewertungen", count: evals.length },
     { key: "notizen", label: "Notizen" },
+    { key: "verlauf", label: "Verlauf", count: activities.length },
   ];
 
   return (
@@ -444,6 +458,32 @@ export default function CandidateDetailPage() {
                   <p className="mt-2 text-xs text-petrol-400">{formatDate(ev.created_at)}</p>
                 </div>
               ))
+            )}
+          </div>
+        )}
+
+        {tab === "verlauf" && (
+          <div className="card p-6">
+            <h3 className="mb-4 font-bold text-petrol-900">Aktivitäten-Verlauf</h3>
+            {activities.length === 0 ? (
+              <p className="py-6 text-center text-sm text-petrol-400">
+                Noch keine Aktivitäten protokolliert. Phasenwechsel, Interviews
+                und Bewertungen erscheinen hier automatisch.
+              </p>
+            ) : (
+              <ol className="relative space-y-5 border-l-2 border-petrol-100 pl-6">
+                {activities.map((a) => (
+                  <li key={a.id} className="relative">
+                    <span className="absolute -left-[31px] top-1 h-3 w-3 rounded-full border-2 border-white bg-petrol-500" />
+                    <p className="text-sm font-medium text-petrol-800">
+                      {a.description}
+                    </p>
+                    <p className="mt-0.5 text-xs text-petrol-400">
+                      {formatDateTime(a.created_at)}
+                    </p>
+                  </li>
+                ))}
+              </ol>
             )}
           </div>
         )}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Application, Job, STAGES, Stage } from "@/lib/types";
 import { Avatar, Modal, PageHeader, RatingStars, formatDate } from "@/components/ui";
+import { logActivity } from "@/lib/activity";
 import { GripVertical } from "lucide-react";
 
 export default function PipelinePage() {
@@ -61,7 +62,12 @@ export default function PipelinePage() {
       .from("applications")
       .update({ stage, updated_at: new Date().toISOString() })
       .eq("id", app.id);
-    if (error) load();
+    if (error) {
+      load();
+    } else {
+      const label = STAGES.find((s) => s.key === stage)?.label ?? stage;
+      logActivity(app.candidate_id, `Phase geändert auf „${label}“ (${app.job?.title})`);
+    }
   }
 
   async function confirmReject() {
@@ -81,6 +87,10 @@ export default function PipelinePage() {
         updated_at: new Date().toISOString(),
       })
       .eq("id", rejectApp.id);
+    logActivity(
+      rejectApp.candidate_id,
+      `Abgesagt${rejectReason ? ` – Grund: ${rejectReason}` : ""} (${rejectApp.job?.title})`
+    );
     setRejectApp(null);
   }
 

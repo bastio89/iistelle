@@ -25,6 +25,7 @@ export default function CandidateFormModal({
     source: candidate?.source ?? "Karriereseite",
     cv_summary: candidate?.cv_summary ?? "",
   });
+  const [tags, setTags] = useState((candidate?.tags ?? []).join(", "));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,9 +37,16 @@ export default function CandidateFormModal({
     e.preventDefault();
     setSaving(true);
     setError(null);
+    const payload = {
+      ...form,
+      tags: tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
+    };
     const res = candidate
-      ? await supabase.from("candidates").update(form).eq("id", candidate.id)
-      : await supabase.from("candidates").insert(form);
+      ? await supabase.from("candidates").update(payload).eq("id", candidate.id)
+      : await supabase.from("candidates").insert(payload);
     if (res.error) {
       setError(res.error.message);
       setSaving(false);
@@ -122,6 +130,15 @@ export default function CandidateFormModal({
             value={form.linkedin ?? ""}
             onChange={(e) => set("linkedin", e.target.value)}
             placeholder="https://linkedin.com/in/…"
+          />
+        </div>
+        <div>
+          <label className="label">Tags (kommagetrennt)</label>
+          <input
+            className="input"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            placeholder="z. B. Talent-Pool, React, Top-Kandidat"
           />
         </div>
         <div>

@@ -13,6 +13,7 @@ export default function CandidatesPage() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [apps, setApps] = useState<Application[]>([]);
   const [query, setQuery] = useState("");
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -31,11 +32,15 @@ export default function CandidatesPage() {
     load();
   }, [load]);
 
-  const filtered = candidates.filter((c) =>
-    `${c.first_name} ${c.last_name} ${c.email} ${c.city}`
+  const allTags = Array.from(new Set(candidates.flatMap((c) => c.tags ?? []))).sort();
+
+  const filtered = candidates.filter((c) => {
+    const matchesQuery = `${c.first_name} ${c.last_name} ${c.email} ${c.city}`
       .toLowerCase()
-      .includes(query.toLowerCase())
-  );
+      .includes(query.toLowerCase());
+    const matchesTag = !tagFilter || (c.tags ?? []).includes(tagFilter);
+    return matchesQuery && matchesTag;
+  });
 
   if (loading) {
     return <p className="py-20 text-center text-petrol-400">Lade Kandidaten…</p>;
@@ -62,6 +67,35 @@ export default function CandidatesPage() {
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
+
+      {allTags.length > 0 && (
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-petrol-400">
+            Tags:
+          </span>
+          {allTags.map((t) => (
+            <button
+              key={t}
+              onClick={() => setTagFilter(tagFilter === t ? null : t)}
+              className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                tagFilter === t
+                  ? "border-coral-500 bg-coral-500 text-white"
+                  : "border-petrol-200 bg-white text-petrol-600 hover:bg-petrol-50"
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+          {tagFilter && (
+            <button
+              onClick={() => setTagFilter(null)}
+              className="text-xs font-semibold text-petrol-400 hover:text-petrol-700"
+            >
+              Filter zurücksetzen
+            </button>
+          )}
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <EmptyState title="Keine Kandidat:innen gefunden" />
@@ -101,9 +135,19 @@ export default function CandidatesPage() {
                       <p className="text-xs text-petrol-400">{c.phone}</p>
                     </td>
                     <td className="px-5 py-3">
-                      <span className="rounded-full bg-petrol-50 px-2.5 py-0.5 text-xs font-semibold text-petrol-600">
-                        {c.source}
-                      </span>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="rounded-full bg-petrol-50 px-2.5 py-0.5 text-xs font-semibold text-petrol-600">
+                          {c.source}
+                        </span>
+                        {(c.tags ?? []).map((t) => (
+                          <span
+                            key={t}
+                            className="rounded-full bg-coral-500/10 px-2 py-0.5 text-[10px] font-bold text-coral-600"
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex flex-wrap gap-1.5">

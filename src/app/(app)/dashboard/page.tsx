@@ -7,8 +7,10 @@ import {
   Absence,
   Application,
   Employee,
+  HrTask,
   Interview,
   Job,
+  OnboardingTask,
   STAGES,
 } from "@/lib/types";
 import {
@@ -21,9 +23,13 @@ import {
 import {
   ArrowRight,
   Briefcase,
+  Cake,
   CalendarClock,
   KanbanSquare,
+  ListTodo,
+  PartyPopper,
   Plane,
+  Rocket,
   UserPlus,
 } from "lucide-react";
 
@@ -34,11 +40,13 @@ export default function DashboardPage() {
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [absences, setAbsences] = useState<Absence[]>([]);
+  const [hrTasks, setHrTasks] = useState<HrTask[]>([]);
+  const [obTasks, setObTasks] = useState<OnboardingTask[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const [j, a, i, e, ab] = await Promise.all([
+      const [j, a, i, e, ab, ht, ob] = await Promise.all([
         supabase.from("jobs").select("*"),
         supabase.from("applications").select("*, candidate:candidates(*), job:jobs(*)"),
         supabase
@@ -50,12 +58,21 @@ export default function DashboardPage() {
           .limit(5),
         supabase.from("employees").select("*"),
         supabase.from("absences").select("*"),
+        supabase
+          .from("hr_tasks")
+          .select("*")
+          .eq("done", false)
+          .order("due_date", { ascending: true, nullsFirst: false })
+          .limit(5),
+        supabase.from("onboarding_tasks").select("*"),
       ]);
       setJobs((j.data as Job[]) ?? []);
       setApps((a.data as Application[]) ?? []);
       setInterviews((i.data as Interview[]) ?? []);
       setEmployees((e.data as Employee[]) ?? []);
       setAbsences((ab.data as Absence[]) ?? []);
+      setHrTasks((ht.data as HrTask[]) ?? []);
+      setObTasks((ob.data as OnboardingTask[]) ?? []);
       setLoading(false);
     }
     load();
@@ -82,6 +99,44 @@ export default function DashboardPage() {
   const recentApps = [...apps]
     .sort((a, b) => +new Date(b.applied_at) - +new Date(a.applied_at))
     .slice(0, 6);
+
+  // Geburtstage & Jubiläen der nächsten 30 Tage
+  const upcoming: { name: string; label: string; days: number; icon: "cake" | "party" }[] = [];
+  const now2 = new Date();
+  employees
+    .filter((e) => e.status !== "ausgeschieden")
+    .forEach((e) => {
+      const check = (dateStr: string | null, icon: "cake" | "party", what: string) => {
+        if (!dateStr) return;
+        const d = new Date(dateStr);
+        const next = new Date(now2.getFullYear(), d.getMonth(), d.getDate());
+        if (next < new Date(now2.getFullYear(), now2.getMonth(), now2.getDate())) {
+          next.setFullYear(next.getFullYear() + 1);
+        }
+        const days = Math.round((next.getTime() - now2.getTime()) / 86400000);
+        if (days <= 30) {
+          const years = next.getFullYear() - d.getFullYear();
+          upcoming.push({
+            name: `${e.first_name} ${e.last_name}`,
+            label: what === "geb" ? `${years}. Geburtstag` : `${years}. Firmenjubiläum`,
+            days,
+            icon,
+          });
+        }
+      };
+      check(e.birth_date, "cake", "geb");
+      check(e.hire_date, "party", "jub");
+    });
+  upcoming.sort((a, b) => a.days - b.days);
+
+  // Laufende Onboardings mit Fortschritt
+  const onboardings = employees
+    .filter((e) => e.status === "onboarding")
+    .map((e) => {
+      const tasks = obTasks.filter((t) => t.employee_id === e.id);
+      const done = tasks.filter((t) => t.done).length;
+      return { employee: e, done, total: tasks.length };
+    });
 
   if (loading) {
     return <p className="py-20 text-center text-petrol-400">Lade Dashboard…</p>;
@@ -235,6 +290,119 @@ export default function DashboardPage() {
               })}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Aufgaben, Jubiläen, Onboarding */}
+      <div className="mt-8 grid gap-6 lg:grid-cols-3">
+        <div className="card">
+          <div className="flex items-center justify-between border-b border-petrol-100 px-5 py-4">
+            <h2 className="flex items-center gap-2 font-bold text-petrol-900">
+              <ListTodo className="h-4 w-4 text-petrol-500" /> Offene Aufgaben
+            </h2>
+            <Link
+              href="/aufgaben"
+              className="text-sm font-semibold text-petrol-600 hover:text-petrol-800"
+            >
+              Alle →
+            </Link>
+          </div>
+          {hrTasks.length === 0 ? (
+            <p className="px-5 py-8 text-center text-sm text-petrol-400">
+              Keine offenen Aufgaben. 🎉
+            </p>
+          ) : (
+            <ul className="divide-y divide-petrol-50">
+              {hrTasks.map((t) => (
+                <li key={t.id} className="px-5 py-3">
+                  <p className="text-sm font-semibold text-petrol-900">{t.title}</p>
+                  <p className="text-xs text-petrol-400">
+                    {t.assignee && `${t.assignee} · `}
+                    {t.due_date
+                      ? `fällig ${new Date(t.due_date).toLocaleDateString("de-DE")}`
+                      : "ohne Frist"}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="card">
+          <div className="border-b border-petrol-100 px-5 py-4">
+            <h2 className="flex items-center gap-2 font-bold text-petrol-900">
+              <Cake className="h-4 w-4 text-petrol-500" /> Anstehende Anlässe
+            </h2>
+          </div>
+          {upcoming.length === 0 ? (
+            <p className="px-5 py-8 text-center text-sm text-petrol-400">
+              Keine Geburtstage oder Jubiläen in den nächsten 30 Tagen.
+            </p>
+          ) : (
+            <ul className="divide-y divide-petrol-50">
+              {upcoming.slice(0, 5).map((u, i) => (
+                <li key={i} className="flex items-center gap-3 px-5 py-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-petrol-50 text-petrol-600">
+                    {u.icon === "cake" ? (
+                      <Cake className="h-4 w-4" />
+                    ) : (
+                      <PartyPopper className="h-4 w-4" />
+                    )}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-petrol-900">
+                      {u.name}
+                    </p>
+                    <p className="text-xs text-petrol-400">{u.label}</p>
+                  </div>
+                  <span className="text-xs font-bold text-petrol-600">
+                    {u.days === 0 ? "Heute!" : `in ${u.days} T.`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="card">
+          <div className="border-b border-petrol-100 px-5 py-4">
+            <h2 className="flex items-center gap-2 font-bold text-petrol-900">
+              <Rocket className="h-4 w-4 text-petrol-500" /> Laufende Onboardings
+            </h2>
+          </div>
+          {onboardings.length === 0 ? (
+            <p className="px-5 py-8 text-center text-sm text-petrol-400">
+              Aktuell keine Onboardings.
+            </p>
+          ) : (
+            <ul className="divide-y divide-petrol-50">
+              {onboardings.map(({ employee, done, total }) => (
+                <li key={employee.id}>
+                  <Link
+                    href={`/mitarbeiter/${employee.id}`}
+                    className="block px-5 py-3 transition hover:bg-petrol-50/50"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-petrol-900">
+                        {employee.first_name} {employee.last_name}
+                      </p>
+                      <span className="text-xs font-bold text-petrol-600">
+                        {total > 0 ? `${done}/${total}` : "–"}
+                      </span>
+                    </div>
+                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-petrol-50">
+                      <div
+                        className="h-full rounded-full bg-emerald-500"
+                        style={{
+                          width: total > 0 ? `${(done / total) * 100}%` : "0%",
+                        }}
+                      />
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
 
