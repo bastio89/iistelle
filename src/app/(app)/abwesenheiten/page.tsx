@@ -20,6 +20,7 @@ import {
   formatDate,
 } from "@/components/ui";
 import { downloadCsv } from "@/lib/csv";
+import { isHoliday, upcomingHolidays, workdaysBetween } from "@/lib/holidays";
 import {
   Check,
   ChevronLeft,
@@ -30,26 +31,13 @@ import {
   X,
 } from "lucide-react";
 
-function workdaysBetween(start: string, end: string) {
-  const s = new Date(start);
-  const e = new Date(end);
-  let days = 0;
-  const d = new Date(s);
-  while (d <= e) {
-    const wd = d.getDay();
-    if (wd !== 0 && wd !== 6) days++;
-    d.setDate(d.getDate() + 1);
-  }
-  return Math.max(days, 1);
-}
-
 export default function AbsencesPage() {
   const supabase = createClient();
   const [absences, setAbsences] = useState<Absence[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>("alle");
   const [showForm, setShowForm] = useState(false);
-  const [view, setView] = useState<"liste" | "kalender" | "konten">("liste");
+  const [view, setView] = useState<"liste" | "kalender" | "konten" | "statistik">("liste");
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -198,6 +186,7 @@ export default function AbsencesPage() {
               ["liste", "Liste"],
               ["kalender", "Team-Kalender"],
               ["konten", "Urlaubskonten"],
+              ["statistik", "Statistik"],
             ] as const
           ).map(([key, label]) => (
             <button
@@ -219,6 +208,8 @@ export default function AbsencesPage() {
         <TeamCalendar absences={absences} employees={employees} />
       ) : view === "konten" ? (
         <VacationAccounts absences={absences} employees={employees} />
+      ) : view === "statistik" ? (
+        <AbsenceStats absences={absences} employees={employees} />
       ) : filtered.length === 0 ? (
         <EmptyState title="Keine Abwesenheiten in dieser Ansicht" />
       ) : (
@@ -355,7 +346,13 @@ function TeamCalendar({
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const days = Array.from({ length: daysInMonth }, (_, i) => {
     const d = new Date(year, month, i + 1);
-    return { day: i + 1, iso: toISO(d), weekend: d.getDay() === 0 || d.getDay() === 6 };
+    const dayIso = toISO(d);
+    return {
+      day: i + 1,
+      iso: dayIso,
+      weekend: d.getDay() === 0 || d.getDay() === 6,
+      holiday: isHoliday(dayIso),
+    };
   });
   const todayIso = toISO(now);
 
@@ -410,12 +407,15 @@ function TeamCalendar({
               {days.map((d) => (
                 <th
                   key={d.day}
+                  title={d.holiday ?? undefined}
                   className={`min-w-7 px-0.5 py-2 text-center font-semibold ${
                     d.iso === todayIso
                       ? "bg-coral-500 text-white"
-                      : d.weekend
-                        ? "bg-petrol-100/60 text-petrol-400"
-                        : "bg-petrol-50/80 text-petrol-500"
+                      : d.holiday
+                        ? "bg-amber-100 text-amber-700"
+                        : d.weekend
+                          ? "bg-petrol-100/60 text-petrol-400"
+                          : "bg-petrol-50/80 text-petrol-500"
                   }`}
                 >
                   {d.day}
@@ -446,14 +446,17 @@ function TeamCalendar({
                     return (
                       <td
                         key={d.day}
-                        className={`h-9 px-0.5 ${d.weekend ? "bg-petrol-50/60" : ""}`}
+                        className={`h-9 px-0.5 ${
+                          d.holiday ? "bg-amber-50/70" : d.weekend ? "bg-petrol-50/60" : ""
+                        }`}
                         title={
-                          abs
+                          d.holiday ??
+                          (abs
                             ? `${ABSENCE_TYPE_META[abs.absence_type].label} (${ABSENCE_STATUS_META[abs.status].label})`
-                            : undefined
+                            : undefined)
                         }
                       >
-                        {abs && !d.weekend && (
+                        {abs && !d.weekend && !d.holiday && (
                           <div
                             className={`h-5 w-full rounded ${CAL_COLORS[abs.absence_type]} ${
                               abs.status === "beantragt" ? "opacity-40" : ""
@@ -470,7 +473,8 @@ function TeamCalendar({
         </table>
       </div>
       <p className="border-t border-petrol-50 px-5 py-2.5 text-xs text-petrol-400">
-        Halbtransparente Balken = noch nicht genehmigt. Wochenenden sind ausgegraut.
+        Halbtransparente Balken = noch nicht genehmigt. Wochenenden grau, bundesweite
+        Feiertage gelb markiert.
       </p>
     </div>
   );
@@ -498,8 +502,9 @@ function VacationAccounts({
     const planned = empVacation
       .filter((a) => a.status === "beantragt")
       .reduce((s, a) => s + Number(a.days), 0);
-    const remaining = emp.vacation_days_per_year - taken;
-    return { emp, taken, planned, remaining };
+    const entitlement = emp.vacation_days_per_year + Number(emp.carryover_days || 0);
+    const remaining = entitlement - taken;
+    return { emp, entitlement, taken, planned, remaining };
   });
 
   return (
@@ -507,7 +512,8 @@ function VacationAccounts({
       <div className="border-b border-petrol-100 px-5 py-4">
         <h2 className="font-bold text-petrol-900">Urlaubskonten {year}</h2>
         <p className="text-xs text-petrol-400">
-          Genommen = genehmigte Urlaubstage · Geplant = noch nicht genehmigte Anträge
+          Anspruch = Jahresurlaub + Übertrag aus Vorjahr · Genommen = genehmigte
+          Urlaubstage · Geplant = noch nicht genehmigte Anträge
         </p>
       </div>
       <table className="w-full text-sm">
@@ -522,7 +528,7 @@ function VacationAccounts({
           </tr>
         </thead>
         <tbody className="divide-y divide-petrol-50">
-          {rows.map(({ emp, taken, planned, remaining }) => (
+          {rows.map(({ emp, entitlement, taken, planned, remaining }) => (
             <tr key={emp.id} className="transition hover:bg-petrol-50/40">
               <td className="px-5 py-3">
                 <Link href={`/mitarbeiter/${emp.id}`} className="flex items-center gap-3">
@@ -532,7 +538,17 @@ function VacationAccounts({
                   </span>
                 </Link>
               </td>
-              <td className="px-5 py-3 text-petrol-700">{emp.vacation_days_per_year}</td>
+              <td className="px-5 py-3 text-petrol-700">
+                {entitlement}
+                {Number(emp.carryover_days) > 0 && (
+                  <span
+                    className="ml-1.5 rounded-full bg-sky-100 px-1.5 py-0.5 text-[10px] font-bold text-sky-700"
+                    title={`davon ${emp.carryover_days} Tage Übertrag aus dem Vorjahr`}
+                  >
+                    +{emp.carryover_days}
+                  </span>
+                )}
+              </td>
               <td className="px-5 py-3 text-petrol-700">{taken}</td>
               <td className="px-5 py-3 text-petrol-500">{planned}</td>
               <td
@@ -546,13 +562,13 @@ function VacationAccounts({
                 <div className="h-2.5 overflow-hidden rounded-full bg-petrol-50">
                   <div
                     className={`h-full rounded-full ${
-                      taken / Math.max(emp.vacation_days_per_year, 1) > 0.8
+                      taken / Math.max(entitlement, 1) > 0.8
                         ? "bg-coral-500"
                         : "bg-petrol-600"
                     }`}
                     style={{
                       width: `${Math.min(
-                        (taken / Math.max(emp.vacation_days_per_year, 1)) * 100,
+                        (taken / Math.max(entitlement, 1)) * 100,
                         100
                       )}%`,
                     }}
@@ -563,6 +579,108 @@ function VacationAccounts({
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+const MONTH_SHORT = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+
+function AbsenceStats({
+  absences,
+  employees,
+}: {
+  absences: Absence[];
+  employees: Employee[];
+}) {
+  const year = new Date().getFullYear();
+  const approved = absences.filter(
+    (a) => a.status === "genehmigt" && new Date(a.start_date).getFullYear() === year
+  );
+
+  const byType = (Object.keys(ABSENCE_TYPE_META) as AbsenceType[]).map((t) => ({
+    type: t,
+    days: approved
+      .filter((a) => a.absence_type === t)
+      .reduce((s, a) => s + Number(a.days), 0),
+  }));
+  const totalDays = byType.reduce((s, t) => s + t.days, 0);
+
+  const sickDays = byType.find((t) => t.type === "krank")?.days ?? 0;
+  const headcount = Math.max(employees.length, 1);
+
+  // Krankheitstage pro Monat (nach Startdatum zugeordnet)
+  const sickByMonth = Array.from({ length: 12 }, (_, m) =>
+    approved
+      .filter(
+        (a) => a.absence_type === "krank" && new Date(a.start_date).getMonth() === m
+      )
+      .reduce((s, a) => s + Number(a.days), 0)
+  );
+  const maxSick = Math.max(...sickByMonth, 1);
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-3 gap-4">
+        <StatCard label={`Abwesenheitstage ${year}`} value={totalDays} sub="genehmigt" />
+        <StatCard
+          label="Krankheitstage"
+          value={sickDays}
+          sub={`Ø ${(sickDays / headcount).toFixed(1)} pro Kopf`}
+          accent={sickDays / headcount > 10}
+        />
+        <StatCard
+          label="Urlaubstage genommen"
+          value={byType.find((t) => t.type === "urlaub")?.days ?? 0}
+          sub={`bei ${employees.length} Mitarbeitenden`}
+        />
+      </div>
+
+      <div className="card p-5">
+        <h2 className="mb-4 font-bold text-petrol-900">Verteilung nach Art ({year})</h2>
+        <div className="space-y-2.5">
+          {byType.map(({ type, days }) => {
+            const meta = ABSENCE_TYPE_META[type];
+            const pct = totalDays ? (days / totalDays) * 100 : 0;
+            return (
+              <div key={type} className="flex items-center gap-3">
+                <span className="w-28 shrink-0 text-xs font-medium text-petrol-500">
+                  {meta.label}
+                </span>
+                <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-petrol-50">
+                  <div
+                    className={`h-full rounded-full ${CAL_COLORS[type]}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <span className="w-12 text-right text-xs font-bold text-petrol-700">
+                  {days} T.
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="card p-5">
+        <h2 className="mb-4 font-bold text-petrol-900">
+          Krankheitstage pro Monat ({year})
+        </h2>
+        <div className="flex h-36 items-end gap-2">
+          {sickByMonth.map((v, m) => (
+            <div key={m} className="flex flex-1 flex-col items-center gap-1.5">
+              <span className="text-[10px] font-bold text-petrol-600">
+                {v > 0 ? v : ""}
+              </span>
+              <div
+                className={`w-full rounded-t ${v > 0 ? "bg-rose-400" : "bg-petrol-50"}`}
+                style={{ height: `${Math.max((v / maxSick) * 100, 4)}%` }}
+                title={`${MONTH_SHORT[m]}: ${v} Tage`}
+              />
+              <span className="text-[10px] text-petrol-400">{MONTH_SHORT[m]}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -686,7 +804,14 @@ function AbsenceFormModal({
           </label>
         )}
         <p className="rounded-lg bg-petrol-50 px-4 py-2.5 text-sm text-petrol-600">
-          {days} Arbeitstag{days === 1 ? "" : "e"} (Mo–Fr)
+          {days} Arbeitstag{days === 1 ? "" : "e"} (Mo–Fr, bundesweite Feiertage
+          bereits abgezogen)
+        </p>
+        <p className="text-xs text-petrol-400">
+          Nächste Feiertage:{" "}
+          {upcomingHolidays(3)
+            .map((h) => `${h.name} (${formatDate(h.date)})`)
+            .join(" · ")}
         </p>
         {form.absence_type === "krank" && (
           <div>

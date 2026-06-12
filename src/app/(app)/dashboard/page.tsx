@@ -25,16 +25,20 @@ import {
   Briefcase,
   Cake,
   CalendarClock,
+  Hourglass,
   KanbanSquare,
   ListTodo,
   PartyPopper,
   Plane,
   Rocket,
+  TrendingUp,
   UserPlus,
 } from "lucide-react";
+import { useRole } from "@/lib/useRole";
 
 export default function DashboardPage() {
   const supabase = createClient();
+  const { company } = useRole();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [apps, setApps] = useState<Application[]>([]);
   const [interviews, setInterviews] = useState<Interview[]>([]);
@@ -128,6 +132,39 @@ export default function DashboardPage() {
       check(e.hire_date, "party", "jub");
     });
   upcoming.sort((a, b) => a.days - b.days);
+
+  // Endende Probezeiten (nächste 30 Tage)
+  const probationMonths = company?.probation_months ?? 6;
+  const probations = employees
+    .filter((e) => e.status !== "ausgeschieden")
+    .map((e) => {
+      const end = new Date(e.hire_date);
+      end.setMonth(end.getMonth() + probationMonths);
+      const days = Math.round((end.getTime() - Date.now()) / 86400000);
+      return { employee: e, end, days };
+    })
+    .filter((p) => p.days >= 0 && p.days <= 30)
+    .sort((a, b) => a.days - b.days);
+
+  // Headcount-Entwicklung der letzten 12 Monate
+  const months: { label: string; count: number }[] = [];
+  for (let i = 11; i >= 0; i--) {
+    const ref = new Date();
+    ref.setMonth(ref.getMonth() - i);
+    const monthEnd = new Date(ref.getFullYear(), ref.getMonth() + 1, 0)
+      .toISOString()
+      .slice(0, 10);
+    const count = employees.filter((e) => {
+      if (e.hire_date > monthEnd) return false;
+      if (e.exit_date) return e.exit_date > monthEnd;
+      return e.status !== "ausgeschieden";
+    }).length;
+    months.push({
+      label: ref.toLocaleDateString("de-DE", { month: "short" }),
+      count,
+    });
+  }
+  const maxHeadcount = Math.max(...months.map((m) => m.count), 1);
 
   // Laufende Onboardings mit Fortschritt
   const onboardings = employees
@@ -403,6 +440,77 @@ export default function DashboardPage() {
               ))}
             </ul>
           )}
+        </div>
+      </div>
+
+      {/* Probezeiten & Headcount */}
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <div className="card">
+          <div className="border-b border-petrol-100 px-5 py-4">
+            <h2 className="flex items-center gap-2 font-bold text-petrol-900">
+              <Hourglass className="h-4 w-4 text-petrol-500" /> Endende Probezeiten
+            </h2>
+            <p className="text-xs text-petrol-400">
+              in den nächsten 30 Tagen ({probationMonths} Monate Probezeit)
+            </p>
+          </div>
+          {probations.length === 0 ? (
+            <p className="px-5 py-8 text-center text-sm text-petrol-400">
+              Keine Probezeiten enden in den nächsten 30 Tagen.
+            </p>
+          ) : (
+            <ul className="divide-y divide-petrol-50">
+              {probations.map(({ employee, end, days }) => (
+                <li key={employee.id}>
+                  <Link
+                    href={`/mitarbeiter/${employee.id}`}
+                    className="flex items-center gap-3 px-5 py-3 transition hover:bg-petrol-50/50"
+                  >
+                    <Avatar name={`${employee.first_name} ${employee.last_name}`} size="sm" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-petrol-900">
+                        {employee.first_name} {employee.last_name}
+                      </p>
+                      <p className="text-xs text-petrol-400">
+                        Probezeit endet am {end.toLocaleDateString("de-DE")} – Feedbackgespräch planen
+                      </p>
+                    </div>
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                        days <= 7 ? "bg-coral-500 text-white" : "bg-amber-100 text-amber-800"
+                      }`}
+                    >
+                      {days === 0 ? "Heute" : `in ${days} T.`}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="card p-5">
+          <h2 className="mb-1 flex items-center gap-2 font-bold text-petrol-900">
+            <TrendingUp className="h-4 w-4 text-petrol-500" /> Headcount-Entwicklung
+          </h2>
+          <p className="mb-4 text-xs text-petrol-400">
+            Mitarbeiterzahl zum Monatsende, letzte 12 Monate
+          </p>
+          <div className="flex h-36 items-end gap-1.5">
+            {months.map((m, i) => (
+              <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                <span className="text-[10px] font-bold text-petrol-600">{m.count}</span>
+                <div
+                  className={`w-full rounded-t ${
+                    i === months.length - 1 ? "bg-coral-500" : "bg-petrol-600"
+                  }`}
+                  style={{ height: `${Math.max((m.count / maxHeadcount) * 100, 3)}%` }}
+                  title={`${m.label}: ${m.count}`}
+                />
+                <span className="text-[10px] text-petrol-400">{m.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

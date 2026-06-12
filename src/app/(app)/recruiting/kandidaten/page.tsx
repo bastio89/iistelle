@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { Application, Candidate } from "@/lib/types";
 import { Avatar, EmptyState, PageHeader, StageBadge, formatDate } from "@/components/ui";
 import CandidateFormModal from "@/components/CandidateFormModal";
-import { Plus, Search } from "lucide-react";
+import { downloadCsv } from "@/lib/csv";
+import { Download, Plus, Search } from "lucide-react";
 
 export default function CandidatesPage() {
   const supabase = createClient();
@@ -14,6 +15,7 @@ export default function CandidatesPage() {
   const [apps, setApps] = useState<Application[]>([]);
   const [query, setQuery] = useState("");
   const [tagFilter, setTagFilter] = useState<string | null>(null);
+  const [poolOnly, setPoolOnly] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -39,8 +41,11 @@ export default function CandidatesPage() {
       .toLowerCase()
       .includes(query.toLowerCase());
     const matchesTag = !tagFilter || (c.tags ?? []).includes(tagFilter);
-    return matchesQuery && matchesTag;
+    const matchesPool = !poolOnly || c.in_talent_pool;
+    return matchesQuery && matchesTag && matchesPool;
   });
+
+  const poolCount = candidates.filter((c) => c.in_talent_pool).length;
 
   if (loading) {
     return <p className="py-20 text-center text-petrol-400">Lade Kandidaten…</p>;
@@ -52,20 +57,55 @@ export default function CandidatesPage() {
         title="Kandidaten"
         subtitle={`${candidates.length} Personen im Talent-Pool`}
         action={
-          <button className="btn-primary" onClick={() => setShowForm(true)}>
-            <Plus className="h-4 w-4" /> Kandidat:in anlegen
-          </button>
+          <div className="flex gap-2">
+            <button
+              className="btn-secondary"
+              onClick={() =>
+                downloadCsv(
+                  "kandidaten.csv",
+                  filtered.map((c) => ({
+                    Vorname: c.first_name,
+                    Nachname: c.last_name,
+                    "E-Mail": c.email,
+                    Telefon: c.phone,
+                    Stadt: c.city,
+                    Quelle: c.source,
+                    Tags: (c.tags ?? []).join(", "),
+                    "Talent-Pool": c.in_talent_pool ? "ja" : "nein",
+                    Angelegt: c.created_at.slice(0, 10),
+                  }))
+                )
+              }
+            >
+              <Download className="h-4 w-4" /> CSV
+            </button>
+            <button className="btn-primary" onClick={() => setShowForm(true)}>
+              <Plus className="h-4 w-4" /> Kandidat:in anlegen
+            </button>
+          </div>
         }
       />
 
-      <div className="card mb-4 flex items-center gap-2 px-4 py-2.5">
-        <Search className="h-4 w-4 text-petrol-400" />
-        <input
-          className="w-full bg-transparent text-sm outline-none placeholder:text-petrol-300"
-          placeholder="Nach Name, E-Mail oder Stadt suchen…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="card flex min-w-64 flex-1 items-center gap-2 px-4 py-2.5">
+          <Search className="h-4 w-4 text-petrol-400" />
+          <input
+            className="w-full bg-transparent text-sm outline-none placeholder:text-petrol-300"
+            placeholder="Nach Name, E-Mail oder Stadt suchen…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+        <button
+          onClick={() => setPoolOnly((p) => !p)}
+          className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+            poolOnly
+              ? "bg-violet-600 text-white"
+              : "bg-white text-petrol-600 shadow-card hover:bg-petrol-50"
+          }`}
+        >
+          ✦ Talent-Pool ({poolCount})
+        </button>
       </div>
 
       {allTags.length > 0 && (
@@ -123,8 +163,16 @@ export default function CandidatesPage() {
                       >
                         <Avatar name={`${c.first_name} ${c.last_name}`} />
                         <div>
-                          <p className="font-semibold text-petrol-900">
+                          <p className="flex items-center gap-1.5 font-semibold text-petrol-900">
                             {c.first_name} {c.last_name}
+                            {c.in_talent_pool && (
+                              <span
+                                className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-bold text-violet-700"
+                                title="Im Talent-Pool vorgemerkt"
+                              >
+                                ✦ Pool
+                              </span>
+                            )}
                           </p>
                           <p className="text-xs text-petrol-400">{c.city}</p>
                         </div>

@@ -56,6 +56,11 @@ export default function JobsPage() {
   const filtered =
     filter === "alle" ? jobs : jobs.filter((j) => j.status === filter);
 
+  const todayIso = new Date().toISOString().slice(0, 10);
+  function jobAgeDays(job: Job) {
+    return Math.floor((Date.now() - new Date(job.created_at).getTime()) / 86400000);
+  }
+
   const published = jobs.filter((j) => j.status === "veroeffentlicht").length;
   const activeApps = apps.filter(
     (a) => !["eingestellt", "abgelehnt"].includes(a.stage)
@@ -122,6 +127,9 @@ export default function JobsPage() {
             ).length;
             const hired = jobApps.filter((a) => a.stage === "eingestellt").length;
             const target = Math.max(job.target_hires, 1);
+            const age = jobAgeDays(job);
+            const deadlinePassed =
+              job.application_deadline && job.application_deadline < todayIso;
             return (
               <div
                 key={job.id}
@@ -149,6 +157,35 @@ export default function JobsPage() {
                   {job.channels.length > 0 && (
                     <span className="flex items-center gap-1">
                       <Megaphone className="h-4 w-4" /> {job.channels.length} Kanäle
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {job.status === "veroeffentlicht" && (
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
+                        age > 60
+                          ? "bg-rose-100 text-rose-700"
+                          : age > 30
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-petrol-50 text-petrol-600"
+                      }`}
+                      title="Zeit seit Erstellung der Stelle"
+                    >
+                      offen seit {age} Tagen
+                    </span>
+                  )}
+                  {job.application_deadline && (
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
+                        deadlinePassed
+                          ? "bg-rose-100 text-rose-700"
+                          : "bg-sky-100 text-sky-700"
+                      }`}
+                    >
+                      {deadlinePassed ? "Frist abgelaufen: " : "Frist bis "}
+                      {new Date(job.application_deadline).toLocaleDateString("de-DE")}
                     </span>
                   )}
                 </div>

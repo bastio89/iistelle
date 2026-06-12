@@ -7,7 +7,7 @@ import { EMPLOYEE_STATUS_META, Employee } from "@/lib/types";
 import { Avatar, EmptyState, PageHeader, StatCard, formatDate } from "@/components/ui";
 import EmployeeFormModal from "@/components/EmployeeFormModal";
 import { downloadCsv } from "@/lib/csv";
-import { Download, Plus, Search } from "lucide-react";
+import { Download, Plus, Search, Upload } from "lucide-react";
 
 export default function EmployeesPage() {
   const supabase = createClient();
@@ -15,6 +15,8 @@ export default function EmployeesPage() {
   const [query, setQuery] = useState("");
   const [deptFilter, setDeptFilter] = useState("alle");
   const [showForm, setShowForm] = useState(false);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -31,10 +33,63 @@ export default function EmployeesPage() {
     load();
   }, [load]);
 
+  async function importCsv(ev: React.ChangeEvent<HTMLInputElement>) {
+    const file = ev.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    setImportMsg(null);
+    const text = await file.text();
+    const lines = text.split(/\r?\n/).filter((l) => l.trim());
+    const delim = (lines[0]?.match(/;/g)?.length ?? 0) >= (lines[0]?.match(/,/g)?.length ?? 0) ? ";" : ",";
+    const headers = lines[0].split(delim).map((h) => h.trim().toLowerCase().replace(/^"|"$/g, ""));
+    const idx = (name: string) => headers.findIndex((h) => h.includes(name));
+    const iVor = idx("vorname");
+    const iNach = idx("nachname");
+    const iMail = idx("mail");
+    const iPos = idx("position");
+    const iDept = idx("abteilung");
+    const iDate = idx("eintritt");
+    if (iVor < 0 || iNach < 0 || iMail < 0) {
+      setImportMsg("Import fehlgeschlagen: CSV braucht mindestens die Spalten Vorname, Nachname, E-Mail.");
+      setImporting(false);
+      ev.target.value = "";
+      return;
+    }
+    const rows = lines.slice(1).map((l) => l.split(delim).map((c) => c.trim().replace(/^"|"$/g, "")));
+    const payload = rows
+      .filter((r) => r[iVor] && r[iNach] && r[iMail])
+      .map((r) => ({
+        first_name: r[iVor],
+        last_name: r[iNach],
+        email: r[iMail],
+        position: (iPos >= 0 && r[iPos]) || "Mitarbeiter:in",
+        department: (iDept >= 0 && r[iDept]) || "Operations",
+        employment_type: "Vollzeit",
+        status: "aktiv",
+        hire_date:
+          iDate >= 0 && /^\d{4}-\d{2}-\d{2}$/.test(r[iDate] ?? "")
+            ? r[iDate]
+            : new Date().toISOString().slice(0, 10),
+      }));
+    if (payload.length === 0) {
+      setImportMsg("Keine gültigen Zeilen in der Datei gefunden.");
+    } else {
+      const { error } = await supabase.from("employees").insert(payload);
+      setImportMsg(
+        error
+          ? `Import fehlgeschlagen: ${error.message}`
+          : `${payload.length} Mitarbeiter:innen importiert.`
+      );
+      if (!error) load();
+    }
+    setImporting(false);
+    ev.target.value = "";
+  }
+
   const departments = Array.from(new Set(employees.map((e) => e.department))).sort();
 
   const filtered = employees.filter((e) => {
-    const matchesQuery = `${e.first_name} ${e.last_name} ${e.email} ${e.position}`
+    const matchesQuery = `${e.first_name} ${e.last_name} ${e.email} ${e.position} ${(e.skills ?? []).join(" ")}`
       .toLowerCase()
       .includes(query.toLowerCase());
     const matchesDept = deptFilter === "alle" || e.department === deptFilter;
@@ -78,12 +133,39 @@ export default function EmployeesPage() {
             >
               <Download className="h-4 w-4" /> CSV
             </button>
+            <label className={`btn-secondary cursor-pointer ${importing ? "opacity-50" : ""}`}>
+              <Upload className="h-4 w-4" /> {importing ? "Importiere…" : "CSV-Import"}
+              <input
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                onChange={importCsv}
+                disabled={importing}
+              />
+            </label>
             <button className="btn-primary" onClick={() => setShowForm(true)}>
               <Plus className="h-4 w-4" /> Mitarbeiter:in anlegen
             </button>
           </div>
         }
       />
+
+      {importMsg && (
+        <div
+          className={`mb-4 rounded-lg px-4 py-3 text-sm ${
+            importMsg.includes("fehlgeschlagen") || importMsg.includes("Keine gültigen")
+              ? "bg-rose-50 text-rose-700"
+              : "bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          {importMsg}
+          {importMsg.includes("Spalten") && (
+            <span className="block text-xs opacity-80">
+              Erwartetes Format: Vorname;Nachname;E-Mail;Position;Abteilung;Eintritt (YYYY-MM-DD)
+            </span>
+          )}
+        </div>
+      )}
 
       <div className="mb-6 grid grid-cols-3 gap-4">
         <StatCard label="Aktiv" value={active} />

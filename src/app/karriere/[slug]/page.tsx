@@ -59,9 +59,13 @@ export default function CareerPage() {
     );
   }
 
-  const departments = Array.from(new Set(jobs.map((j) => j.department))).sort();
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const openJobs = jobs.filter(
+    (j) => !j.application_deadline || j.application_deadline >= todayIso
+  );
+  const departments = Array.from(new Set(openJobs.map((j) => j.department))).sort();
   const filtered =
-    deptFilter === "alle" ? jobs : jobs.filter((j) => j.department === deptFilter);
+    deptFilter === "alle" ? openJobs : openJobs.filter((j) => j.department === deptFilter);
 
   return (
     <div className="min-h-screen bg-surface">
@@ -133,6 +137,12 @@ export default function CareerPage() {
                     <span className="flex items-center gap-1">
                       <Clock className="h-4 w-4" /> {job.employment_type}
                     </span>
+                    {job.application_deadline && (
+                      <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800">
+                        Bewirb dich bis{" "}
+                        {new Date(job.application_deadline).toLocaleDateString("de-DE")}
+                      </span>
+                    )}
                   </div>
                 </Link>
                 <div className="flex items-center gap-2">

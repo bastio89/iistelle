@@ -6,11 +6,11 @@ Modernes HR-Tool mit Fokus auf Recruiting – inspiriert vom Aufbau führender H
 
 **Login & geschlossener Bereich:** Echte Authentifizierung über Supabase (E-Mail + Passwort), geschützte Routen via Middleware.
 
-**Recruiting:** Stellenverwaltung mit Status und Multiposting-Kanälen, Bewerber-Pipeline als Kanban-Board mit Drag & Drop (Eingang → Screening → Interview → Angebot → Eingestellt / Abgelehnt), Kandidatenprofile mit Tabs (Profil, Interviews, Bewertungen, Notizen), Interview-Planung mit Status-Verwaltung sowie Auswertungen (Funnel, Time-to-Hire, Conversion, Quellen). Eingestellte Bewerber lassen sich per Klick als Mitarbeiter übernehmen.
+**Recruiting:** Stellenverwaltung mit Status, Multiposting-Kanälen, Bewerbungsfrist und Vakanz-Alter, Talent-Pool für vorgemerkte Kandidaten, Bewerber-Pipeline als Kanban-Board mit Drag & Drop (Eingang → Screening → Interview → Angebot → Eingestellt / Abgelehnt), Kandidatenprofile mit Tabs (Profil, Interviews, Bewertungen, Notizen), Interview-Planung mit Status-Verwaltung sowie Auswertungen (Funnel, Time-to-Hire, Conversion, Quellen). Eingestellte Bewerber lassen sich per Klick als Mitarbeiter übernehmen.
 
-**Mitarbeiter:** Digitale Personalakte mit Stammdaten, Abwesenheits-, Gehalts- und Performance-Tab, Suche und Abteilungsfilter.
+**Mitarbeiter:** Digitale Personalakte mit Stammdaten (inkl. Skills, Notfallkontakt, Austrittsdatum), Onboarding- und Offboarding-Checklisten, Dokumenten, Equipment, Abwesenheits-, Gehalts- und Performance-Tab, CSV-Import/-Export, Suche und Abteilungsfilter. Dazu firmenweite Inventar-Übersicht und zentrale Firmendokumente (Richtlinien, Vorlagen, Handbücher). Das Dashboard zeigt zusätzlich endende Probezeiten und die Headcount-Entwicklung.
 
-**Abwesenheiten:** Anträge (Urlaub, Krankheit, Sonderurlaub, unbezahlt) mit Genehmigungs-Workflow, Arbeitstage-Berechnung, Resturlaub und „Heute abwesend“-Übersicht.
+**Abwesenheiten:** Anträge (Urlaub, Krankheit, Sonderurlaub, unbezahlt) mit Genehmigungs-Workflow, Arbeitstage-Berechnung inkl. bundesweiter Feiertage, Urlaubsübertrag aus dem Vorjahr, Team-Kalender, Urlaubskonten, Abwesenheits-Statistik (Krankheitsquote, Monatsverlauf) und „Heute abwesend“-Übersicht.
 
 **Gehalt:** Aktuelle Vergütung pro Mitarbeiter, Gehaltshistorie mit Anpassungen, Gesamt- und Durchschnittswerte.
 

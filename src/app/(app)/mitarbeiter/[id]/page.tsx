@@ -8,6 +8,7 @@ import {
   ABSENCE_STATUS_META,
   ABSENCE_TYPE_META,
   Absence,
+  DEFAULT_OFFBOARDING_TASKS,
   DEFAULT_ONBOARDING_TASKS,
   DOC_CATEGORY_META,
   DocCategory,
@@ -51,6 +52,7 @@ import {
 type Tab =
   | "profil"
   | "onboarding"
+  | "offboarding"
   | "dokumente"
   | "equipment"
   | "abwesenheiten"
@@ -186,15 +188,28 @@ export default function EmployeeDetailPage() {
     load();
   }
 
-  async function addTask(e: React.FormEvent) {
+  async function addTask(e: React.FormEvent, phase: "onboarding" | "offboarding") {
     e.preventDefault();
     if (!newTask.trim()) return;
     await supabase.from("onboarding_tasks").insert({
       employee_id: id,
       title: newTask.trim(),
       sort_order: obTasks.length,
+      phase,
     });
     setNewTask("");
+    load();
+  }
+
+  async function insertOffboardingChecklist() {
+    await supabase.from("onboarding_tasks").insert(
+      DEFAULT_OFFBOARDING_TASKS.map((title, i) => ({
+        employee_id: id,
+        title,
+        sort_order: obTasks.length + i,
+        phase: "offboarding",
+      }))
+    );
     load();
   }
 
@@ -235,6 +250,8 @@ export default function EmployeeDetailPage() {
   const fullName = `${employee.first_name} ${employee.last_name}`;
   const statusMeta = EMPLOYEE_STATUS_META[employee.status];
   const year = new Date().getFullYear();
+  const vacationEntitlement =
+    employee.vacation_days_per_year + Number(employee.carryover_days || 0);
   const usedVacation = absences
     .filter(
       (a) =>
@@ -245,16 +262,29 @@ export default function EmployeeDetailPage() {
     .reduce((s, a) => s + Number(a.days), 0);
   const currentSalary = salaries[0];
 
-  const doneCount = obTasks.filter((t) => t.done).length;
+  const onbTasks = obTasks.filter((t) => t.phase !== "offboarding");
+  const offbTasks = obTasks.filter((t) => t.phase === "offboarding");
+  const doneCount = onbTasks.filter((t) => t.done).length;
+  const offbDone = offbTasks.filter((t) => t.done).length;
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "profil", label: "Profil" },
     {
       key: "onboarding",
-      label: obTasks.length
-        ? `Onboarding (${doneCount}/${obTasks.length})`
+      label: onbTasks.length
+        ? `Onboarding (${doneCount}/${onbTasks.length})`
         : "Onboarding",
     },
+    ...(employee.exit_date || offbTasks.length > 0
+      ? ([
+          {
+            key: "offboarding",
+            label: offbTasks.length
+              ? `Offboarding (${offbDone}/${offbTasks.length})`
+              : "Offboarding",
+          },
+        ] as { key: Tab; label: string }[])
+      : []),
     { key: "dokumente", label: `Dokumente (${docs.length})` },
     { key: "equipment", label: `Equipment (${equipment.filter((q) => !q.returned_on).length})` },
     { key: "abwesenheiten", label: "Abwesenheiten" },
@@ -318,7 +348,12 @@ export default function EmployeeDetailPage() {
           <div>
             <p className="text-xs font-semibold uppercase text-petrol-400">Resturlaub {year}</p>
             <p className="mt-1 font-semibold text-petrol-800">
-              {employee.vacation_days_per_year - usedVacation} / {employee.vacation_days_per_year} Tage
+              {vacationEntitlement - usedVacation} / {vacationEntitlement} Tage
+              {Number(employee.carryover_days) > 0 && (
+                <span className="ml-1.5 text-xs font-normal text-petrol-400">
+                  (inkl. {employee.carryover_days} Übertrag)
+                </span>
+              )}
             </p>
           </div>
           <div>
@@ -365,6 +400,22 @@ export default function EmployeeDetailPage() {
                 [Briefcase, "Anstellungsart", employee.employment_type],
                 [MapPin, "Standort", employee.location || "–"],
                 [CalendarDays, "Eintrittsdatum", formatDate(employee.hire_date)],
+                [
+                  CalendarDays,
+                  "Austrittsdatum",
+                  employee.exit_date ? formatDate(employee.exit_date) : "–",
+                ],
+                [
+                  Phone,
+                  "Notfallkontakt",
+                  employee.emergency_contact_name
+                    ? `${employee.emergency_contact_name}${
+                        employee.emergency_contact_phone
+                          ? ` · ${employee.emergency_contact_phone}`
+                          : ""
+                      }`
+                    : "–",
+                ],
               ].map(([Icon, label, value]) => {
                 const I = Icon as React.ElementType;
                 return (
@@ -377,6 +428,27 @@ export default function EmployeeDetailPage() {
                   </div>
                 );
               })}
+            </div>
+            <div className="mt-5 border-t border-petrol-50 pt-4">
+              <p className="text-xs font-semibold uppercase text-petrol-400">
+                Skills & Qualifikationen
+              </p>
+              {(employee.skills ?? []).length === 0 ? (
+                <p className="mt-1.5 text-sm text-petrol-400">
+                  Noch keine Skills hinterlegt – über „Bearbeiten“ ergänzen.
+                </p>
+              ) : (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {employee.skills.map((s) => (
+                    <span
+                      key={s}
+                      className="rounded-full bg-petrol-100 px-2.5 py-1 text-xs font-semibold text-petrol-700"
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             {employee.candidate_id && (
               <p className="mt-5 border-t border-petrol-50 pt-4 text-sm text-petrol-500">
@@ -396,24 +468,24 @@ export default function EmployeeDetailPage() {
           <div className="card p-6">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h3 className="font-bold text-petrol-900">Onboarding-Checkliste</h3>
-              {obTasks.length > 0 && (
+              {onbTasks.length > 0 && (
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-36 overflow-hidden rounded-full bg-petrol-50">
                     <div
                       className="h-full rounded-full bg-emerald-500 transition-all"
                       style={{
-                        width: `${obTasks.length ? (doneCount / obTasks.length) * 100 : 0}%`,
+                        width: `${onbTasks.length ? (doneCount / onbTasks.length) * 100 : 0}%`,
                       }}
                     />
                   </div>
                   <span className="text-xs font-bold text-petrol-600">
-                    {doneCount}/{obTasks.length} erledigt
+                    {doneCount}/{onbTasks.length} erledigt
                   </span>
                 </div>
               )}
             </div>
 
-            {obTasks.length === 0 ? (
+            {onbTasks.length === 0 ? (
               <div className="rounded-xl border border-dashed border-petrol-200 p-8 text-center">
                 <p className="text-sm text-petrol-500">
                   Noch keine Checkliste vorhanden.
@@ -424,7 +496,7 @@ export default function EmployeeDetailPage() {
               </div>
             ) : (
               <ul className="space-y-1.5">
-                {obTasks.map((t) => (
+                {onbTasks.map((t) => (
                   <li
                     key={t.id}
                     className="group flex items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-petrol-50/60"
@@ -460,12 +532,90 @@ export default function EmployeeDetailPage() {
               </ul>
             )}
 
-            <form onSubmit={addTask} className="mt-4 flex gap-2 border-t border-petrol-50 pt-4">
+            <form
+              onSubmit={(e) => addTask(e, "onboarding")}
+              className="mt-4 flex gap-2 border-t border-petrol-50 pt-4"
+            >
               <input
                 className="input"
                 value={newTask}
                 onChange={(e) => setNewTask(e.target.value)}
                 placeholder="Neue Aufgabe hinzufügen…"
+              />
+              <button className="btn-primary shrink-0" disabled={!newTask.trim()}>
+                <Plus className="h-4 w-4" /> Hinzufügen
+              </button>
+            </form>
+          </div>
+        )}
+
+        {tab === "offboarding" && (
+          <div className="card p-6">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <h3 className="font-bold text-petrol-900">Offboarding-Checkliste</h3>
+              {employee.exit_date && (
+                <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
+                  Austritt am {formatDate(employee.exit_date)}
+                </span>
+              )}
+            </div>
+
+            {offbTasks.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-petrol-200 p-8 text-center">
+                <p className="text-sm text-petrol-500">
+                  Noch keine Offboarding-Checkliste vorhanden.
+                </p>
+                <button className="btn-primary mt-4" onClick={insertOffboardingChecklist}>
+                  Standard-Offboarding einfügen
+                </button>
+              </div>
+            ) : (
+              <ul className="space-y-1.5">
+                {offbTasks.map((t) => (
+                  <li
+                    key={t.id}
+                    className="group flex items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-petrol-50/60"
+                  >
+                    <button
+                      onClick={() => toggleTask(t)}
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition ${
+                        t.done
+                          ? "border-emerald-500 bg-emerald-500 text-white"
+                          : "border-petrol-300 bg-white hover:border-petrol-500"
+                      }`}
+                    >
+                      {t.done && <span className="text-[10px] font-black">✓</span>}
+                    </button>
+                    <span
+                      className={`flex-1 text-sm ${
+                        t.done
+                          ? "text-petrol-300 line-through"
+                          : "font-medium text-petrol-800"
+                      }`}
+                    >
+                      {t.title}
+                    </span>
+                    <button
+                      onClick={() => deleteTask(t.id)}
+                      className="rounded p-1 text-petrol-300 opacity-0 transition hover:bg-rose-50 hover:text-rose-500 group-hover:opacity-100"
+                      title="Aufgabe entfernen"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <form
+              onSubmit={(e) => addTask(e, "offboarding")}
+              className="mt-4 flex gap-2 border-t border-petrol-50 pt-4"
+            >
+              <input
+                className="input"
+                value={newTask}
+                onChange={(e) => setNewTask(e.target.value)}
+                placeholder="Neue Offboarding-Aufgabe…"
               />
               <button className="btn-primary shrink-0" disabled={!newTask.trim()}>
                 <Plus className="h-4 w-4" /> Hinzufügen
@@ -544,6 +694,84 @@ export default function EmployeeDetailPage() {
                     </li>
                   );
                 })}
+              </ul>
+            )}
+          </div>
+        )}
+
+        {tab === "equipment" && (
+          <div className="card p-6">
+            <h3 className="mb-4 font-bold text-petrol-900">Ausgegebenes Equipment</h3>
+            <form onSubmit={addEquipment} className="mb-5 flex flex-wrap items-end gap-3">
+              <div className="min-w-48 flex-1">
+                <label className="label">Gerät / Gegenstand</label>
+                <input
+                  className="input"
+                  value={eqForm.name}
+                  onChange={(e) => setEqForm({ ...eqForm, name: e.target.value })}
+                  placeholder="z. B. MacBook Pro 14&quot;"
+                />
+              </div>
+              <div>
+                <label className="label">Seriennummer</label>
+                <input
+                  className="input w-44"
+                  value={eqForm.serial_no}
+                  onChange={(e) => setEqForm({ ...eqForm, serial_no: e.target.value })}
+                  placeholder="optional"
+                />
+              </div>
+              <button className="btn-primary" disabled={!eqForm.name.trim()}>
+                <Plus className="h-4 w-4" /> Ausgeben
+              </button>
+            </form>
+
+            {equipment.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-petrol-200 p-8 text-center text-sm text-petrol-500">
+                Noch kein Equipment ausgegeben.
+              </div>
+            ) : (
+              <ul className="divide-y divide-petrol-50">
+                {equipment.map((item) => (
+                  <li key={item.id} className="group flex items-center gap-3 py-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-petrol-900">
+                        {item.name}
+                        {item.serial_no && (
+                          <span className="ml-2 text-xs font-normal text-petrol-400">
+                            SN: {item.serial_no}
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-xs text-petrol-400">
+                        ausgegeben {formatDate(item.issued_on)}
+                        {item.returned_on && ` · zurück ${formatDate(item.returned_on)}`}
+                      </p>
+                    </div>
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        item.returned_on
+                          ? "bg-slate-100 text-slate-600"
+                          : "bg-emerald-100 text-emerald-800"
+                      }`}
+                    >
+                      {item.returned_on ? "Zurückgegeben" : "Im Einsatz"}
+                    </span>
+                    <button
+                      onClick={() => returnEquipment(item)}
+                      className="btn-secondary !px-2.5 !py-1 text-xs"
+                    >
+                      {item.returned_on ? "Rückgabe aufheben" : "Rückgabe"}
+                    </button>
+                    <button
+                      onClick={() => deleteEquipment(item.id)}
+                      className="rounded p-1.5 text-petrol-300 opacity-0 transition hover:bg-rose-50 hover:text-rose-500 group-hover:opacity-100"
+                      title="Eintrag löschen"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </li>
+                ))}
               </ul>
             )}
           </div>

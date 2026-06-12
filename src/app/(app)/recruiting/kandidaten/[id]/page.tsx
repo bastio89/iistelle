@@ -38,6 +38,7 @@ import {
   Pencil,
   Phone,
   Send,
+  Sparkles,
   Star,
   UserPlus,
 } from "lucide-react";
@@ -169,6 +170,20 @@ export default function CandidateDetailPage() {
 
   async function deleteComment(commentId: string) {
     await supabase.from("candidate_comments").delete().eq("id", commentId);
+    load();
+  }
+
+  async function toggleTalentPool() {
+    if (!candidate) return;
+    const next = !candidate.in_talent_pool;
+    await supabase
+      .from("candidates")
+      .update({ in_talent_pool: next })
+      .eq("id", id);
+    await logActivity(
+      id,
+      next ? "Zum Talent-Pool hinzugefügt" : "Aus dem Talent-Pool entfernt"
+    );
     load();
   }
 
@@ -332,6 +347,22 @@ export default function CandidateDetailPage() {
                 </button>
               )
             )}
+            <button
+              className={
+                candidate.in_talent_pool
+                  ? "flex items-center gap-1.5 rounded-lg bg-violet-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-violet-700"
+                  : "btn-secondary"
+              }
+              onClick={toggleTalentPool}
+              title={
+                candidate.in_talent_pool
+                  ? "Im Talent-Pool – Klick zum Entfernen"
+                  : "Für später vormerken"
+              }
+            >
+              <Sparkles className="h-4 w-4" />
+              {candidate.in_talent_pool ? "Im Talent-Pool" : "Talent-Pool"}
+            </button>
             <button className="btn-secondary" onClick={() => setShowEmail(true)}>
               <Send className="h-4 w-4" /> E-Mail
             </button>

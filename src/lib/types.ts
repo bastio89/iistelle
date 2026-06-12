@@ -36,6 +36,7 @@ export interface Job {
   recruiter: string | null;
   target_hires: number;
   channels: string[];
+  application_deadline: string | null;
   created_at: string;
 }
 
@@ -51,6 +52,7 @@ export interface Candidate {
   cv_summary: string | null;
   cv_path: string | null;
   tags: string[];
+  in_talent_pool: boolean;
   created_at: string;
 }
 
@@ -199,6 +201,11 @@ export interface Employee {
   birth_date: string | null;
   manager: string | null;
   vacation_days_per_year: number;
+  carryover_days: number;
+  skills: string[];
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
+  exit_date: string | null;
   candidate_id: string | null;
   created_at: string;
 }
@@ -294,6 +301,7 @@ export interface OnboardingTask {
   done: boolean;
   due_date: string | null;
   sort_order: number;
+  phase: "onboarding" | "offboarding";
   created_at: string;
 }
 
@@ -330,6 +338,17 @@ export const DEFAULT_ONBOARDING_TASKS = [
   "Team über Start informieren",
   "Erster Arbeitstag: Begrüßung & Rundgang",
   "Feedbackgespräch nach 30 Tagen einplanen",
+];
+
+export const DEFAULT_OFFBOARDING_TASKS = [
+  "Kündigungsbestätigung versenden",
+  "Übergabeplan mit Team erstellen",
+  "Equipment zurücknehmen (Laptop, Schlüssel, Karten)",
+  "Accounts deaktivieren (E-Mail, Tools, Zugänge)",
+  "Arbeitszeugnis erstellen",
+  "Resturlaub klären / auszahlen",
+  "Exit-Gespräch führen",
+  "Team über Austritt informieren",
 ];
 
 export type DocCategory = "vertrag" | "zeugnis" | "bescheinigung" | "sonstige";

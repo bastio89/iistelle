@@ -28,6 +28,7 @@ export default function JobFormModal({
     target_hires: job?.target_hires ?? 1,
     channels: job?.channels ?? ["Karriereseite"],
     description: job?.description ?? "",
+    application_deadline: job?.application_deadline ?? "",
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +41,11 @@ export default function JobFormModal({
     e.preventDefault();
     setSaving(true);
     setError(null);
-    const payload = { ...form, target_hires: Number(form.target_hires) || 1 };
+    const payload = {
+      ...form,
+      target_hires: Number(form.target_hires) || 1,
+      application_deadline: form.application_deadline || null,
+    };
     const res = job
       ? await supabase.from("jobs").update(payload).eq("id", job.id)
       : await supabase.from("jobs").insert(payload);
@@ -133,6 +138,18 @@ export default function JobFormModal({
               value={form.target_hires}
               onChange={(e) => set("target_hires", Number(e.target.value))}
             />
+          </div>
+          <div>
+            <label className="label">Bewerbungsfrist (optional)</label>
+            <input
+              className="input"
+              type="date"
+              value={form.application_deadline}
+              onChange={(e) => set("application_deadline", e.target.value)}
+            />
+            <p className="mt-1 text-xs text-petrol-400">
+              Nach Ablauf wird die Stelle auf der Karriereseite ausgeblendet.
+            </p>
           </div>
         </div>
 

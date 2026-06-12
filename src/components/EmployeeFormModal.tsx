@@ -31,7 +31,12 @@ export default function EmployeeFormModal({
     birth_date: employee?.birth_date ?? "",
     manager: employee?.manager ?? "",
     vacation_days_per_year: employee?.vacation_days_per_year ?? 28,
+    carryover_days: employee?.carryover_days ?? 0,
+    exit_date: employee?.exit_date ?? "",
+    emergency_contact_name: employee?.emergency_contact_name ?? "",
+    emergency_contact_phone: employee?.emergency_contact_phone ?? "",
   });
+  const [skillsText, setSkillsText] = useState((employee?.skills ?? []).join(", "));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [limitReached, setLimitReached] = useState(false);
@@ -65,7 +70,13 @@ export default function EmployeeFormModal({
     const payload = {
       ...form,
       birth_date: form.birth_date || null,
+      exit_date: form.exit_date || null,
       vacation_days_per_year: Number(form.vacation_days_per_year) || 28,
+      carryover_days: Number(form.carryover_days) || 0,
+      skills: skillsText
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
     };
     const res = employee
       ? await supabase.from("employees").update(payload).eq("id", employee.id)
@@ -144,6 +155,10 @@ export default function EmployeeFormModal({
             <input className="input" type="number" min={0} value={form.vacation_days_per_year} onChange={(e) => set("vacation_days_per_year", Number(e.target.value))} />
           </div>
           <div>
+            <label className="label">Urlaubsübertrag aus Vorjahr</label>
+            <input className="input" type="number" min={0} step={0.5} value={form.carryover_days} onChange={(e) => set("carryover_days", Number(e.target.value))} />
+          </div>
+          <div>
             <label className="label">Status</label>
             <select className="input" value={form.status} onChange={(e) => set("status", e.target.value as EmployeeStatus)}>
               <option value="onboarding">Onboarding</option>
@@ -151,6 +166,28 @@ export default function EmployeeFormModal({
               <option value="ausgeschieden">Ausgeschieden</option>
             </select>
           </div>
+          <div>
+            <label className="label">Austrittsdatum</label>
+            <input className="input" type="date" value={form.exit_date} onChange={(e) => set("exit_date", e.target.value)} />
+          </div>
+          <div>
+            <label className="label">Notfallkontakt (Name)</label>
+            <input className="input" value={form.emergency_contact_name} onChange={(e) => set("emergency_contact_name", e.target.value)} placeholder="z. B. Partner:in, Elternteil" />
+          </div>
+          <div>
+            <label className="label">Notfallkontakt (Telefon)</label>
+            <input className="input" value={form.emergency_contact_phone} onChange={(e) => set("emergency_contact_phone", e.target.value)} />
+          </div>
+        </div>
+
+        <div>
+          <label className="label">Skills & Qualifikationen (kommagetrennt)</label>
+          <input
+            className="input"
+            value={skillsText}
+            onChange={(e) => setSkillsText(e.target.value)}
+            placeholder="z. B. React, Erste Hilfe, Englisch C1"
+          />
         </div>
 
         {error && (
