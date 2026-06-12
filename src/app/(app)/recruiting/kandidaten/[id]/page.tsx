@@ -8,6 +8,7 @@ import {
   Activity,
   Application,
   Candidate,
+  CandidateComment,
   DEFAULT_ONBOARDING_TASKS,
   EmailTemplate,
   Employee,
@@ -52,6 +53,9 @@ export default function CandidateDetailPage() {
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [evals, setEvals] = useState<Evaluation[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [comments, setComments] = useState<CandidateComment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [duplicates, setDuplicates] = useState<Candidate[]>([]);
   const [tab, setTab] = useState<Tab>("profil");
   const [showEdit, setShowEdit] = useState(false);
   const [showInterview, setShowInterview] = useState(false);
@@ -94,12 +98,30 @@ export default function CandidateDetailPage() {
       setInterviews((iv.data as Interview[]) ?? []);
       setEvals((ev.data as Evaluation[]) ?? []);
     }
-    const { data: act } = await supabase
-      .from("activities")
-      .select("*")
-      .eq("candidate_id", id)
-      .order("created_at", { ascending: false });
+    const [{ data: act }, { data: com }] = await Promise.all([
+      supabase
+        .from("activities")
+        .select("*")
+        .eq("candidate_id", id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("candidate_comments")
+        .select("*")
+        .eq("candidate_id", id)
+        .order("created_at", { ascending: false }),
+    ]);
     setActivities((act as Activity[]) ?? []);
+    setComments((com as CandidateComment[]) ?? []);
+
+    // Duplikat-Erkennung: andere Kandidaten mit derselben E-Mail
+    if (c.data) {
+      const { data: dups } = await supabase
+        .from("candidates")
+        .select("*")
+        .eq("email", (c.data as Candidate).email)
+        .neq("id", id);
+      setDuplicates((dups as Candidate[]) ?? []);
+    }
     setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -128,6 +150,26 @@ export default function CandidateDetailPage() {
       await supabase.from("applications").update({ notes }).eq("id", apps[0].id);
       load();
     }
+  }
+
+  async function addComment(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    const { data: u } = await supabase.auth.getUser();
+    const author =
+      (u.user?.user_metadata?.full_name as string) || u.user?.email || "Team";
+    await supabase.from("candidate_comments").insert({
+      candidate_id: id,
+      author,
+      body: newComment.trim(),
+    });
+    setNewComment("");
+    load();
+  }
+
+  async function deleteComment(commentId: string) {
+    await supabase.from("candidate_comments").delete().eq("id", commentId);
+    load();
   }
 
   async function openCv() {
@@ -162,9 +204,17 @@ export default function CandidateDetailPage() {
       .single();
     setConverting(false);
     if (!error && data) {
-      // Standard-Onboarding-Checkliste anlegen
+      // Onboarding-Checkliste der Firma anlegen (Fallback: Standard)
+      const { data: comp } = await supabase
+        .from("companies")
+        .select("onboarding_template")
+        .maybeSingle();
+      const template: string[] =
+        (comp?.onboarding_template as string[])?.length
+          ? (comp!.onboarding_template as string[])
+          : DEFAULT_ONBOARDING_TASKS;
       await supabase.from("onboarding_tasks").insert(
-        DEFAULT_ONBOARDING_TASKS.map((title, i) => ({
+        template.map((title, i) => ({
           employee_id: (data as Employee).id,
           title,
           sort_order: i,
@@ -202,6 +252,25 @@ export default function CandidateDetailPage() {
       >
         <ArrowLeft className="h-4 w-4" /> Zurück zu den Kandidaten
       </Link>
+
+      {duplicates.length > 0 && (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <strong>Mögliches Duplikat:</strong> Die E-Mail-Adresse existiert noch{" "}
+          {duplicates.length === 1 ? "bei einem weiteren Profil" : `bei ${duplicates.length} weiteren Profilen`}
+          :{" "}
+          {duplicates.map((d, i) => (
+            <span key={d.id}>
+              {i > 0 && ", "}
+              <Link
+                href={`/recruiting/kandidaten/${d.id}`}
+                className="font-bold underline"
+              >
+                {d.first_name} {d.last_name}
+              </Link>
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Kopfbereich */}
       <div className="card p-6">
@@ -489,7 +558,56 @@ export default function CandidateDetailPage() {
         )}
 
         {tab === "notizen" && (
-          <div className="card p-6">
+          <div className="space-y-5">
+            {/* Team-Kommentare */}
+            <div className="card p-6">
+              <h3 className="mb-3 font-bold text-petrol-900">
+                Team-Kommentare ({comments.length})
+              </h3>
+              <form onSubmit={addComment} className="mb-4 flex gap-2">
+                <input
+                  className="input"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Kommentar für das Team schreiben…"
+                />
+                <button className="btn-primary shrink-0" disabled={!newComment.trim()}>
+                  Senden
+                </button>
+              </form>
+              {comments.length === 0 ? (
+                <p className="py-4 text-center text-sm text-petrol-400">
+                  Noch keine Kommentare – starte die Team-Diskussion.
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {comments.map((cm) => (
+                    <li key={cm.id} className="group rounded-xl bg-petrol-50/60 px-4 py-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <Avatar name={cm.author} size="sm" />
+                          <span className="text-sm font-bold text-petrol-900">
+                            {cm.author}
+                          </span>
+                          <span className="text-xs text-petrol-400">
+                            {formatDateTime(cm.created_at)}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => deleteComment(cm.id)}
+                          className="text-xs text-petrol-300 opacity-0 transition hover:text-rose-500 group-hover:opacity-100"
+                        >
+                          Löschen
+                        </button>
+                      </div>
+                      <p className="mt-1.5 text-sm text-petrol-700">{cm.body}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="card p-6">
             <h3 className="mb-3 font-bold text-petrol-900">Interne Notizen</h3>
             <textarea
               className="input min-h-36"
@@ -502,6 +620,7 @@ export default function CandidateDetailPage() {
               <button className="btn-primary" onClick={saveNotes} disabled={apps.length === 0}>
                 Notizen speichern
               </button>
+            </div>
             </div>
           </div>
         )}

@@ -13,6 +13,7 @@ import {
   DocCategory,
   EMPLOYEE_STATUS_META,
   Employee,
+  EquipmentItem,
   GOAL_STATUS_META,
   Goal,
   HrDocument,
@@ -51,6 +52,7 @@ type Tab =
   | "profil"
   | "onboarding"
   | "dokumente"
+  | "equipment"
   | "abwesenheiten"
   | "gehalt"
   | "performance";
@@ -68,6 +70,8 @@ export default function EmployeeDetailPage() {
   const [newTask, setNewTask] = useState("");
   const [docs, setDocs] = useState<HrDocument[]>([]);
   const [docCategory, setDocCategory] = useState<DocCategory>("sonstige");
+  const [equipment, setEquipment] = useState<EquipmentItem[]>([]);
+  const [eqForm, setEqForm] = useState({ name: "", serial_no: "" });
   const [uploading, setUploading] = useState(false);
   const { isAdmin } = useRole();
   const [tab, setTab] = useState<Tab>("profil");
@@ -86,12 +90,20 @@ export default function EmployeeDetailPage() {
       supabase.from("onboarding_tasks").select("*").eq("employee_id", id).order("sort_order"),
     ]);
     setObTasks((ob.data as OnboardingTask[]) ?? []);
-    const { data: docData } = await supabase
-      .from("documents")
-      .select("*")
-      .eq("employee_id", id)
-      .order("created_at", { ascending: false });
+    const [{ data: docData }, { data: eqData }] = await Promise.all([
+      supabase
+        .from("documents")
+        .select("*")
+        .eq("employee_id", id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("equipment")
+        .select("*")
+        .eq("employee_id", id)
+        .order("issued_on", { ascending: false }),
+    ]);
     setDocs((docData as HrDocument[]) ?? []);
+    setEquipment((eqData as EquipmentItem[]) ?? []);
     setEmployee(e.data as Employee);
     setAbsences((a.data as Absence[]) ?? []);
     setSalaries((s.data as Salary[]) ?? []);
@@ -104,6 +116,31 @@ export default function EmployeeDetailPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  async function addEquipment(e: React.FormEvent) {
+    e.preventDefault();
+    if (!eqForm.name.trim()) return;
+    await supabase.from("equipment").insert({
+      employee_id: id,
+      name: eqForm.name.trim(),
+      serial_no: eqForm.serial_no.trim(),
+    });
+    setEqForm({ name: "", serial_no: "" });
+    load();
+  }
+
+  async function returnEquipment(item: EquipmentItem) {
+    await supabase
+      .from("equipment")
+      .update({ returned_on: item.returned_on ? null : new Date().toISOString().slice(0, 10) })
+      .eq("id", item.id);
+    load();
+  }
+
+  async function deleteEquipment(itemId: string) {
+    await supabase.from("equipment").delete().eq("id", itemId);
+    load();
+  }
 
   async function uploadDoc(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -167,8 +204,16 @@ export default function EmployeeDetailPage() {
   }
 
   async function insertDefaultChecklist() {
+    const { data: comp } = await supabase
+      .from("companies")
+      .select("onboarding_template")
+      .maybeSingle();
+    const template: string[] =
+      (comp?.onboarding_template as string[])?.length
+        ? (comp!.onboarding_template as string[])
+        : DEFAULT_ONBOARDING_TASKS;
     await supabase.from("onboarding_tasks").insert(
-      DEFAULT_ONBOARDING_TASKS.map((title, i) => ({
+      template.map((title, i) => ({
         employee_id: id,
         title,
         sort_order: obTasks.length + i,
@@ -211,6 +256,7 @@ export default function EmployeeDetailPage() {
         : "Onboarding",
     },
     { key: "dokumente", label: `Dokumente (${docs.length})` },
+    { key: "equipment", label: `Equipment (${equipment.filter((q) => !q.returned_on).length})` },
     { key: "abwesenheiten", label: "Abwesenheiten" },
     ...(isAdmin ? ([{ key: "gehalt", label: "Gehalt" }] as { key: Tab; label: string }[]) : []),
     { key: "performance", label: "Performance" },

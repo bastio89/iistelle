@@ -84,9 +84,9 @@ export default function CareerPage() {
           <h1 className="max-w-2xl text-4xl font-bold leading-tight text-white">
             Werde Teil unseres Teams
           </h1>
-          <p className="mt-3 max-w-xl text-petrol-200">
-            Finde die Rolle, die zu dir passt – die Bewerbung dauert keine zwei
-            Minuten, Lebenslauf einfach anhängen.
+          <p className="mt-3 max-w-xl whitespace-pre-line text-petrol-200">
+            {company.career_intro ||
+              "Finde die Rolle, die zu dir passt – die Bewerbung dauert keine zwei Minuten."}
           </p>
         </div>
       </header>

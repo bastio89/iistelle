@@ -190,6 +190,24 @@ export default function PipelinePage() {
                         {formatDate(a.applied_at)}
                       </span>
                     </div>
+                    {(() => {
+                      if (["eingestellt", "abgelehnt"].includes(a.stage)) return null;
+                      const waitDays = Math.floor(
+                        (Date.now() - new Date(a.updated_at).getTime()) / 86400000
+                      );
+                      if (waitDays < 7) return null;
+                      return (
+                        <div
+                          className={`mt-2 rounded-md px-2 py-1 text-[10px] font-bold ${
+                            waitDays >= 14
+                              ? "bg-rose-50 text-rose-600"
+                              : "bg-amber-50 text-amber-700"
+                          }`}
+                        >
+                          ⚠ Wartet seit {waitDays} Tagen auf Rückmeldung
+                        </div>
+                      );
+                    })()}
                   </div>
                 ))}
                 {stageApps.length === 0 && (

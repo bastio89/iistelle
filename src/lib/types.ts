@@ -61,6 +61,46 @@ export interface Activity {
   created_at: string;
 }
 
+export interface CandidateComment {
+  id: string;
+  candidate_id: string;
+  author: string;
+  body: string;
+  created_at: string;
+}
+
+export interface EquipmentItem {
+  id: string;
+  employee_id: string;
+  name: string;
+  serial_no: string | null;
+  issued_on: string;
+  returned_on: string | null;
+  note: string | null;
+  created_at: string;
+}
+
+export type CompanyFileCategory = "richtlinie" | "vorlage" | "handbuch" | "sonstige";
+
+export interface CompanyFile {
+  id: string;
+  name: string;
+  category: CompanyFileCategory;
+  storage_path: string;
+  size_bytes: number;
+  created_at: string;
+}
+
+export const COMPANY_FILE_CATEGORY_META: Record<
+  CompanyFileCategory,
+  { label: string; color: string }
+> = {
+  richtlinie: { label: "Richtlinie", color: "bg-petrol-100 text-petrol-700" },
+  vorlage: { label: "Vorlage", color: "bg-violet-100 text-violet-800" },
+  handbuch: { label: "Handbuch", color: "bg-sky-100 text-sky-800" },
+  sonstige: { label: "Sonstige", color: "bg-slate-100 text-slate-700" },
+};
+
 export interface HrTask {
   id: string;
   title: string;
@@ -82,6 +122,8 @@ export interface Company {
   plan_status: "aktiv" | "gekuendigt" | "zahlung_offen";
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
+  career_intro: string;
+  onboarding_template: string[];
   created_at: string;
 }
 
@@ -182,6 +224,7 @@ export interface Absence {
   days: number;
   status: AbsenceStatus;
   comment: string | null;
+  attachment_path: string | null;
   created_at: string;
   employee?: Employee;
 }

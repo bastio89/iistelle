@@ -61,6 +61,8 @@ export default function SettingsPage() {
         name: settings.name,
         default_vacation_days: settings.default_vacation_days,
         probation_months: settings.probation_months,
+        career_intro: settings.career_intro,
+        onboarding_template: settings.onboarding_template,
       })
       .eq("id", settings.id);
     setMsg(
@@ -189,6 +191,33 @@ export default function SettingsPage() {
                     /karriere/{settings.slug}
                   </a>
                 </span>
+              </div>
+              <div>
+                <label className="label">Karriereseiten-Begrüßung</label>
+                <textarea
+                  className="input min-h-20"
+                  value={settings.career_intro}
+                  onChange={(e) =>
+                    setSettings({ ...settings, career_intro: e.target.value })
+                  }
+                  placeholder="Text, der Bewerber:innen auf deiner Karriereseite begrüßt"
+                />
+              </div>
+              <div>
+                <label className="label">Onboarding-Standard-Checkliste (eine Aufgabe pro Zeile)</label>
+                <textarea
+                  className="input min-h-32"
+                  value={(settings.onboarding_template ?? []).join("\n")}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      onboarding_template: e.target.value
+                        .split("\n")
+                        .map((l) => l.trim())
+                        .filter(Boolean),
+                    })
+                  }
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>

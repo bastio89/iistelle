@@ -19,6 +19,7 @@ import {
   Network,
   CreditCard,
   ListTodo,
+  FolderOpen,
 } from "lucide-react";
 import { useRole } from "@/lib/useRole";
 
@@ -42,6 +43,7 @@ const moreNav = [
   { href: "/abwesenheiten", label: "Abwesenheiten", icon: Plane },
   { href: "/gehalt", label: "Gehalt", icon: Wallet, adminOnly: true },
   { href: "/performance", label: "Performance", icon: TrendingUp },
+  { href: "/dokumente", label: "Dokumente", icon: FolderOpen },
   { href: "/abrechnung", label: "Abrechnung", icon: CreditCard, adminOnly: true },
   { href: "/einstellungen", label: "Einstellungen", icon: Settings },
 ];

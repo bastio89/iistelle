@@ -20,7 +20,15 @@ import {
   formatDate,
 } from "@/components/ui";
 import { downloadCsv } from "@/lib/csv";
-import { Check, ChevronLeft, ChevronRight, Download, Plus, X } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Paperclip,
+  Plus,
+  X,
+} from "lucide-react";
 
 function workdaysBetween(start: string, end: string) {
   const s = new Date(start);
@@ -41,7 +49,7 @@ export default function AbsencesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>("alle");
   const [showForm, setShowForm] = useState(false);
-  const [view, setView] = useState<"liste" | "kalender">("liste");
+  const [view, setView] = useState<"liste" | "kalender" | "konten">("liste");
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -65,6 +73,13 @@ export default function AbsencesPage() {
   async function setStatus(id: string, status: AbsenceStatus) {
     await supabase.from("absences").update({ status }).eq("id", id);
     load();
+  }
+
+  async function openAttachment(path: string) {
+    const { data } = await supabase.storage
+      .from("dokumente")
+      .createSignedUrl(path, 60);
+    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
   }
 
   const today = new Date().toISOString().slice(0, 10);
@@ -182,6 +197,7 @@ export default function AbsencesPage() {
             [
               ["liste", "Liste"],
               ["kalender", "Team-Kalender"],
+              ["konten", "Urlaubskonten"],
             ] as const
           ).map(([key, label]) => (
             <button
@@ -201,6 +217,8 @@ export default function AbsencesPage() {
 
       {view === "kalender" ? (
         <TeamCalendar absences={absences} employees={employees} />
+      ) : view === "konten" ? (
+        <VacationAccounts absences={absences} employees={employees} />
       ) : filtered.length === 0 ? (
         <EmptyState title="Keine Abwesenheiten in dieser Ansicht" />
       ) : (
@@ -244,7 +262,20 @@ export default function AbsencesPage() {
                     <td className="px-5 py-3 text-petrol-700">
                       {formatDate(a.start_date)} – {formatDate(a.end_date)}
                     </td>
-                    <td className="px-5 py-3 font-semibold text-petrol-800">{a.days}</td>
+                    <td className="px-5 py-3 font-semibold text-petrol-800">
+                      <span className="flex items-center gap-1.5">
+                        {a.days}
+                        {a.attachment_path && (
+                          <button
+                            onClick={() => openAttachment(a.attachment_path!)}
+                            title="Attest öffnen"
+                            className="text-petrol-400 transition hover:text-petrol-700"
+                          >
+                            <Paperclip className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </span>
+                    </td>
                     <td className="px-5 py-3">
                       <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${stMeta.color}`}>
                         {stMeta.label}
@@ -445,6 +476,97 @@ function TeamCalendar({
   );
 }
 
+function VacationAccounts({
+  absences,
+  employees,
+}: {
+  absences: Absence[];
+  employees: Employee[];
+}) {
+  const year = new Date().getFullYear();
+
+  const rows = employees.map((emp) => {
+    const empVacation = absences.filter(
+      (a) =>
+        a.employee_id === emp.id &&
+        a.absence_type === "urlaub" &&
+        new Date(a.start_date).getFullYear() === year
+    );
+    const taken = empVacation
+      .filter((a) => a.status === "genehmigt")
+      .reduce((s, a) => s + Number(a.days), 0);
+    const planned = empVacation
+      .filter((a) => a.status === "beantragt")
+      .reduce((s, a) => s + Number(a.days), 0);
+    const remaining = emp.vacation_days_per_year - taken;
+    return { emp, taken, planned, remaining };
+  });
+
+  return (
+    <div className="card overflow-hidden">
+      <div className="border-b border-petrol-100 px-5 py-4">
+        <h2 className="font-bold text-petrol-900">Urlaubskonten {year}</h2>
+        <p className="text-xs text-petrol-400">
+          Genommen = genehmigte Urlaubstage · Geplant = noch nicht genehmigte Anträge
+        </p>
+      </div>
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-petrol-100 bg-petrol-50/50 text-left text-xs font-bold uppercase tracking-wide text-petrol-500">
+            <th className="px-5 py-3">Mitarbeiter:in</th>
+            <th className="px-5 py-3">Anspruch</th>
+            <th className="px-5 py-3">Genommen</th>
+            <th className="px-5 py-3">Geplant</th>
+            <th className="px-5 py-3">Rest</th>
+            <th className="px-5 py-3 w-48">Verbrauch</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-petrol-50">
+          {rows.map(({ emp, taken, planned, remaining }) => (
+            <tr key={emp.id} className="transition hover:bg-petrol-50/40">
+              <td className="px-5 py-3">
+                <Link href={`/mitarbeiter/${emp.id}`} className="flex items-center gap-3">
+                  <Avatar name={`${emp.first_name} ${emp.last_name}`} size="sm" />
+                  <span className="font-semibold text-petrol-900">
+                    {emp.first_name} {emp.last_name}
+                  </span>
+                </Link>
+              </td>
+              <td className="px-5 py-3 text-petrol-700">{emp.vacation_days_per_year}</td>
+              <td className="px-5 py-3 text-petrol-700">{taken}</td>
+              <td className="px-5 py-3 text-petrol-500">{planned}</td>
+              <td
+                className={`px-5 py-3 font-bold ${
+                  remaining < 5 ? "text-coral-500" : "text-petrol-900"
+                }`}
+              >
+                {remaining}
+              </td>
+              <td className="px-5 py-3">
+                <div className="h-2.5 overflow-hidden rounded-full bg-petrol-50">
+                  <div
+                    className={`h-full rounded-full ${
+                      taken / Math.max(emp.vacation_days_per_year, 1) > 0.8
+                        ? "bg-coral-500"
+                        : "bg-petrol-600"
+                    }`}
+                    style={{
+                      width: `${Math.min(
+                        (taken / Math.max(emp.vacation_days_per_year, 1)) * 100,
+                        100
+                      )}%`,
+                    }}
+                  />
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function AbsenceFormModal({
   employees,
   onClose,
@@ -463,14 +585,33 @@ function AbsenceFormModal({
     end_date: today,
     comment: "",
   });
+  const [halfDay, setHalfDay] = useState(false);
+  const [attachment, setAttachment] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const days = workdaysBetween(form.start_date, form.end_date);
+  const singleDay = form.start_date === form.end_date;
+  const days =
+    singleDay && halfDay ? 0.5 : workdaysBetween(form.start_date, form.end_date);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    await supabase.from("absences").insert({ ...form, days, status: "beantragt" });
+
+    let attachmentPath = "";
+    if (attachment) {
+      const path = `atteste/${Date.now()}-${attachment.name}`;
+      const { error: upErr } = await supabase.storage
+        .from("dokumente")
+        .upload(path, attachment);
+      if (!upErr) attachmentPath = path;
+    }
+
+    await supabase.from("absences").insert({
+      ...form,
+      days,
+      status: "beantragt",
+      attachment_path: attachmentPath,
+    });
     onSaved();
   }
 
@@ -533,9 +674,31 @@ function AbsenceFormModal({
             />
           </div>
         </div>
+        {singleDay && (
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-petrol-700">
+            <input
+              type="checkbox"
+              checked={halfDay}
+              onChange={(e) => setHalfDay(e.target.checked)}
+              className="h-4 w-4 accent-petrol-700"
+            />
+            Nur halber Tag (0,5 Tage)
+          </label>
+        )}
         <p className="rounded-lg bg-petrol-50 px-4 py-2.5 text-sm text-petrol-600">
           {days} Arbeitstag{days === 1 ? "" : "e"} (Mo–Fr)
         </p>
+        {form.absence_type === "krank" && (
+          <div>
+            <label className="label">Attest / Nachweis (optional)</label>
+            <input
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              className="block w-full text-sm text-petrol-500 file:mr-3 file:rounded-lg file:border-0 file:bg-petrol-800 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-petrol-700"
+              onChange={(e) => setAttachment(e.target.files?.[0] ?? null)}
+            />
+          </div>
+        )}
         <div>
           <label className="label">Kommentar</label>
           <input

@@ -135,6 +135,14 @@ export default function InterviewsPage() {
                     {INTERVIEW_TYPE_LABEL[iv.interview_type]} · {iv.interviewer}
                   </p>
                   <p className="text-xs text-petrol-400">{iv.application?.job?.title}</p>
+                  {iv.status === "abgeschlossen" && (
+                    <Link
+                      href={`/recruiting/kandidaten/${cand?.id}`}
+                      className="mt-1 inline-block text-xs font-bold text-coral-500 hover:text-coral-600"
+                    >
+                      Jetzt Bewertung erfassen →
+                    </Link>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   {cand && <Avatar name={`${cand.first_name} ${cand.last_name}`} size="sm" />}
