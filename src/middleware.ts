@@ -40,7 +40,9 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname === "/" ||
     request.nextUrl.pathname.startsWith("/karriere") ||
     request.nextUrl.pathname.startsWith("/impressum") ||
-    request.nextUrl.pathname.startsWith("/datenschutz");
+    request.nextUrl.pathname.startsWith("/datenschutz") ||
+    request.nextUrl.pathname.startsWith("/status") ||
+    request.nextUrl.pathname.startsWith("/termin");
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();

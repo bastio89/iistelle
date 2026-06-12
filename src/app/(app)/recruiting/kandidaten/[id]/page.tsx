@@ -32,6 +32,7 @@ import {
   ArrowLeft,
   CalendarPlus,
   FileText,
+  Link2,
   Linkedin,
   Mail,
   MapPin,
@@ -65,6 +66,8 @@ export default function CandidateDetailPage() {
   const [employeeRecord, setEmployeeRecord] = useState<Employee | null>(null);
   const [converting, setConverting] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
+  const [showScheduling, setShowScheduling] = useState(false);
+  const [statusLinkCopied, setStatusLinkCopied] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -363,6 +366,22 @@ export default function CandidateDetailPage() {
               <Sparkles className="h-4 w-4" />
               {candidate.in_talent_pool ? "Im Talent-Pool" : "Talent-Pool"}
             </button>
+            {apps[0] && (
+              <button
+                className="btn-secondary"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(
+                    `${window.location.origin}/status/${apps[0].status_token}`
+                  );
+                  setStatusLinkCopied(true);
+                  setTimeout(() => setStatusLinkCopied(false), 2000);
+                }}
+                title="Status-Link für Bewerber kopieren"
+              >
+                <Link2 className="h-4 w-4" />
+                {statusLinkCopied ? "Kopiert ✓" : "Status-Link"}
+              </button>
+            )}
             <button className="btn-secondary" onClick={() => setShowEmail(true)}>
               <Send className="h-4 w-4" /> E-Mail
             </button>
@@ -465,7 +484,14 @@ export default function CandidateDetailPage() {
 
         {tab === "interviews" && (
           <div className="space-y-3">
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
+              <button
+                className="btn-secondary"
+                onClick={() => setShowScheduling(true)}
+                disabled={apps.length === 0}
+              >
+                <Link2 className="h-4 w-4" /> Terminvorschläge senden
+              </button>
               <button
                 className="btn-primary"
                 onClick={() => setShowInterview(true)}
@@ -694,7 +720,193 @@ export default function CandidateDetailPage() {
           onClose={() => setShowEmail(false)}
         />
       )}
+
+      {showScheduling && apps.length > 0 && (
+        <SchedulingModal
+          apps={apps}
+          candidateId={id}
+          onClose={() => setShowScheduling(false)}
+        />
+      )}
     </div>
+  );
+}
+
+function SchedulingModal({
+  apps,
+  candidateId,
+  onClose,
+}: {
+  apps: Application[];
+  candidateId: string;
+  onClose: () => void;
+}) {
+  const supabase = createClient();
+  const [form, setForm] = useState({
+    application_id: apps[0].id,
+    title: "Erstgespräch",
+    interview_type: "video",
+    duration_min: 60,
+    interviewer: "",
+  });
+  const [slots, setSlots] = useState<string[]>(["", "", ""]);
+  const [link, setLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  async function create(e: React.FormEvent) {
+    e.preventDefault();
+    const validSlots = slots.filter(Boolean);
+    if (validSlots.length === 0) return;
+    setSaving(true);
+    const { data, error } = await supabase
+      .from("scheduling_links")
+      .insert({
+        application_id: form.application_id,
+        title: form.title,
+        interview_type: form.interview_type,
+        duration_min: Number(form.duration_min),
+        interviewer: form.interviewer,
+      })
+      .select()
+      .single();
+    if (!error && data) {
+      await supabase.from("scheduling_slots").insert(
+        validSlots.map((s) => ({
+          link_id: data.id,
+          starts_at: new Date(s).toISOString(),
+        }))
+      );
+      await logActivity(candidateId, `Terminvorschläge gesendet (${form.title})`);
+      setLink(`${window.location.origin}/termin/${data.token}`);
+    }
+    setSaving(false);
+  }
+
+  if (link) {
+    return (
+      <Modal title="Buchungslink erstellt" onClose={onClose}>
+        <div className="space-y-4">
+          <p className="text-sm text-petrol-600">
+            Teile diesen Link mit der Kandidatin / dem Kandidaten. Der erste
+            gebuchte Termin wird automatisch als Interview angelegt.
+          </p>
+          <div className="flex items-center gap-2 rounded-lg bg-petrol-50 px-4 py-3">
+            <span className="min-w-0 flex-1 truncate text-sm font-mono text-petrol-800">
+              {link}
+            </span>
+            <button
+              className="btn-primary py-1.5"
+              onClick={async () => {
+                await navigator.clipboard.writeText(link);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+            >
+              {copied ? "Kopiert ✓" : "Kopieren"}
+            </button>
+          </div>
+          <div className="flex justify-end">
+            <button className="btn-secondary" onClick={onClose}>
+              Schließen
+            </button>
+          </div>
+        </div>
+      </Modal>
+    );
+  }
+
+  return (
+    <Modal title="Terminvorschläge senden" onClose={onClose} wide>
+      <form onSubmit={create} className="space-y-4">
+        <p className="text-sm text-petrol-500">
+          Gib bis zu drei Zeitfenster frei – die Person bucht selbst über einen
+          Link, ganz ohne E-Mail-Pingpong.
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="label">Stelle</label>
+            <select
+              className="input"
+              value={form.application_id}
+              onChange={(e) => setForm({ ...form, application_id: e.target.value })}
+            >
+              {apps.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.job?.title}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label">Titel</label>
+            <input
+              className="input"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              required
+            />
+          </div>
+          <div>
+            <label className="label">Art</label>
+            <select
+              className="input"
+              value={form.interview_type}
+              onChange={(e) => setForm({ ...form, interview_type: e.target.value })}
+            >
+              <option value="telefon">Telefon</option>
+              <option value="video">Video-Call</option>
+              <option value="vor_ort">Vor Ort</option>
+            </select>
+          </div>
+          <div>
+            <label className="label">Dauer (Min)</label>
+            <input
+              className="input"
+              type="number"
+              min={15}
+              step={15}
+              value={form.duration_min}
+              onChange={(e) => setForm({ ...form, duration_min: Number(e.target.value) })}
+            />
+          </div>
+        </div>
+        <div>
+          <label className="label">Interviewer:in</label>
+          <input
+            className="input"
+            value={form.interviewer}
+            onChange={(e) => setForm({ ...form, interviewer: e.target.value })}
+            placeholder="z. B. Sarah Klein"
+            required
+          />
+        </div>
+        <div>
+          <label className="label">Zeitfenster (mind. 1)</label>
+          <div className="space-y-2">
+            {slots.map((s, i) => (
+              <input
+                key={i}
+                className="input"
+                type="datetime-local"
+                value={s}
+                onChange={(e) =>
+                  setSlots(slots.map((x, j) => (j === i ? e.target.value : x)))
+                }
+              />
+            ))}
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 pt-2">
+          <button type="button" className="btn-secondary" onClick={onClose}>
+            Abbrechen
+          </button>
+          <button className="btn-primary" disabled={saving || !slots.some(Boolean)}>
+            {saving ? "Erstelle…" : "Buchungslink erstellen"}
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 
@@ -748,6 +960,27 @@ function EmailModal({
     await navigator.clipboard.writeText(`Betreff: ${subject}\n\n${body}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  const [sending, setSending] = useState(false);
+  const [sendMsg, setSendMsg] = useState<string | null>(null);
+
+  async function sendDirect() {
+    setSending(true);
+    setSendMsg(null);
+    const res = await fetch("/api/email/send", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ to: candidate.email, subject, body }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setSendMsg("✓ E-Mail versendet.");
+      logActivity(candidate.id, `E-Mail gesendet: „${subject}“`);
+    } else {
+      setSendMsg(data.error ?? "Versand fehlgeschlagen.");
+    }
+    setSending(false);
   }
 
   const mailto = `mailto:${candidate.email}?subject=${encodeURIComponent(
@@ -805,15 +1038,35 @@ function EmailModal({
             onChange={(e) => setBody(e.target.value)}
           />
         </div>
+        {sendMsg && (
+          <div
+            className={`rounded-lg px-4 py-3 text-sm ${
+              sendMsg.startsWith("✓")
+                ? "bg-emerald-50 text-emerald-700"
+                : "bg-amber-50 text-amber-800"
+            }`}
+          >
+            {sendMsg}
+          </div>
+        )}
         <div className="flex items-center justify-between gap-2 pt-1">
           <span className="text-xs text-petrol-400">An: {candidate.email}</span>
           <div className="flex gap-2">
             <button type="button" className="btn-secondary" onClick={copy}>
               {copied ? "Kopiert ✓" : "Text kopieren"}
             </button>
-            <a className="btn-primary" href={mailto}>
-              <Send className="h-4 w-4" /> Im Mail-Programm öffnen
+            <a className="btn-secondary" href={mailto}>
+              Im Mail-Programm öffnen
             </a>
+            <button
+              type="button"
+              className="btn-primary"
+              disabled={sending}
+              onClick={sendDirect}
+            >
+              <Send className="h-4 w-4" />
+              {sending ? "Sende…" : "Direkt senden"}
+            </button>
           </div>
         </div>
       </div>

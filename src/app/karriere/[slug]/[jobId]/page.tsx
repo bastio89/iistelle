@@ -82,12 +82,21 @@ export default function PublicJobDetailPage() {
 
   return (
     <div className="min-h-screen bg-surface">
-      <header className="bg-petrol-950">
+      <header style={{ backgroundColor: company.brand_color || "#0f2e34" }}>
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
-          <Link href={`/karriere/${slug}`} className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-coral-500 font-black text-white">
-              {company.name.slice(0, 1).toUpperCase()}
-            </div>
+          <Link href={`/karriere/${slug}`} className="flex items-center gap-2.5">
+            {company.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={company.logo_url}
+                alt={company.name}
+                className="h-9 w-9 rounded-lg bg-white/90 object-contain p-1"
+              />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-coral-500 font-black text-white">
+                {company.name.slice(0, 1).toUpperCase()}
+              </div>
+            )}
             <span className="text-lg font-bold text-white">{company.name}</span>
           </Link>
           <Link

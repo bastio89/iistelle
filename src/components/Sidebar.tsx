@@ -21,6 +21,8 @@ import {
   ListTodo,
   FolderOpen,
   Laptop,
+  Timer,
+  ShieldCheck,
 } from "lucide-react";
 import { useRole } from "@/lib/useRole";
 
@@ -42,11 +44,14 @@ const moreNav = [
   { href: "/mitarbeiter", label: "Mitarbeiter", icon: UserCircle },
   { href: "/organigramm", label: "Organigramm", icon: Network },
   { href: "/abwesenheiten", label: "Abwesenheiten", icon: Plane },
+  { href: "/zeiterfassung", label: "Zeiterfassung", icon: Timer, premium: true },
   { href: "/gehalt", label: "Gehalt", icon: Wallet, adminOnly: true },
+  { href: "/berichte", label: "Berichte", icon: BarChart3, premium: true },
   { href: "/performance", label: "Performance", icon: TrendingUp },
   { href: "/dokumente", label: "Dokumente", icon: FolderOpen },
   { href: "/inventar", label: "Inventar", icon: Laptop },
   { href: "/abrechnung", label: "Abrechnung", icon: CreditCard, adminOnly: true },
+  { href: "/datenschutz-center", label: "DSGVO-Center", icon: ShieldCheck, adminOnly: true, premium: true },
   { href: "/einstellungen", label: "Einstellungen", icon: Settings },
 ];
 
@@ -55,11 +60,13 @@ function NavLink({
   label,
   icon: Icon,
   exact,
+  showPro,
 }: {
   href: string;
   label: string;
   icon: React.ElementType;
   exact?: boolean;
+  showPro?: boolean;
 }) {
   const pathname = usePathname();
   const active = exact ? pathname === href : pathname.startsWith(href);
@@ -77,7 +84,12 @@ function NavLink({
           active ? "text-coral-400" : "text-petrol-300 group-hover:text-coral-400"
         }`}
       />
-      {label}
+      <span className="flex-1">{label}</span>
+      {showPro && (
+        <span className="rounded bg-coral-500/20 px-1.5 py-0.5 text-[9px] font-black tracking-wide text-coral-400">
+          PRO
+        </span>
+      )}
     </Link>
   );
 }
@@ -119,8 +131,14 @@ export default function Sidebar() {
             Weitere Module
           </p>
           <div className="space-y-1">
-            {visibleMoreNav.map(({ href, label, icon }) => (
-              <NavLink key={href} href={href} label={label} icon={icon} />
+            {visibleMoreNav.map(({ href, label, icon, premium }) => (
+              <NavLink
+                key={href}
+                href={href}
+                label={label}
+                icon={icon}
+                showPro={!!premium && company?.plan === "starter"}
+              />
             ))}
           </div>
         </div>

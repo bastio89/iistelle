@@ -4,6 +4,8 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Job, JobStatus } from "@/lib/types";
 import { Modal } from "@/components/ui";
+import { usePremium } from "@/components/PremiumGate";
+import { Sparkles } from "lucide-react";
 
 const CHANNELS = ["Karriereseite", "LinkedIn", "StepStone", "Indeed", "XING"];
 
@@ -31,10 +33,32 @@ export default function JobFormModal({
     application_deadline: job?.application_deadline ?? "",
   });
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { isPremium } = usePremium();
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  async function generateDescription() {
+    setGenerating(true);
+    setError(null);
+    const res = await fetch("/api/ai/generate", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        mode: "stellenanzeige",
+        input: `Titel: ${form.title}\nAbteilung: ${form.department}\nStandort: ${form.location}\nSeniorität: ${form.seniority}\nAnstellungsart: ${form.employment_type}\nVorhandene Stichpunkte: ${form.description || "keine"}`,
+      }),
+    });
+    const data = await res.json();
+    if (data.text) {
+      set("description", data.text);
+    } else {
+      setError(data.error ?? "KI-Generierung fehlgeschlagen.");
+    }
+    setGenerating(false);
   }
 
   async function save(e: React.FormEvent) {
@@ -211,7 +235,21 @@ export default function JobFormModal({
         </div>
 
         <div>
-          <label className="label">Stellenbeschreibung</label>
+          <div className="mb-1 flex items-center justify-between">
+            <label className="label mb-0">Stellenbeschreibung</label>
+            {isPremium && (
+              <button
+                type="button"
+                className="flex items-center gap-1 text-xs font-bold text-coral-500 hover:text-coral-600 disabled:opacity-50"
+                onClick={generateDescription}
+                disabled={generating || !form.title}
+                title="Beschreibung aus den Eckdaten generieren"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                {generating ? "Generiere…" : "Mit KI generieren"}
+              </button>
+            )}
+          </div>
           <textarea
             className="input min-h-28"
             value={form.description ?? ""}

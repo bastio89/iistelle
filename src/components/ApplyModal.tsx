@@ -94,6 +94,18 @@ export default function ApplyModal({
       setSaving(false);
       return;
     }
+
+    // Team benachrichtigen (Slack), falls konfiguriert – Fehler ignorieren
+    fetch("/api/notify/application", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        company_id: company.id,
+        candidate_name: `${form.first_name} ${form.last_name}`,
+        job_title: job.title,
+      }),
+    }).catch(() => {});
+
     setDone(true);
   }
 

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Application, Job, STAGES, Stage } from "@/lib/types";
 import { Avatar, Modal, PageHeader, RatingStars, formatDate } from "@/components/ui";
 import { logActivity } from "@/lib/activity";
+import { runAutomations } from "@/lib/automations";
 import { GripVertical } from "lucide-react";
 
 export default function PipelinePage() {
@@ -66,7 +67,9 @@ export default function PipelinePage() {
       load();
     } else {
       const label = STAGES.find((s) => s.key === stage)?.label ?? stage;
+      const candName = `${app.candidate?.first_name} ${app.candidate?.last_name}`;
       logActivity(app.candidate_id, `Phase geändert auf „${label}“ (${app.job?.title})`);
+      runAutomations(stage, candName, app.job?.title ?? "");
     }
   }
 

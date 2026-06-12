@@ -126,6 +126,10 @@ export interface Company {
   stripe_subscription_id: string | null;
   career_intro: string;
   onboarding_template: string[];
+  logo_url: string;
+  brand_color: string;
+  slack_webhook_url: string;
+  candidate_retention_months: number;
   created_at: string;
 }
 
@@ -147,11 +151,65 @@ export interface Application {
   salary_expectation: string | null;
   notes: string | null;
   rejected_reason: string | null;
+  status_token: string;
   applied_at: string;
   updated_at: string;
   job?: Job;
   candidate?: Candidate;
 }
+
+export interface Automation {
+  id: string;
+  trigger_stage: string;
+  task_title: string;
+  assignee: string | null;
+  active: boolean;
+  created_at: string;
+}
+
+export interface TimeEntry {
+  id: string;
+  employee_id: string;
+  clock_in: string;
+  clock_out: string | null;
+  pause_min: number;
+  note: string | null;
+  employee?: Employee;
+}
+
+export interface AuditLog {
+  id: string;
+  actor: string;
+  action: string;
+  details: string | null;
+  created_at: string;
+}
+
+export interface ApiKey {
+  id: string;
+  name: string;
+  key: string;
+  created_at: string;
+}
+
+export interface SchedulingLink {
+  id: string;
+  application_id: string;
+  token: string;
+  title: string;
+  interview_type: string;
+  duration_min: number;
+  interviewer: string;
+  status: "offen" | "gebucht";
+  created_at: string;
+}
+
+export type ReviewType = "manager" | "self" | "peer";
+export const REVIEW_TYPE_LABEL: Record<ReviewType, string> = {
+  manager: "Manager-Review",
+  self: "Self-Review",
+  peer: "Peer-Feedback",
+};
 
 export interface Interview {
   id: string;
@@ -282,6 +340,7 @@ export const GOAL_STATUS_META: Record<GoalStatus, { label: string; color: string
 };
 
 export interface Review {
+  review_type: ReviewType;
   id: string;
   employee_id: string;
   reviewer: string;

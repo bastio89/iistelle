@@ -17,6 +17,8 @@ import {
   EquipmentItem,
   GOAL_STATUS_META,
   Goal,
+  REVIEW_TYPE_LABEL,
+  ReviewType,
   HrDocument,
   OnboardingTask,
   Review,
@@ -25,6 +27,7 @@ import {
   formatEuro,
 } from "@/lib/types";
 import { useRole } from "@/lib/useRole";
+import { logAudit } from "@/lib/audit";
 import {
   Avatar,
   Modal,
@@ -80,6 +83,7 @@ export default function EmployeeDetailPage() {
   const [showEdit, setShowEdit] = useState(false);
   const [showSalary, setShowSalary] = useState(false);
   const [showGoal, setShowGoal] = useState(false);
+  const [showReview, setShowReview] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -901,7 +905,12 @@ export default function EmployeeDetailPage() {
             </div>
 
             <div>
-              <h3 className="mb-3 font-bold text-petrol-900">Reviews</h3>
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="font-bold text-petrol-900">Reviews & 360°-Feedback</h3>
+                <button className="btn-secondary" onClick={() => setShowReview(true)}>
+                  <Plus className="h-4 w-4" /> Feedback
+                </button>
+              </div>
               <div className="space-y-3">
                 {reviews.length === 0 && (
                   <div className="card p-6 text-center text-sm text-petrol-400">Noch keine Reviews.</div>
@@ -909,7 +918,20 @@ export default function EmployeeDetailPage() {
                 {reviews.map((r) => (
                   <div key={r.id} className="card p-4">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-semibold text-petrol-900">{r.cycle}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-petrol-900">{r.cycle}</p>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                            r.review_type === "self"
+                              ? "bg-violet-100 text-violet-800"
+                              : r.review_type === "peer"
+                                ? "bg-sky-100 text-sky-800"
+                                : "bg-petrol-100 text-petrol-700"
+                          }`}
+                        >
+                          {REVIEW_TYPE_LABEL[r.review_type] ?? "Manager-Review"}
+                        </span>
+                      </div>
                       <RatingStars value={r.score} size={14} />
                     </div>
                     <p className="mt-1 text-xs text-petrol-400">von {r.reviewer} · {formatDate(r.created_at)}</p>
@@ -941,6 +963,17 @@ export default function EmployeeDetailPage() {
           onClose={() => setShowSalary(false)}
           onSaved={() => {
             setShowSalary(false);
+            load();
+          }}
+        />
+      )}
+
+      {showReview && (
+        <ReviewModal
+          employeeId={employee.id}
+          onClose={() => setShowReview(false)}
+          onSaved={() => {
+            setShowReview(false);
             load();
           }}
         />
@@ -988,6 +1021,7 @@ function SalaryModal({
       effective_from: form.effective_from,
       note: form.note,
     });
+    logAudit("Gehaltsanpassung erfasst", `gültig ab ${form.effective_from}`);
     onSaved();
   }
 
@@ -1023,6 +1057,113 @@ function SalaryModal({
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" className="btn-secondary" onClick={onClose}>Abbrechen</button>
           <button className="btn-primary" disabled={saving}>{saving ? "Speichern…" : "Speichern"}</button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+function ReviewModal({
+  employeeId,
+  onClose,
+  onSaved,
+}: {
+  employeeId: string;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const supabase = createClient();
+  const [form, setForm] = useState({
+    reviewer: "",
+    cycle: `H${new Date().getMonth() < 6 ? 1 : 2} ${new Date().getFullYear()}`,
+    review_type: "manager" as ReviewType,
+    score: 3,
+    strengths: "",
+    improvements: "",
+  });
+  const [saving, setSaving] = useState(false);
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    await supabase.from("reviews").insert({ ...form, employee_id: employeeId });
+    onSaved();
+  }
+
+  return (
+    <Modal title="Feedback erfassen" onClose={onClose}>
+      <form onSubmit={save} className="space-y-4">
+        <div>
+          <label className="label">Art des Feedbacks</label>
+          <div className="flex gap-2">
+            {(Object.keys(REVIEW_TYPE_LABEL) as ReviewType[]).map((t) => (
+              <button
+                type="button"
+                key={t}
+                onClick={() => setForm({ ...form, review_type: t })}
+                className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
+                  form.review_type === t
+                    ? "border-petrol-800 bg-petrol-800 text-white"
+                    : "border-petrol-200 bg-white text-petrol-600 hover:bg-petrol-50"
+                }`}
+              >
+                {REVIEW_TYPE_LABEL[t]}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="label">
+              {form.review_type === "self" ? "Dein Name" : "Feedback-Geber:in"}
+            </label>
+            <input
+              className="input"
+              value={form.reviewer}
+              onChange={(e) => setForm({ ...form, reviewer: e.target.value })}
+              required
+            />
+          </div>
+          <div>
+            <label className="label">Zyklus</label>
+            <input
+              className="input"
+              value={form.cycle}
+              onChange={(e) => setForm({ ...form, cycle: e.target.value })}
+            />
+          </div>
+        </div>
+        <div>
+          <label className="label">Bewertung</label>
+          <RatingStars
+            value={form.score}
+            onChange={(v) => setForm({ ...form, score: v })}
+            size={24}
+          />
+        </div>
+        <div>
+          <label className="label">Stärken</label>
+          <textarea
+            className="input min-h-20"
+            value={form.strengths}
+            onChange={(e) => setForm({ ...form, strengths: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="label">Entwicklungsfelder</label>
+          <textarea
+            className="input min-h-20"
+            value={form.improvements}
+            onChange={(e) => setForm({ ...form, improvements: e.target.value })}
+          />
+        </div>
+        <div className="flex justify-end gap-2 pt-2">
+          <button type="button" className="btn-secondary" onClick={onClose}>
+            Abbrechen
+          </button>
+          <button className="btn-primary" disabled={saving}>
+            {saving ? "Speichern…" : "Feedback speichern"}
+          </button>
         </div>
       </form>
     </Modal>

@@ -34,6 +34,38 @@ export default function CandidatesPage() {
     load();
   }, [load]);
 
+  // Duplikat-Erkennung: gleiche E-Mail-Adresse
+  const emailGroups = candidates.reduce<Record<string, Candidate[]>>((acc, c) => {
+    const key = c.email.toLowerCase().trim();
+    (acc[key] = acc[key] ?? []).push(c);
+    return acc;
+  }, {});
+  const duplicateGroups = Object.values(emailGroups).filter((g) => g.length > 1);
+
+  async function mergeDuplicates(group: Candidate[]) {
+    const [primary, ...rest] = [...group].sort(
+      (a, b) => +new Date(a.created_at) - +new Date(b.created_at)
+    );
+    if (
+      !confirm(
+        `${rest.length} Duplikat(e) von ${primary.first_name} ${primary.last_name} in das älteste Profil zusammenführen? Bewerbungen und Verlauf werden übernommen.`
+      )
+    )
+      return;
+    for (const dup of rest) {
+      await supabase
+        .from("applications")
+        .update({ candidate_id: primary.id })
+        .eq("candidate_id", dup.id);
+      await supabase
+        .from("activities")
+        .update({ candidate_id: primary.id })
+        .eq("candidate_id", dup.id);
+      await supabase.from("candidates").delete().eq("id", dup.id);
+    }
+    load();
+  }
+
   const allTags = Array.from(new Set(candidates.flatMap((c) => c.tags ?? []))).sort();
 
   const filtered = candidates.filter((c) => {
@@ -107,6 +139,31 @@ export default function CandidatesPage() {
           ✦ Talent-Pool ({poolCount})
         </button>
       </div>
+
+      {duplicateGroups.length > 0 && (
+        <div className="card mb-4 border-2 border-amber-200 p-4">
+          <p className="text-sm font-semibold text-petrol-900">
+            ⚠️ {duplicateGroups.length} mögliche{" "}
+            {duplicateGroups.length === 1 ? "Dublette" : "Dubletten"} gefunden
+            (gleiche E-Mail-Adresse)
+          </p>
+          <div className="mt-2 space-y-1.5">
+            {duplicateGroups.map((g) => (
+              <div key={g[0].email} className="flex items-center justify-between gap-3 text-sm">
+                <span className="text-petrol-600">
+                  {g[0].first_name} {g[0].last_name} · {g[0].email} ({g.length} Profile)
+                </span>
+                <button
+                  className="btn-secondary py-1"
+                  onClick={() => mergeDuplicates(g)}
+                >
+                  Zusammenführen
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {allTags.length > 0 && (
         <div className="mb-4 flex flex-wrap items-center gap-2">

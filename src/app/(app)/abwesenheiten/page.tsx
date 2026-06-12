@@ -20,6 +20,7 @@ import {
   formatDate,
 } from "@/components/ui";
 import { downloadCsv } from "@/lib/csv";
+import { useRole } from "@/lib/useRole";
 import { isHoliday, upcomingHolidays, workdaysBetween } from "@/lib/holidays";
 import {
   Check,
@@ -38,9 +39,13 @@ export default function AbsencesPage() {
   const [statusFilter, setStatusFilter] = useState<string>("alle");
   const [showForm, setShowForm] = useState(false);
   const [view, setView] = useState<"liste" | "kalender" | "konten" | "statistik">("liste");
+  const [userName, setUserName] = useState("");
+  const { isAdmin } = useRole();
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
+    const { data: u } = await supabase.auth.getUser();
+    setUserName((u.user?.user_metadata?.full_name as string) ?? "");
     const [a, e] = await Promise.all([
       supabase
         .from("absences")
@@ -57,6 +62,13 @@ export default function AbsencesPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  /** Genehmiger-Workflow: nur Admins oder die direkte Führungskraft dürfen entscheiden. */
+  function canApprove(a: Absence) {
+    if (isAdmin) return true;
+    const manager = a.employee?.manager?.trim();
+    return !!manager && !!userName && manager === userName;
+  }
 
   async function setStatus(id: string, status: AbsenceStatus) {
     await supabase.from("absences").update({ status }).eq("id", id);
@@ -273,24 +285,32 @@ export default function AbsencesPage() {
                       </span>
                     </td>
                     <td className="px-5 py-3">
-                      {a.status === "beantragt" && (
-                        <div className="flex justify-end gap-1.5">
-                          <button
-                            onClick={() => setStatus(a.id, "genehmigt")}
-                            className="rounded-lg bg-emerald-100 p-1.5 text-emerald-700 transition hover:bg-emerald-200"
-                            title="Genehmigen"
+                      {a.status === "beantragt" &&
+                        (canApprove(a) ? (
+                          <div className="flex justify-end gap-1.5">
+                            <button
+                              onClick={() => setStatus(a.id, "genehmigt")}
+                              className="rounded-lg bg-emerald-100 p-1.5 text-emerald-700 transition hover:bg-emerald-200"
+                              title="Genehmigen"
+                            >
+                              <Check className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => setStatus(a.id, "abgelehnt")}
+                              className="rounded-lg bg-rose-100 p-1.5 text-rose-600 transition hover:bg-rose-200"
+                              title="Ablehnen"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <p
+                            className="text-right text-xs text-petrol-400"
+                            title="Nur Admins oder die direkte Führungskraft dürfen entscheiden"
                           >
-                            <Check className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => setStatus(a.id, "abgelehnt")}
-                            className="rounded-lg bg-rose-100 p-1.5 text-rose-600 transition hover:bg-rose-200"
-                            title="Ablehnen"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      )}
+                            wartet auf {a.employee?.manager || "Admin"}
+                          </p>
+                        ))}
                     </td>
                   </tr>
                 );

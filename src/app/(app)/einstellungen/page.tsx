@@ -2,18 +2,32 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Company, Invitation, ROLE_META, UserRole, UserRoleRow } from "@/lib/types";
+import {
+  ApiKey,
+  AuditLog,
+  Automation,
+  Company,
+  Invitation,
+  ROLE_META,
+  STAGES,
+  UserRole,
+  UserRoleRow,
+} from "@/lib/types";
+import { logAudit } from "@/lib/audit";
+import { PremiumSection } from "@/components/PremiumGate";
 import { useRole } from "@/lib/useRole";
-import { PageHeader, formatDate } from "@/components/ui";
+import { PageHeader, formatDate, formatDateTime } from "@/components/ui";
 import {
   Building2,
   Copy,
   Globe,
   KeyRound,
+  ScrollText,
   ShieldCheck,
   Trash2,
   UserCircle,
   UserPlus,
+  Workflow,
 } from "lucide-react";
 
 export default function SettingsPage() {
@@ -28,6 +42,14 @@ export default function SettingsPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<UserRole>("mitarbeiter");
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [automations, setAutomations] = useState<Automation[]>([]);
+  const [autoForm, setAutoForm] = useState({
+    trigger_stage: "angebot",
+    task_title: "",
+    assignee: "",
+  });
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const { isAdmin } = useRole();
   const [loading, setLoading] = useState(true);
 
@@ -46,6 +68,14 @@ export default function SettingsPage() {
       ]);
       setRoles((r as UserRoleRow[]) ?? []);
       setInvites((inv as Invitation[]) ?? []);
+      const [{ data: autos }, { data: logs }, { data: keys }] = await Promise.all([
+        supabase.from("automations").select("*").order("created_at"),
+        supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(50),
+        supabase.from("api_keys").select("*").order("created_at"),
+      ]);
+      setAutomations((autos as Automation[]) ?? []);
+      setAuditLogs((logs as AuditLog[]) ?? []);
+      setApiKeys((keys as ApiKey[]) ?? []);
       setLoading(false);
     }
     load();
@@ -63,6 +93,9 @@ export default function SettingsPage() {
         probation_months: settings.probation_months,
         career_intro: settings.career_intro,
         onboarding_template: settings.onboarding_template,
+        brand_color: settings.brand_color,
+        slack_webhook_url: settings.slack_webhook_url,
+        candidate_retention_months: settings.candidate_retention_months,
       })
       .eq("id", settings.id);
     setMsg(
@@ -70,6 +103,69 @@ export default function SettingsPage() {
         ? { type: "err", text: error.message }
         : { type: "ok", text: "Unternehmenseinstellungen gespeichert." }
     );
+  }
+
+  async function addAutomation(e: React.FormEvent) {
+    e.preventDefault();
+    if (!autoForm.task_title.trim()) return;
+    const { data, error } = await supabase
+      .from("automations")
+      .insert(autoForm)
+      .select()
+      .single();
+    if (!error && data) {
+      setAutomations((prev) => [...prev, data as Automation]);
+      setAutoForm({ trigger_stage: "angebot", task_title: "", assignee: "" });
+      setMsg({ type: "ok", text: "Automatisierung angelegt." });
+    }
+  }
+
+  async function toggleAutomation(a: Automation) {
+    await supabase.from("automations").update({ active: !a.active }).eq("id", a.id);
+    setAutomations((prev) =>
+      prev.map((x) => (x.id === a.id ? { ...x, active: !x.active } : x))
+    );
+  }
+
+  async function deleteAutomation(id: string) {
+    await supabase.from("automations").delete().eq("id", id);
+    setAutomations((prev) => prev.filter((x) => x.id !== id));
+  }
+
+  async function createApiKey() {
+    const { data, error } = await supabase
+      .from("api_keys")
+      .insert({ name: `Key ${apiKeys.length + 1}` })
+      .select()
+      .single();
+    if (!error && data) {
+      setApiKeys((prev) => [...prev, data as ApiKey]);
+      logAudit("API-Key erstellt", (data as ApiKey).name);
+    }
+  }
+
+  async function deleteApiKey(id: string) {
+    await supabase.from("api_keys").delete().eq("id", id);
+    setApiKeys((prev) => prev.filter((k) => k.id !== id));
+    logAudit("API-Key gelöscht");
+  }
+
+  async function uploadLogo(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !settings) return;
+    const path = `${settings.id}/logo-${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from("branding").upload(path, file);
+    if (error) {
+      setMsg({ type: "err", text: error.message });
+      return;
+    }
+    const { data } = supabase.storage.from("branding").getPublicUrl(path);
+    await supabase
+      .from("companies")
+      .update({ logo_url: data.publicUrl })
+      .eq("id", settings.id);
+    setSettings({ ...settings, logo_url: data.publicUrl });
+    setMsg({ type: "ok", text: "Logo hochgeladen – es erscheint auf deiner Karriereseite." });
   }
 
   async function saveProfile(e: React.FormEvent) {
@@ -93,6 +189,8 @@ export default function SettingsPage() {
       setRoles((prev) =>
         prev.map((r) => (r.user_id === userId ? { ...r, role } : r))
       );
+      const target = roles.find((r) => r.user_id === userId);
+      logAudit("Rolle geändert", `${target?.email ?? userId} → ${role}`);
       setMsg({ type: "ok", text: "Rolle aktualisiert." });
     } else {
       setMsg({ type: "err", text: error.message });
@@ -191,6 +289,85 @@ export default function SettingsPage() {
                     /karriere/{settings.slug}
                   </a>
                 </span>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="label">Logo (Karriereseite)</label>
+                  <div className="flex items-center gap-3">
+                    {settings.logo_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={settings.logo_url}
+                        alt="Logo"
+                        className="h-10 w-10 rounded-lg bg-petrol-50 object-contain"
+                      />
+                    ) : (
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-petrol-50 text-xs font-bold text-petrol-400">
+                        {settings.name.slice(0, 1)}
+                      </div>
+                    )}
+                    <label className="btn-secondary cursor-pointer py-1.5">
+                      Hochladen
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={uploadLogo}
+                      />
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="label">Markenfarbe</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={settings.brand_color}
+                      onChange={(e) =>
+                        setSettings({ ...settings, brand_color: e.target.value })
+                      }
+                      className="h-10 w-14 cursor-pointer rounded-lg border border-petrol-200"
+                    />
+                    <span className="text-sm font-mono text-petrol-500">
+                      {settings.brand_color}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="label">Bewerberdaten-Löschfrist (Monate)</label>
+                  <input
+                    className="input"
+                    type="number"
+                    min={1}
+                    value={settings.candidate_retention_months}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        candidate_retention_months: Number(e.target.value),
+                      })
+                    }
+                  />
+                  <p className="mt-1 text-xs text-petrol-400">
+                    Für das DSGVO-Center: Absagen älter als diese Frist werden
+                    zur Löschung vorgeschlagen.
+                  </p>
+                </div>
+                <div>
+                  <label className="label">Slack-Webhook-URL (optional)</label>
+                  <input
+                    className="input"
+                    value={settings.slack_webhook_url}
+                    onChange={(e) =>
+                      setSettings({ ...settings, slack_webhook_url: e.target.value })
+                    }
+                    placeholder="https://hooks.slack.com/services/…"
+                  />
+                  <p className="mt-1 text-xs text-petrol-400">
+                    Neue Bewerbungen werden in deinen Kanal gepostet.
+                  </p>
+                </div>
               </div>
               <div>
                 <label className="label">Karriereseiten-Begrüßung</label>
@@ -444,6 +621,202 @@ export default function SettingsPage() {
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* Workflow-Automatisierungen (nur Admins, Professional) */}
+      {isAdmin && (
+        <PremiumSection feature="Workflow-Automatisierungen">
+        <div className="card mt-6 p-6">
+          <div className="mb-4 flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-petrol-50 text-petrol-600">
+              <Workflow className="h-4 w-4" />
+            </div>
+            <div>
+              <h2 className="font-bold text-petrol-900">Workflow-Automatisierungen</h2>
+              <p className="text-xs text-petrol-400">
+                Wenn eine Bewerbung in die gewählte Phase wechselt, wird automatisch
+                eine Aufgabe erstellt. Platzhalter: {"{{kandidat}}, {{stelle}}"}
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={addAutomation} className="flex flex-wrap items-end gap-3">
+            <div>
+              <label className="label">Wenn Phase wird…</label>
+              <select
+                className="input w-auto"
+                value={autoForm.trigger_stage}
+                onChange={(e) =>
+                  setAutoForm({ ...autoForm, trigger_stage: e.target.value })
+                }
+              >
+                {STAGES.map((s) => (
+                  <option key={s.key} value={s.key}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="min-w-64 flex-1">
+              <label className="label">…erstelle Aufgabe</label>
+              <input
+                className="input"
+                value={autoForm.task_title}
+                onChange={(e) =>
+                  setAutoForm({ ...autoForm, task_title: e.target.value })
+                }
+                placeholder="z. B. Vertrag für {{kandidat}} vorbereiten"
+                required
+              />
+            </div>
+            <div>
+              <label className="label">Zuständig</label>
+              <input
+                className="input w-40"
+                value={autoForm.assignee}
+                onChange={(e) =>
+                  setAutoForm({ ...autoForm, assignee: e.target.value })
+                }
+                placeholder="optional"
+              />
+            </div>
+            <button className="btn-primary">Regel anlegen</button>
+          </form>
+
+          {automations.length > 0 && (
+            <div className="mt-5 divide-y divide-petrol-50 border-t border-petrol-50">
+              {automations.map((a) => (
+                <div key={a.id} className="flex items-center gap-3 py-3">
+                  <button
+                    onClick={() => toggleAutomation(a)}
+                    className={`relative h-5 w-9 rounded-full transition ${
+                      a.active ? "bg-emerald-500" : "bg-petrol-200"
+                    }`}
+                    title={a.active ? "Aktiv" : "Pausiert"}
+                  >
+                    <span
+                      className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${
+                        a.active ? "left-[18px]" : "left-0.5"
+                      }`}
+                    />
+                  </button>
+                  <p className="flex-1 text-sm text-petrol-800">
+                    <span className="font-semibold">
+                      {STAGES.find((s) => s.key === a.trigger_stage)?.label ?? a.trigger_stage}
+                    </span>{" "}
+                    → „{a.task_title}“
+                    {a.assignee && (
+                      <span className="text-petrol-400"> · {a.assignee}</span>
+                    )}
+                  </p>
+                  <button
+                    onClick={() => deleteAutomation(a.id)}
+                    className="rounded p-1.5 text-petrol-300 transition hover:bg-rose-50 hover:text-rose-500"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        </PremiumSection>
+      )}
+
+      {/* API-Keys (nur Admins, Professional) */}
+      {isAdmin && (
+        <PremiumSection feature="API-Zugriff">
+        <div className="card mt-6 p-6">
+          <div className="mb-4 flex items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-petrol-50 text-petrol-600">
+                <KeyRound className="h-4 w-4" />
+              </div>
+              <div>
+                <h2 className="font-bold text-petrol-900">API-Zugriff</h2>
+                <p className="text-xs text-petrol-400">
+                  Lese-Zugriff auf Stellen, Kandidaten und Bewerbungen via{" "}
+                  <code className="rounded bg-petrol-50 px-1">/api/v1/…</code> mit
+                  Bearer-Token.
+                </p>
+              </div>
+            </div>
+            <button className="btn-secondary" onClick={createApiKey}>
+              Key erstellen
+            </button>
+          </div>
+          {apiKeys.length === 0 ? (
+            <p className="py-3 text-center text-sm text-petrol-400">
+              Noch keine API-Keys.
+            </p>
+          ) : (
+            <div className="divide-y divide-petrol-50">
+              {apiKeys.map((k) => (
+                <div key={k.id} className="flex items-center gap-3 py-3">
+                  <span className="text-sm font-semibold text-petrol-900">{k.name}</span>
+                  <code className="min-w-0 flex-1 truncate rounded bg-petrol-50 px-2 py-1 text-xs text-petrol-700">
+                    {k.key}
+                  </code>
+                  <button
+                    className="btn-secondary py-1.5"
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(k.key);
+                      setCopiedId(k.id);
+                      setTimeout(() => setCopiedId(null), 2000);
+                    }}
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                    {copiedId === k.id ? "Kopiert ✓" : "Kopieren"}
+                  </button>
+                  <button
+                    onClick={() => deleteApiKey(k.id)}
+                    className="rounded p-1.5 text-petrol-300 transition hover:bg-rose-50 hover:text-rose-500"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        </PremiumSection>
+      )}
+
+      {/* Audit-Log (nur Admins) */}
+      {isAdmin && (
+        <div className="card mt-6 p-6">
+          <div className="mb-4 flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-petrol-50 text-petrol-600">
+              <ScrollText className="h-4 w-4" />
+            </div>
+            <div>
+              <h2 className="font-bold text-petrol-900">Audit-Log</h2>
+              <p className="text-xs text-petrol-400">
+                Die letzten 50 sicherheitsrelevanten Aktionen (Rollen, Gehälter,
+                Löschungen, Exporte).
+              </p>
+            </div>
+          </div>
+          {auditLogs.length === 0 ? (
+            <p className="py-3 text-center text-sm text-petrol-400">
+              Noch keine Einträge.
+            </p>
+          ) : (
+            <div className="max-h-80 divide-y divide-petrol-50 overflow-y-auto">
+              {auditLogs.map((l) => (
+                <div key={l.id} className="py-2.5 text-sm">
+                  <p className="text-petrol-800">
+                    <span className="font-semibold">{l.actor}</span> · {l.action}
+                    {l.details && (
+                      <span className="text-petrol-500"> – {l.details}</span>
+                    )}
+                  </p>
+                  <p className="text-xs text-petrol-400">{formatDateTime(l.created_at)}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
