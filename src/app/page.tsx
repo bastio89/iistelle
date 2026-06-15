@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 import {
   ArrowRight,
   BarChart3,
@@ -20,6 +21,7 @@ import {
   TrendingUp,
   Clock,
   Briefcase,
+  Sparkles as SparklesIcon,
 } from "lucide-react";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 
@@ -98,6 +100,24 @@ const comparisonRows = [
 ];
 
 export default function LandingPage() {
+  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+  const yearlySavingsPercent = 17;
+
+  const getYearlyPrice = (monthlyPrice: number, yearlyPrice: number) => {
+    if (billing === "yearly") {
+      return {
+        monthly: yearlyPrice / 12,
+        totalYearly: yearlyPrice,
+        savings: monthlyPrice * 12 - yearlyPrice,
+      };
+    }
+    return {
+      monthly: monthlyPrice,
+      totalYearly: 0,
+      savings: 0,
+    };
+  };
+
   return (
     <div className="min-h-screen bg-surface">
       {/* Navigation */}
@@ -375,13 +395,52 @@ export default function LandingPage() {
             Zwei klare Pläne – kein Verstecken hinter Mindestabnahmen. Starte mit 14 Tagen
             kostenlos und kündige monatlich.
           </p>
+
+          {/* Billing Toggle */}
+          <div className="mt-6 inline-flex items-center gap-1 rounded-full border border-petrol-200 bg-white p-1">
+            <button
+              onClick={() => setBilling("monthly")}
+              className={`rounded-full px-5 py-2 text-sm font-semibold transition-all ${
+                billing === "monthly"
+                  ? "bg-petrol-800 text-white shadow-sm"
+                  : "text-petrol-600 hover:text-petrol-900"
+              }`}
+            >
+              Monatlich
+            </button>
+            <button
+              onClick={() => setBilling("yearly")}
+              className={`rounded-full px-5 py-2 text-sm font-semibold transition-all flex items-center gap-2 ${
+                billing === "yearly"
+                  ? "bg-petrol-800 text-white shadow-sm"
+                  : "text-petrol-600 hover:text-petrol-900"
+              }`}
+            >
+              Jährlich
+              <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                -{yearlySavingsPercent}%
+              </span>
+            </button>
+          </div>
+          <p className="mt-2 text-sm text-petrol-500">
+            {billing === "yearly" ? (
+              <span className="text-emerald-600 font-medium">
+                Jährliche Abrechnung – 2 Monate gratis!
+              </span>
+            ) : (
+              <span>
+                Jährlich sparen: ca. {yearlySavingsPercent}% (2 Monate gratis)
+              </span>
+            )}
+          </p>
         </div>
 
         <div className="fade-in-stagger mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-2">
           {[
             {
               name: "Starter",
-              price: "39 €",
+              monthlyPrice: 39,
+              yearlyPrice: 390,
               sub: "pro Monat, pro Firma",
               highlight: false,
               description: "Für Kleinunternehmen, die Recruiting und Abwesenheiten effizient managen wollen.",
@@ -397,7 +456,8 @@ export default function LandingPage() {
             },
             {
               name: "Professional",
-              price: "99 €",
+              monthlyPrice: 99,
+              yearlyPrice: 990,
               sub: "pro Monat, pro Firma",
               highlight: true,
               description: "Für wachsende Unternehmen, die alle HR-Prozesse an einem Ort brauchen.",
@@ -413,16 +473,19 @@ export default function LandingPage() {
               ],
               cta: "14 Tage kostenlos testen",
             },
-          ].map((plan) => (
-            <div
-              key={plan.name}
-              className={`card relative flex flex-col p-7 transition-all ${
-                plan.highlight ? "border-2 border-coral-500 shadow-cardHover scale-in-spring" : ""
-              }`}
-            >
-              {plan.highlight && (
-                <span className="badge-pop absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-coral-500 px-3 py-1 text-xs font-bold text-white">
-                  Empfohlen
+          ].map((plan) => {
+            const priceData = getYearlyPrice(plan.monthlyPrice, plan.yearlyPrice);
+
+            return (
+              <div
+                key={plan.name}
+                className={`card relative flex flex-col p-7 transition-all ${
+                  plan.highlight ? "border-2 border-coral-500 shadow-cardHover scale-in-spring" : ""
+                }`}
+              >
+                {plan.highlight && (
+                  <span className="badge-pop absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-coral-500 px-3 py-1 text-xs font-bold text-white">
+                    Empfohlen
                 </span>
               )}
 
@@ -432,8 +495,14 @@ export default function LandingPage() {
                   <p className="mt-1 text-sm text-petrol-500">{plan.description}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-4xl font-black text-petrol-900">{plan.price}</p>
+                  <p className="text-4xl font-black text-petrol-900">{priceData.monthly} €</p>
                   <p className="text-sm text-petrol-400">{plan.sub}</p>
+                  {billing === "yearly" && priceData.savings > 0 && (
+                    <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                      <SparklesIcon className="h-3 w-3" />
+                      Sparen: {priceData.savings} €/Jahr
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -449,13 +518,14 @@ export default function LandingPage() {
               </ul>
 
               <Link
-                href="/login"
+                href={`/login?plan=${plan.name.toLowerCase()}${billing === "yearly" ? "&billing=yearly" : ""}`}
                 className={`${plan.highlight ? "btn-danger" : "btn-secondary"} mt-6 justify-center`}
               >
                 {plan.cta}
               </Link>
             </div>
-          ))}
+          );
+          })}
         </div>
 
         <p className="mt-6 text-center text-sm text-petrol-400">
