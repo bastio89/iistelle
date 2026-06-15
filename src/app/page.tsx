@@ -299,6 +299,28 @@ export default function LandingPage() {
         </div>
       </header>
 
+      {/* Recruiting Fakten */}
+      <section className="border-b border-petrol-100 bg-white">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 py-12 md:grid-cols-4">
+          <div className="text-center">
+            <p className="text-3xl font-black text-petrol-900">40%</p>
+            <p className="text-sm text-petrol-500">der Stellenanzeigen scheitern</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-black text-petrol-900">65%</p>
+            <p className="text-sm text-petrol-500">suchen aktiv nach Jobs</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-black text-petrol-900">2 Min.</p>
+            <p className="text-sm text-petrol-500">Ø erste Impression zählt</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-black text-petrol-900">73%</p>
+            <p className="text-sm text-petrol-500">erwarten Gehaltsangaben</p>
+          </div>
+        </div>
+      </section>
+
       {/* Vorteils-Leiste */}
       <section className="border-b border-petrol-100 bg-petrol-50/50">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-6 py-10 md:grid-cols-4">
