@@ -72,7 +72,7 @@ export default function PricingClient({ plans, config }: Props) {
 
       {/* Pricing Cards */}
       <section className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
           {plans.map((plan) => (
             <div
               key={plan.id}

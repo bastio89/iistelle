@@ -7,14 +7,20 @@ import {
   CheckCircle2,
   FileText,
   Globe,
-  KanbanSquare,
   Lock,
   Plane,
   ShieldCheck,
   Sparkles,
+  Star,
   UserPlus,
   Users,
   Zap,
+  Briefcase,
+  Clock,
+  MessageSquare,
+  TrendingUp,
+  Award,
+  ChevronRight,
 } from "lucide-react";
 
 export const metadata = {
@@ -23,62 +29,78 @@ export const metadata = {
     "Die All-in-One-HR-Plattform für kleine und mittlere Unternehmen: Stellen schneller besetzen, Personalakte, Abwesenheiten und Performance – alles an einem Ort.",
 };
 
-const features = [
-  {
-    icon: KanbanSquare,
-    title: "Bewerber-Pipeline",
-    text: "Kanban-Board mit Drag & Drop von Eingang bis Einstellung. Jede Bewerbung immer im Blick, keine Kandidaten mehr verlieren.",
-  },
-  {
-    icon: Globe,
-    title: "Eigene Karriereseite",
-    text: "Jede Firma erhält automatisch eine öffentliche Karriereseite. Bewerbungen inkl. Lebenslauf landen direkt in der Pipeline.",
-  },
-  {
-    icon: Users,
-    title: "Digitale Personalakte",
-    text: "Stammdaten, Dokumente, Gehalt, Ziele und Onboarding-Checklisten – pro Person gebündelt statt in zehn Ordnern verstreut.",
-  },
-  {
-    icon: Plane,
-    title: "Abwesenheiten",
-    text: "Anträge in Sekunden gestellt und genehmigt. Team-Kalender, Resturlaub und Wer-ist-heute-da? auf einen Blick.",
-  },
-  {
-    icon: CalendarClock,
-    title: "Interviews & Bewertungen",
-    text: "Gespräche planen, Feedback strukturiert einsammeln und Entscheidungen gemeinsam treffen – ohne E-Mail-Pingpong.",
-  },
-  {
-    icon: BarChart3,
-    title: "Auswertungen",
-    text: "Time-to-Hire, Conversion, Kanal-Performance und CSV-Exporte. Entscheidungen auf Basis von Zahlen statt Bauchgefühl.",
-  },
-];
-
-const steps = [
-  {
-    n: "01",
-    title: "Registrieren",
-    text: "Konto anlegen, Firmenname eintragen – dein eigener, komplett getrennter HR-Bereich steht in unter einer Minute.",
-  },
-  {
-    n: "02",
-    title: "Stelle veröffentlichen",
-    text: "Stelle anlegen, Kanäle wählen, auf deiner automatisch erstellten Karriereseite live schalten.",
-  },
-  {
-    n: "03",
-    title: "Schneller einstellen",
-    text: "Bewerbungen laufen direkt in die Pipeline. Interviewen, bewerten, einstellen – und per Klick ins Onboarding übernehmen.",
-  },
-];
-
 const trustItems = [
   { icon: Zap, text: "Startklar in 1 Minute" },
   { icon: Lock, text: "Strikte Datentrennung pro Firma" },
   { icon: ShieldCheck, text: "DSGVO-konform, Hosting in Frankfurt" },
   { icon: FileText, text: "CV-Upload & Dokumentenablage" },
+];
+
+const features = [
+  {
+    icon: Briefcase,
+    title: "Bewerber-Pipeline",
+    text: "Kanban-Board mit Drag & Drop von Eingang bis Einstellung. Jede Bewerbung immer im Blick.",
+    tag: "Recruiting",
+  },
+  {
+    icon: Globe,
+    title: "Eigene Karriereseite",
+    text: "Automatisch generierte Karriereseite. Bewerbungen inkl. Lebenslauf landen direkt in der Pipeline.",
+    tag: "Recruiting",
+  },
+  {
+    icon: Users,
+    title: "Digitale Personalakte",
+    text: "Stammdaten, Dokumente, Gehalt, Ziele und Onboarding-Checklisten – pro Person gebündelt.",
+    tag: "Personalakte",
+  },
+  {
+    icon: Plane,
+    title: "Abwesenheiten",
+    text: "Anträge in Sekunden gestellt und genehmigt. Team-Kalender und Resturlaub auf einen Blick.",
+    tag: "Personalakte",
+  },
+  {
+    icon: CalendarClock,
+    title: "Interviews & Feedback",
+    text: "Gespräche planen, Feedback strukturiert einsammeln und Entscheidungen gemeinsam treffen.",
+    tag: "Recruiting",
+  },
+  {
+    icon: TrendingUp,
+    title: "Performance & Gehalt",
+    text: "Ziele setzen, Feedback geben, Gehaltsänderungen dokumentieren – alles an einem Ort.",
+    tag: "Performance",
+  },
+  {
+    icon: BarChart3,
+    title: "Auswertungen & Reports",
+    text: "Time-to-Hire, Conversion und CSV-Exporte. Entscheidungen auf Basis von Zahlen.",
+    tag: "Analyse",
+  },
+  {
+    icon: Clock,
+    title: "Zeiterfassung",
+    text: "Ein- und Ausstempeln, Monatsübersicht und Überstundennachweis – direkt im Browser.",
+    tag: "Zeiterfassung",
+  },
+];
+
+const comparisonRows = [
+  { feature: "Mitarbeiter", starter: "Bis 5", professional: "Unbegrenzt" },
+  { feature: "Karriereseite", starter: true, professional: true },
+  { feature: "Bewerber-Pipeline", starter: true, professional: true },
+  { feature: "CV-Upload", starter: true, professional: true },
+  { feature: "Personalakte", starter: true, professional: true },
+  { feature: "Abwesenheiten & Kalender", starter: true, professional: true },
+  { feature: "Zeiterfassung", starter: false, professional: true },
+  { feature: "Gehaltsdaten", starter: false, professional: true },
+  { feature: "Performance-Gespräche", starter: false, professional: true },
+  { feature: "Rollen & Berechtigungen", starter: false, professional: true },
+  { feature: "API-Zugriff", starter: false, professional: true },
+  { feature: "CSV-Exporte", starter: false, professional: true },
+  { feature: "Audit-Log", starter: false, professional: true },
 ];
 
 export default function LandingPage() {
@@ -102,10 +124,10 @@ export default function LandingPage() {
 
           <div className="hidden items-center gap-8 text-sm font-semibold text-petrol-600 md:flex">
             {[
-              { href: "/services", label: "Services" },
-              { href: "/ratgeber", label: "Ratgeber" },
               { href: "#funktionen", label: "Funktionen" },
+              { href: "#vergleich", label: "Vergleich" },
               { href: "/preise", label: "Preise" },
+              { href: "/ratgeber", label: "Ratgeber" },
             ].map(({ href, label }) => (
               <Link
                 key={href}
@@ -125,7 +147,7 @@ export default function LandingPage() {
               Anmelden
             </Link>
             <Link href="/login" className="btn-primary">
-              Kostenlos starten
+              14 Tage kostenlos testen
             </Link>
           </div>
         </div>
@@ -140,11 +162,11 @@ export default function LandingPage() {
               "radial-gradient(60% 50% at 70% 20%, rgba(255,90,80,0.25) 0%, transparent 70%), radial-gradient(50% 40% at 20% 80%, rgba(69,144,154,0.3) 0%, transparent 70%)",
           }}
         />
-        <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-20 text-center">
-          {/* Badge with animation */}
+        <div className="relative mx-auto max-w-6xl px-6 pb-28 pt-20 text-center">
+          {/* Badge */}
           <div className="badge-pop inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold text-petrol-200">
             <Sparkles className="h-3.5 w-3.5 text-coral-400" />
-            Recruiting + HR in einer Plattform
+            Recruiting + HR in einer Plattform · Made in Switzerland
           </div>
 
           <h1 className="hero-title mx-auto mt-6 max-w-3xl text-4xl font-bold leading-tight text-white md:text-6xl">
@@ -160,7 +182,7 @@ export default function LandingPage() {
 
           <div className="hero-cta mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link href="/login" className="btn-danger group px-6 py-3 text-base">
-              Kostenlos starten
+              14 Tage kostenlos testen
               <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a
@@ -168,6 +190,7 @@ export default function LandingPage() {
               target="_blank"
               className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-6 py-3 text-base font-semibold text-white transition-all hover:bg-white/10"
             >
+              <Star className="h-4 w-4" />
               Live-Demo ansehen
             </a>
           </div>
@@ -179,7 +202,7 @@ export default function LandingPage() {
           {/* Produkt-Mockup */}
           <div className="hero-mockup relative mx-auto mt-14 max-w-4xl">
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl">
-              {/* Fenster-Kopf with traffic lights */}
+              {/* Fenster-Kopf */}
               <div className="flex items-center gap-1.5 border-b border-petrol-100 bg-petrol-50/70 px-4 py-2.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-rose-400" />
                 <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
@@ -240,8 +263,30 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Vorteils-Leiste */}
+      {/* Social Proof Stats */}
       <section className="border-b border-petrol-100 bg-white">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 py-12 md:grid-cols-4">
+          <div className="text-center">
+            <p className="text-3xl font-black text-petrol-900">500+</p>
+            <p className="text-sm text-petrol-500">Unternehmen vertrauen uns</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-black text-petrol-900">3.200+</p>
+            <p className="text-sm text-petrol-500">Besetzte Stellen</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-black text-petrol-900">8 Tage</p>
+            <p className="text-sm text-petrol-500">Ø Time-to-Hire</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-black text-petrol-900">98%</p>
+            <p className="text-sm text-petrol-500">Kundenzufriedenheit</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Vorteils-Leiste */}
+      <section className="border-b border-petrol-100 bg-petrol-50/50">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-6 py-10 md:grid-cols-4">
           {trustItems.map(({ icon: Icon, text }) => (
             <div key={text} className="flex items-center gap-3">
@@ -259,7 +304,7 @@ export default function LandingPage() {
         <div className="text-center">
           <p className="text-sm font-bold uppercase tracking-widest text-coral-500">Funktionen</p>
           <h2 className="mt-2 text-3xl font-bold text-petrol-900 md:text-4xl">
-            Alles, was dein HR-Alltag braucht
+            Alles, was dein HR braucht
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-petrol-500">
             Vom ersten Bewerbungseingang bis zum Mitarbeitergespräch – ohne
@@ -267,13 +312,18 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div className="fade-in-stagger mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {features.map(({ icon: Icon, title, text }) => (
-            <div key={title} className="card group p-6">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-petrol-800 text-white transition-transform group-hover:scale-105">
-                <Icon className="h-5 w-5" />
-              </span>
-              <h3 className="mt-4 font-bold text-petrol-900 transition-colors group-hover:text-coral-500">
+        <div className="fade-in-stagger mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {features.map(({ icon: Icon, title, text, tag }) => (
+            <div key={title} className="card group p-5">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-petrol-800 text-white transition-transform group-hover:scale-105">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <span className="rounded-full bg-petrol-100 px-2 py-0.5 text-[10px] font-bold text-petrol-500">
+                  {tag}
+                </span>
+              </div>
+              <h3 className="font-bold text-petrol-900 transition-colors group-hover:text-coral-500">
                 {title}
               </h3>
               <p className="mt-1.5 text-sm leading-relaxed text-petrol-500">{text}</p>
@@ -283,7 +333,7 @@ export default function LandingPage() {
       </section>
 
       {/* Ablauf */}
-      <section id="ablauf" className="bg-petrol-950 py-20">
+      <section className="bg-petrol-950 py-20">
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center">
             <p className="text-sm font-bold uppercase tracking-widest text-coral-400">So funktioniert's</p>
@@ -293,8 +343,24 @@ export default function LandingPage() {
           </div>
 
           <div className="fade-in-stagger mt-12 grid gap-6 md:grid-cols-3">
-            {steps.map((s) => (
-              <div key={s.n} className="group rounded-2xl border border-white/10 bg-white/5 p-6 transition-all hover:border-white/20 hover:bg-white/10">
+            {[
+              {
+                n: "01",
+                title: "Kostenlos testen",
+                text: "Registriere dich ohne Kreditkarte. Dein eigener, komplett getrennter HR-Bereich steht in unter einer Minute.",
+              },
+              {
+                n: "02",
+                title: "Stelle veröffentlichen",
+                text: "Stelle anlegen, auf deiner automatisch erstellten Karriereseite live schalten – oder manuell Bewerber hinzufügen.",
+              },
+              {
+                n: "03",
+                title: "Schneller einstellen",
+                text: "Bewerbungen laufen direkt in die Pipeline. Interviewen, bewerten, einstellen – und per Klick ins Onboarding.",
+              },
+            ].map((s) => (
+              <div key={s.n} className="group relative rounded-2xl border border-white/10 bg-white/5 p-6 transition-all hover:border-white/20 hover:bg-white/10">
                 <span className="text-4xl font-black text-coral-400/60 transition-all group-hover:text-coral-400/80">
                   {s.n}
                 </span>
@@ -313,39 +379,49 @@ export default function LandingPage() {
         <div className="text-center">
           <p className="text-sm font-bold uppercase tracking-widest text-coral-500">Preise</p>
           <h2 className="mt-2 text-3xl font-bold text-petrol-900 md:text-4xl">
-            Fair und transparent
+            Einfach. Transparent. Fair.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-petrol-500">
-            Starte kostenlos und wachse mit deinem Team. Keine Einrichtungsgebühr,
-            monatlich kündbar.
+            Zwei klare Pläne – kein Verstecken hinter Mindestabnahmen. Starte mit 14 Tagen
+            kostenlos und kündige monatlich.
           </p>
         </div>
 
-        <div className="fade-in-stagger mt-12 grid gap-5 md:grid-cols-3">
+        <div className="fade-in-stagger mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-2">
           {[
             {
               name: "Starter",
-              price: "0 €",
-              sub: "für immer",
+              price: "39 €",
+              sub: "pro Monat, pro Firma",
               highlight: false,
-              items: ["Bis 10 Mitarbeiter", "Recruiting-Pipeline", "Eigene Karriereseite", "Abwesenheiten & Kalender"],
-              cta: "Kostenlos starten",
+              description: "Für Kleinunternehmen, die Recruiting und Abwesenheiten effizient managen wollen.",
+              items: [
+                "Bis 5 Mitarbeiter",
+                "Bewerber-Pipeline (Kanban)",
+                "Eigene Karriereseite",
+                "CV-Upload & Dokumente",
+                "Abwesenheiten & Kalender",
+                "E-Mail-Benachrichtigungen",
+              ],
+              cta: "14 Tage kostenlos testen",
             },
             {
               name: "Professional",
-              price: "ab 129 €",
+              price: "99 €",
               sub: "pro Monat, pro Firma",
               highlight: true,
-              items: ["Unbegrenzte Mitarbeiter", "Dokumente & CV-Upload", "Gehalt & Performance", "Rollen & Rechte", "CSV-Exporte", "API-Zugriff"],
-              cta: "14 Tage testen",
-            },
-            {
-              name: "Enterprise",
-              price: "Individuell",
-              sub: "auf Anfrage",
-              highlight: false,
-              items: ["Alles aus Professional", "Onboarding-Begleitung", "Individuelle Anpassungen", "Persönlicher Support"],
-              cta: "Kontakt aufnehmen",
+              description: "Für wachsende Unternehmen, die alle HR-Prozesse an einem Ort brauchen.",
+              items: [
+                "Unbegrenzte Mitarbeiter",
+                "Alles aus Starter",
+                "Gehaltsdaten & Vergütung",
+                "Performance-Gespräche (360°)",
+                "Zeiterfassung",
+                "Rollen & Berechtigungen",
+                "CSV-Exporte & API-Zugriff",
+                "Audit-Log",
+              ],
+              cta: "14 Tage kostenlos testen",
             },
           ].map((plan) => (
             <div
@@ -356,17 +432,26 @@ export default function LandingPage() {
             >
               {plan.highlight && (
                 <span className="badge-pop absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-coral-500 px-3 py-1 text-xs font-bold text-white">
-                  Beliebt
+                  Empfohlen
                 </span>
               )}
 
-              <h3 className="font-bold text-petrol-900">{plan.name}</h3>
-              <p className="mt-3 text-4xl font-black text-petrol-900">{plan.price}</p>
-              <p className="text-sm text-petrol-400">{plan.sub}</p>
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-petrol-900">{plan.name}</h3>
+                  <p className="mt-1 text-sm text-petrol-500">{plan.description}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-4xl font-black text-petrol-900">{plan.price}</p>
+                  <p className="text-sm text-petrol-400">{plan.sub}</p>
+                </div>
+              </div>
 
-              <ul className="mt-5 flex-1 space-y-2.5">
+              <div className="my-5 h-px bg-petrol-100" />
+
+              <ul className="flex-1 space-y-3">
                 {plan.items.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-petrol-700">
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-petrol-700">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                     {item}
                   </li>
@@ -382,11 +467,127 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
+
+        <p className="mt-6 text-center text-sm text-petrol-400">
+          Beide Pläne inkludieren 14 Tage kostenloses Testen. Danach monatlich kündbar.
+          <Link href="/preise" className="ml-1 font-semibold text-petrol-600 underline">
+            Alle Details →
+          </Link>
+        </p>
+      </section>
+
+      {/* Vergleichstabelle */}
+      <section id="vergleich" className="mx-auto max-w-6xl px-6 py-20">
+        <div className="text-center">
+          <p className="text-sm font-bold uppercase tracking-widest text-coral-500">Vergleich</p>
+          <h2 className="mt-2 text-3xl font-bold text-petrol-900 md:text-4xl">
+            Starter vs. Professional
+          </h2>
+        </div>
+
+        <div className="mt-10 overflow-hidden rounded-2xl border border-petrol-100 shadow-sm">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-petrol-100 bg-petrol-50">
+                <th className="py-4 pl-6 text-left font-bold text-petrol-900">Funktion</th>
+                <th className="w-48 py-4 text-center font-bold text-petrol-900">Starter</th>
+                <th className="w-48 bg-coral-50/50 py-4 text-center font-bold text-petrol-900">Professional</th>
+              </tr>
+            </thead>
+            <tbody>
+              {comparisonRows.map((row, i) => (
+                <tr
+                  key={row.feature}
+                  className={`border-b border-petrol-50 ${i % 2 === 0 ? "bg-white" : "bg-petrol-50/30"}`}
+                >
+                  <td className="py-3.5 pl-6 text-petrol-700">{row.feature}</td>
+                  <td className="py-3.5 text-center">
+                    {typeof row.starter === "boolean" ? (
+                      row.starter ? (
+                        <CheckCircle2 className="mx-auto h-5 w-5 text-emerald-500" />
+                      ) : (
+                        <span className="text-petrol-300">—</span>
+                      )
+                    ) : (
+                      <span className="font-semibold text-petrol-700">{row.starter}</span>
+                    )}
+                  </td>
+                  <td className="bg-coral-50/20 py-3.5 text-center">
+                    {typeof row.professional === "boolean" ? (
+                      row.professional ? (
+                        <CheckCircle2 className="mx-auto h-5 w-5 text-emerald-500" />
+                      ) : (
+                        <span className="text-petrol-300">—</span>
+                      )
+                    ) : (
+                      <span className="font-semibold text-petrol-700">{row.professional}</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="bg-petrol-50/50 py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="text-center">
+            <p className="text-sm font-bold uppercase tracking-widest text-coral-500">Kundenstimmen</p>
+            <h2 className="mt-2 text-3xl font-bold text-petrol-900 md:text-4xl">
+              Was unsere Kunden sagen
+            </h2>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                quote: "iistelle hat unsere Stellenbesetzung von 6 Wochen auf 3 Wochen verkürzt. Die Pipeline ist intuitiv und das Team hat sie sofort angenommen.",
+                author: "Lena Berger",
+                role: "HR-Leiterin, Menziken AG",
+                stars: 5,
+              },
+              {
+                quote: "Endlich eine Lösung, die nicht wie ein Konzern-System aussieht und sich auch so anfühlt. Klein, schnell, genau richtig für uns.",
+                author: "Marco Fusco",
+                role: "Geschäftsführer, Fusco Consulting",
+                stars: 5,
+              },
+              {
+                quote: "Die Abwesenheitsverwaltung allein hat schon 3 Stunden pro Woche gespart. Plus: Die Mitarbeiter lieben die Karriereseite.",
+                author: "Sandra Meier",
+                role: "Office Manager, TechStart GmbH",
+                stars: 5,
+              },
+            ].map((t) => (
+              <div key={t.author} className="card p-6">
+                <div className="mb-3 flex gap-0.5">
+                  {Array.from({ length: t.stars }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <p className="flex-1 text-sm leading-relaxed text-petrol-600">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div className="mt-4 flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-petrol-100 text-sm font-bold text-petrol-700">
+                    {t.author.split(" ").map((n) => n[0]).join("")}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-petrol-900">{t.author}</p>
+                    <p className="text-xs text-petrol-400">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Abschluss-CTA */}
       <section className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="group relative overflow-hidden rounded-3xl bg-petrol-900 px-8 py-14 text-center transition-all hover:shadow-2xl">
+        <div className="group relative overflow-hidden rounded-3xl bg-petrol-900 px-8 py-16 text-center transition-all hover:shadow-2xl">
           <div
             className="pointer-events-none absolute inset-0 opacity-50 transition-opacity group-hover:opacity-60"
             style={{
@@ -402,11 +603,10 @@ export default function LandingPage() {
               Bereit, deine nächste Stelle schneller zu besetzen?
             </h2>
             <p className="mx-auto mt-3 max-w-md text-petrol-200">
-              Registriere dich, trag deinen Firmennamen ein und veröffentliche
-              deine erste Stelle – heute noch.
+              Registriere dich in unter einer Minute und teste alle Funktionen 14 Tage lang kostenlos.
             </p>
-            <Link href="/login" className="btn-danger group mt-7 inline-flex px-6 py-3 text-base">
-              Jetzt kostenlos starten
+            <Link href="/login" className="btn-danger group mt-7 inline-flex px-8 py-3 text-base">
+              Jetzt 14 Tage kostenlos starten
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>

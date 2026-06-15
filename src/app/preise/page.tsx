@@ -5,7 +5,7 @@ import PricingClient from "./PricingClient";
 export const metadata: Metadata = {
   title: "Preise – iistelle HR",
   description:
-    "Faire und transparente Preise für Recruiting und HR. Starter kostenlos, Professional ab 129 €/Monat. Keine versteckten Kosten.",
+    "Faire und transparente Preise für Recruiting und HR. Starter ab 39 €/Monat, Professional ab 99 €/Monat. Keine versteckten Kosten, 14 Tage kostenlos testen.",
 };
 
 export default async function PricingPage() {

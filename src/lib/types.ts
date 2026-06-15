@@ -139,7 +139,7 @@ export const PLAN_META: Record<
   Plan,
   { label: string; color: string; maxEmployees: number | null }
 > = {
-  starter: { label: "Starter", color: "bg-slate-100 text-slate-700", maxEmployees: 10 },
+  starter: { label: "Starter", color: "bg-slate-100 text-slate-700", maxEmployees: 5 },
   professional: { label: "Professional", color: "bg-coral-500 text-white", maxEmployees: null },
   enterprise: { label: "Enterprise", color: "bg-petrol-800 text-white", maxEmployees: null },
 };

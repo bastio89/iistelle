@@ -19,7 +19,7 @@ export interface PricingPlan {
   name: string;
   nameShort?: string;
   tagline: string;
-  monthlyPrice: number | null; // null = individuell
+  monthlyPrice: number | null;
   yearlyPrice: number | null;
   currency: "CHF" | "EUR";
   maxEmployees: number | null;
@@ -29,154 +29,112 @@ export interface PricingPlan {
   ctaLink: string;
   highlight: boolean;
   badge?: string;
-  plan: "starter" | "professional" | "enterprise";
+  plan: "starter" | "professional";
 }
 
-// Schweizer Preise (CHF)
+// Schweizer Preise (CHF) – Starter: 49 CHF, Professional: 129 CHF
 const CH_PRICING: Omit<PricingPlan, "currency" | "ctaLink">[] = [
   {
     id: "starter",
     name: "Starter",
-    tagline: "Perfekt für den Einstieg",
-    monthlyPrice: 0,
-    yearlyPrice: 0,
-    maxEmployees: 10,
+    tagline: "Für Kleinunternehmen, die Recruiting und Abwesenheiten effizient managen",
+    monthlyPrice: 49,
+    yearlyPrice: 490,
+    maxEmployees: 5,
     features: [
-      "Recruiting-Pipeline",
+      "Bis 5 Mitarbeiter",
+      "Bewerber-Pipeline (Kanban)",
       "Eigene Karriereseite",
-      "Bewerber-Tracking (ATS)",
-      "Bis 10 Mitarbeiter",
+      "CV-Upload & Dokumente",
       "Abwesenheiten & Kalender",
-      "5 GB Speicher",
+      "E-Mail-Benachrichtigungen",
     ],
     notIncluded: [
-      "Gehaltsverwaltung",
-      "Performance-Reviews",
-      "API-Zugriff",
-    ],
-    cta: "Kostenlos starten",
-    highlight: false,
-    plan: "starter",
-  },
-  {
-    id: "professional",
-    name: "Professional",
-    tagline: "Für wachsende Teams",
-    monthlyPrice: 149,
-    yearlyPrice: 1490,
-    maxEmployees: null,
-    features: [
-      "Unbegrenzte Mitarbeiter",
-      "Gehaltsverwaltung",
-      "Performance-Reviews",
+      "Gehaltsdaten & Vergütung",
+      "Performance-Gespräche",
       "Zeiterfassung",
-      "Dokumente & Verträge",
-      "Rollen & Rechte",
+      "Rollen & Berechtigungen",
       "API-Zugriff",
-      "Slack-Integration",
-      "20 GB Speicher",
-      "Priority Support",
+      "CSV-Exporte",
     ],
     cta: "14 Tage kostenlos testen",
-    highlight: true,
-    badge: "Beliebt",
-    plan: "professional",
-  },
-  {
-    id: "enterprise",
-    name: "Enterprise",
-    tagline: "Massgeschneidert für Konzerne",
-    monthlyPrice: null,
-    yearlyPrice: null,
-    maxEmployees: null,
-    features: [
-      "Alles aus Professional",
-      "Multi-Company-Support",
-      "SSO / SAML",
-      "Dedizierter Support",
-      "Custom Branding",
-      "SLA-Garantie",
-      "Onboarding-Begleitung",
-      " Individuelle Schulung",
-      "Unbegrenzter Speicher",
-    ],
-    cta: "Angebot anfordern",
-    highlight: false,
-    plan: "enterprise",
-  },
-];
-
-// Deutsche Preise (EUR)
-const DE_PRICING: Omit<PricingPlan, "currency" | "ctaLink">[] = [
-  {
-    id: "starter",
-    name: "Starter",
-    tagline: "Perfekt für den Einstieg",
-    monthlyPrice: 0,
-    yearlyPrice: 0,
-    maxEmployees: 10,
-    features: [
-      "Recruiting-Pipeline",
-      "Eigene Karriereseite",
-      "Bewerber-Tracking (ATS)",
-      "Bis 10 Mitarbeiter",
-      "Abwesenheiten & Kalender",
-      "5 GB Speicher",
-    ],
-    notIncluded: [
-      "Gehaltsverwaltung",
-      "Performance-Reviews",
-      "API-Zugriff",
-    ],
-    cta: "Kostenlos starten",
     highlight: false,
     plan: "starter",
   },
   {
     id: "professional",
     name: "Professional",
-    tagline: "Für wachsende Teams",
+    tagline: "Für wachsende Unternehmen, die alle HR-Prozesse an einem Ort brauchen",
     monthlyPrice: 129,
     yearlyPrice: 1290,
     maxEmployees: null,
     features: [
       "Unbegrenzte Mitarbeiter",
-      "Gehaltsverwaltung",
-      "Performance-Reviews",
+      "Alles aus Starter",
+      "Gehaltsdaten & Vergütung",
+      "Performance-Gespräche (360°)",
       "Zeiterfassung",
-      "Dokumente & Verträge",
-      "Rollen & Rechte",
-      "API-Zugriff",
-      "Slack-Integration",
-      "20 GB Speicher",
-      "Priority Support",
+      "Rollen & Berechtigungen",
+      "CSV-Exporte & API-Zugriff",
+      "Audit-Log",
     ],
     cta: "14 Tage kostenlos testen",
     highlight: true,
-    badge: "Beliebt",
+    badge: "Empfohlen",
     plan: "professional",
   },
+];
+
+// Deutsche Preise (EUR) – Starter: 39 €, Professional: 99 €
+const DE_PRICING: Omit<PricingPlan, "currency" | "ctaLink">[] = [
   {
-    id: "enterprise",
-    name: "Enterprise",
-    tagline: "Massgeschneidert für Konzerne",
-    monthlyPrice: null,
-    yearlyPrice: null,
+    id: "starter",
+    name: "Starter",
+    tagline: "Für Kleinunternehmen, die Recruiting und Abwesenheiten effizient managen",
+    monthlyPrice: 39,
+    yearlyPrice: 390,
+    maxEmployees: 5,
+    features: [
+      "Bis 5 Mitarbeiter",
+      "Bewerber-Pipeline (Kanban)",
+      "Eigene Karriereseite",
+      "CV-Upload & Dokumente",
+      "Abwesenheiten & Kalender",
+      "E-Mail-Benachrichtigungen",
+    ],
+    notIncluded: [
+      "Gehaltsdaten & Vergütung",
+      "Performance-Gespräche",
+      "Zeiterfassung",
+      "Rollen & Berechtigungen",
+      "API-Zugriff",
+      "CSV-Exporte",
+    ],
+    cta: "14 Tage kostenlos testen",
+    highlight: false,
+    plan: "starter",
+  },
+  {
+    id: "professional",
+    name: "Professional",
+    tagline: "Für wachsende Unternehmen, die alle HR-Prozesse an einem Ort brauchen",
+    monthlyPrice: 99,
+    yearlyPrice: 990,
     maxEmployees: null,
     features: [
-      "Alles aus Professional",
-      "Multi-Company-Support",
-      "SSO / SAML",
-      "Dedizierter Support",
-      "Custom Branding",
-      "SLA-Garantie",
-      "Onboarding-Begleitung",
-      " Individuelle Schulung",
-      "Unbegrenzter Speicher",
+      "Unbegrenzte Mitarbeiter",
+      "Alles aus Starter",
+      "Gehaltsdaten & Vergütung",
+      "Performance-Gespräche (360°)",
+      "Zeiterfassung",
+      "Rollen & Berechtigungen",
+      "CSV-Exporte & API-Zugriff",
+      "Audit-Log",
     ],
-    cta: "Angebot anfordern",
-    highlight: false,
-    plan: "enterprise",
+    cta: "14 Tage kostenlos testen",
+    highlight: true,
+    badge: "Empfohlen",
+    plan: "professional",
   },
 ];
 
@@ -184,7 +142,7 @@ const DE_PRICING: Omit<PricingPlan, "currency" | "ctaLink">[] = [
  * Bestimmt die Region basierend auf dem Accept-Language Header oder Default
  */
 export function detectCountry(acceptLanguage: string | null): Country {
-  if (!acceptLanguage) return "DE"; // Default zu Deutschland
+  if (!acceptLanguage) return "DE";
 
   const langs = acceptLanguage.toLowerCase();
 
@@ -251,7 +209,7 @@ export function getPricingPlans(country: Country = "DE"): PricingPlan[] {
   return basePlans.map((plan) => ({
     ...plan,
     currency: config.currency,
-    ctaLink: plan.id === "enterprise" ? "/kontakt" : `/login?plan=${plan.id}`,
+    ctaLink: `/login?plan=${plan.id}`,
   }));
 }
 
@@ -278,10 +236,8 @@ export function calculateYearlyPrice(monthlyPrice: number, discount = 0): number
 }
 
 /**
- * Demo: Simuliert Geo-IP für Vorschau (kann mit echter IP-basierter Lösung ersetzt werden)
+ * Demo: Simuliert Geo-IP für Vorschau
  */
 export function getDemoCountry(): Country {
-  // In Produktion: echte Geo-IP-basierte Erkennung
-  // Für Demo: Default zu Deutschland
   return "DE";
 }
