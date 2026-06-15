@@ -234,19 +234,17 @@ export default function KarrierePage() {
         <h2 className="mb-8 text-center text-2xl font-bold text-petrol-900 md:text-3xl">
           Lerne das Team kennen
         </h2>
-        <div className="flex flex-wrap justify-center gap-8">
-          <div className="text-center">
-            <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white shadow-lg">
-              <Image
-                src="/sebastian.webp"
-                alt="Sebastian Oczachowski"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <h3 className="mt-4 font-bold text-petrol-900">Sebastian Oczachowski</h3>
-            <p className="text-sm text-petrol-500">Founder & CEO</p>
+        <div className="flex flex-col items-center">
+          <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white shadow-lg">
+            <Image
+              src="/sebastian.webp"
+              alt="Sebastian Oczachowski"
+              fill
+              className="object-cover"
+            />
           </div>
+          <h3 className="mt-4 font-bold text-petrol-900">Sebastian Oczachowski</h3>
+          <p className="text-sm text-petrol-500">Founder & CEO</p>
         </div>
         <p className="mt-6 text-center text-petrol-600">
           Ein kleines, fokussiertes Team mit großer Leidenschaft für innovative HR-Lösungen.
