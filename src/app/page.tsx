@@ -299,28 +299,6 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Social Proof Stats */}
-      <section className="border-b border-petrol-100 bg-white">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 py-12 md:grid-cols-4">
-          <div className="text-center">
-            <p className="text-3xl font-black text-petrol-900">500+</p>
-            <p className="text-sm text-petrol-500">Unternehmen vertrauen uns</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-black text-petrol-900">3.200+</p>
-            <p className="text-sm text-petrol-500">Besetzte Stellen</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-black text-petrol-900">8 Tage</p>
-            <p className="text-sm text-petrol-500">Ø Time-to-Hire</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-black text-petrol-900">98%</p>
-            <p className="text-sm text-petrol-500">Kundenzufriedenheit</p>
-          </div>
-        </div>
-      </section>
-
       {/* Vorteils-Leiste */}
       <section className="border-b border-petrol-100 bg-petrol-50/50">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-6 py-10 md:grid-cols-4">
