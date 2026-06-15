@@ -1,3 +1,4 @@
+import { Lightbulb } from "lucide-react";
 import RatgeberBase from "../RatgeberBase";
 
 export default function StellenanzeigeSchreiben() {
