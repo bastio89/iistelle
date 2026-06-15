@@ -1,8 +1,5 @@
 {
-  "name": "iistelle",
+  "name": "iistelle-root",
   "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "vercel-build": "cd iistelle && npm run build"
-  }
+  "private": true
 }
