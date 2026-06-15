@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { CheckCircle2, X, ArrowRight, Sparkles, Clock, ShieldCheck, Users, FileText, Zap } from "lucide-react";
 import { PricingPlan, PricingConfig, formatPrice } from "@/lib/pricing";
+import { ServiceDropdown } from "../page";
 
 interface Props {
   plans: PricingPlan[];
@@ -31,8 +32,7 @@ export default function PricingClient({ plans, config }: Props) {
             </span>
           </Link>
           <div className="flex items-center gap-6 text-sm font-semibold text-petrol-600">
-            <Link href="/services" className="transition hover:text-petrol-900">Services</Link>
-            <Link href="/ratgeber" className="transition hover:text-petrol-900">Ratgeber</Link>
+            <ServiceDropdown />
             <Link href="/preise" className="transition hover:text-petrol-900">Preise</Link>
           </div>
           <div className="flex items-center gap-2">
