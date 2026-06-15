@@ -1,1 +1,11 @@
-iistelle/package.json
+{
+  "name": "iistelle-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "vercel-build": "cd iistelle && npm install && npm run build"
+  },
+  "dependencies": {
+    "next": "15.3.9"
+  }
+}
