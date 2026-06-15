@@ -96,7 +96,7 @@ function ReportsPage() {
           </div>
           <div className="text-right text-sm text-petrol-400">
             <p>Erstellt am {new Date().toLocaleDateString("de-DE")}</p>
-            <p>iistelle HR</p>
+            <p>iistelle</p>
           </div>
         </div>
 
@@ -189,7 +189,7 @@ function ReportsPage() {
         </div>
 
         <p className="mt-10 border-t border-petrol-100 pt-4 text-xs text-petrol-400">
-          Automatisch erstellt mit iistelle HR · Vertraulich
+          Automatisch erstellt mit iistelle · Vertraulich
         </p>
       </div>
     </div>

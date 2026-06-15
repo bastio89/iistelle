@@ -153,13 +153,13 @@ export default function LandingPage() {
           <Link href="/" className="group flex items-center gap-2">
             <Image
               src="/logo.svg"
-              alt="iistelle HR Logo"
+              alt="iistelle Logo"
               width={36}
               height={36}
               className="rounded-xl"
             />
             <span className="text-lg font-bold tracking-tight text-petrol-900">
-              iistelle HR
+              iistelle
             </span>
           </Link>
 
@@ -254,7 +254,7 @@ export default function LandingPage() {
                 <div className="hidden w-36 shrink-0 flex-col gap-1 bg-petrol-950 p-3 text-left sm:flex">
                   <div className="mb-2 flex items-center gap-1.5">
                     <span className="flex h-5 w-5 items-center justify-center rounded bg-coral-500 text-[9px] font-black text-white">ii</span>
-                    <span className="text-[10px] font-bold text-white">iistelle HR</span>
+                    <span className="text-[10px] font-bold text-white">iistelle</span>
                   </div>
                   {["Dashboard", "Stellen", "Bewerbungen", "Kandidaten", "Interviews"].map((x, i) => (
                     <span
@@ -674,12 +674,12 @@ export default function LandingPage() {
           <div className="flex items-center gap-2">
             <Image
               src="/logo.svg"
-              alt="iistelle HR Logo"
+              alt="iistelle Logo"
               width={32}
               height={32}
               className="rounded-lg"
             />
-            <span className="font-bold text-petrol-900">iistelle HR</span>
+            <span className="font-bold text-petrol-900">iistelle</span>
             <span className="ml-2 text-xs text-petrol-400">
               © {new Date().getFullYear()} · twenty5ai · Sebastian Oczachowski
             </span>

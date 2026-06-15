@@ -111,7 +111,7 @@ export default function Sidebar() {
           className="rounded-lg"
         />
         <span className="text-lg font-bold tracking-tight text-white">
-          iistelle HR
+          iistelle
         </span>
       </Link>
 

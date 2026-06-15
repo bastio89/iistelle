@@ -17,7 +17,7 @@ function downloadIcs(iv: Interview) {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//iistelle HR//DE",
+    "PRODID:-//iistelle//DE",
     "BEGIN:VEVENT",
     `UID:${iv.id}@iistelle`,
     `DTSTAMP:${fmt(new Date())}`,

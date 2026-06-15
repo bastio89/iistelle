@@ -105,7 +105,7 @@ export default function LoginPage() {
         <div>
           <div className="flex items-center gap-2">
             <Image src="/logo.svg" alt="iistelle" width={36} height={36} className="rounded-lg" />
-            <span className="text-xl font-bold tracking-tight">iistelle HR</span>
+            <span className="text-xl font-bold tracking-tight">iistelle</span>
           </div>
           <h1 className="mt-16 max-w-md text-4xl font-bold leading-tight">
             Stellen schneller besetzen. Prozesse schlank halten.
@@ -132,7 +132,7 @@ export default function LoginPage() {
           </div>
         </div>
         <p className="text-xs text-petrol-400">
-          © {new Date().getFullYear()} iistelle HR · Alle Daten DSGVO-konform in Frankfurt gehostet
+          © {new Date().getFullYear()} iistelle · Alle Daten DSGVO-konform in Frankfurt gehostet
         </p>
       </div>
 
@@ -141,7 +141,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <div className="mb-8 flex items-center gap-2 lg:hidden">
             <Image src="/logo.svg" alt="iistelle" width={36} height={36} className="rounded-lg" />
-            <span className="text-xl font-bold text-petrol-900">iistelle HR</span>
+            <span className="text-xl font-bold text-petrol-900">iistelle</span>
           </div>
 
           <div className="card p-8">

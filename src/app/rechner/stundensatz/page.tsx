@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, Calculator, DollarSign, Coffee, Home, Car, Briefcase } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Stundensatz-Rechner – iistelle HR",
+  title: "Stundensatz-Rechner – iistelle",
   description: "Berechne deinen optimalen Stundensatz basierend auf Lebenshaltungskosten und Gewinnmarge. Kostenlos und ohne Anmeldung.",
 };
 
@@ -16,7 +16,7 @@ export default function StundensatzRechnerPage() {
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.svg" alt="iistelle" width={32} height={32} className="rounded-lg" />
             <span className="text-lg font-bold tracking-tight text-petrol-900">
-              iistelle HR
+              iistelle
             </span>
           </Link>
           <div className="flex items-center gap-6 text-sm font-semibold text-petrol-600">
@@ -240,7 +240,7 @@ export default function StundensatzRechnerPage() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8">
           <div className="flex items-center gap-2">
             <img src="/logo.svg" alt="iistelle" width={28} height={28} className="rounded-lg" />
-            <span className="font-bold text-petrol-900">iistelle HR</span>
+            <span className="font-bold text-petrol-900">iistelle</span>
             <span className="ml-2 text-xs text-petrol-400">
               © {new Date().getFullYear()} · twenty5ai
             </span>

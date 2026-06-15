@@ -1,4 +1,4 @@
-# iistelle HR — Roadmap zum Marktführer DACH
+# iistelle — Roadmap zum Marktführer DACH
 
 > Stand: Juni 2026
 > Ziel: Bestes HR-Tool für Schweizer und deutsche Unternehmen

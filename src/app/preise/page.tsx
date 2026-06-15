@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import PricingClient from "./PricingClient";
 
 export const metadata: Metadata = {
-  title: "Preise – iistelle HR",
+  title: "Preise – iistelle",
   description:
     "Faire und transparente Preise für Recruiting und HR. Keine versteckten Kosten, 14 Tage kostenlos testen.",
 };

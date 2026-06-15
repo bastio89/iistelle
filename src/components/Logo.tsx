@@ -19,7 +19,7 @@ export function Logo({ size = 32, className = "", showText = false, href }: Logo
     <>
       <Image
         src="/logo.svg"
-        alt="iistelle HR Logo"
+        alt="iistelle Logo"
         width={size}
         height={size}
         className={`rounded-lg ${className}`}
@@ -27,7 +27,7 @@ export function Logo({ size = 32, className = "", showText = false, href }: Logo
       />
       {showText && (
         <span className="text-lg font-bold tracking-tight text-petrol-900">
-          iistelle HR
+          iistelle
         </span>
       )}
     </>
@@ -51,7 +51,7 @@ export function LogoCompact({ size = 32, className = "" }: { size?: number; clas
   return (
     <Image
       src="/logo.svg"
-      alt="iistelle HR"
+      alt="iistelle"
       width={size}
       height={size}
       className={`rounded-lg ${className}`}
@@ -74,7 +74,7 @@ export function SidebarLogo({ className = "" }: { className?: string }) {
         className="rounded-lg"
         priority
       />
-      <span className="font-bold text-petrol-900">iistelle HR</span>
+      <span className="font-bold text-petrol-900">iistelle</span>
     </div>
   );
 }

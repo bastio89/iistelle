@@ -3,8 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "iistelle HR – Recruiting & HR-Software",
-    template: "%s | iistelle HR",
+    default: "iistelle – Recruiting & HR-Software",
+    template: "%s | iistelle",
   },
   description:
     "Die All-in-One-HR-Plattform für kleine und mittlere Unternehmen: Recruiting, Personalakte, Abwesenheiten und Performance – alles an einem Ort.",
@@ -21,8 +21,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "de_DE",
     url: "https://iistelle.de",
-    siteName: "iistelle HR",
-    title: "iistelle HR – Recruiting & HR-Software",
+    siteName: "iistelle",
+    title: "iistelle – Recruiting & HR-Software",
     description: "Die All-in-One-HR-Plattform für kleine und mittlere Unternehmen.",
   },
 };

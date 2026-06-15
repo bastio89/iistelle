@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      from: process.env.EMAIL_FROM ?? "iistelle HR <onboarding@resend.dev>",
+      from: process.env.EMAIL_FROM ?? "iistelle <onboarding@resend.dev>",
       to: [to],
       subject,
       text: body ?? "",

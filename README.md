@@ -1,4 +1,4 @@
-# iistelle HR
+# iistelle
 
 Modernes HR-Tool mit Fokus auf Recruiting – inspiriert vom Aufbau führender HR-Plattformen, mit eigenem Branding.
 
