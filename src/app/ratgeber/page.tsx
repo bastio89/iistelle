@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Clock, Lightbulb, Search, Sparkles } from "lucide-react";
+import { ArrowRight, Clock, Search, Sparkles } from "lucide-react";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 
 export const metadata: Metadata = {
@@ -10,7 +10,6 @@ export const metadata: Metadata = {
     "Praxisnahe Ratgeber für HR-Verantwortliche: Recruiting, Mitarbeiterführung, Onboarding und rechtliche Grundlagen.",
 };
 
-// Pixabay Bilder für jeden Ratgeber
 const guides = [
   {
     title: "Die perfekte Stellenanzeige schreiben",
@@ -20,7 +19,7 @@ const guides = [
     date: "15. Juni 2026",
     slug: "stellenanzeige-schreiben",
     featured: true,
-    image: "https://cdn.pixabay.com/photo/2018/01/17/07/06/laptop-3087585_1280.jpg",
+    color: "bg-gradient-to-br from-sky-500 to-sky-600",
   },
   {
     title: "Onboarding: Die ersten 90 Tage",
@@ -30,7 +29,7 @@ const guides = [
     date: "10. Juni 2026",
     slug: "onboarding",
     featured: true,
-    image: "https://cdn.pixabay.com/photo/2017/09/05/11/46/laptop-2717053_1280.jpg",
+    color: "bg-gradient-to-br from-emerald-500 to-emerald-600",
   },
   {
     title: "DSGVO im Recruiting: Was du wissen musst",
@@ -39,7 +38,7 @@ const guides = [
     readTime: "10 Min.",
     date: "5. Juni 2026",
     slug: "dsgvo-recruiting",
-    image: "https://cdn.pixabay.com/photo/2016/03/26/18/23/cctv-1280531_1280.jpg",
+    color: "bg-gradient-to-br from-amber-500 to-amber-600",
   },
   {
     title: "Mitarbeiterzufriedenheit messen und verbessern",
@@ -48,7 +47,7 @@ const guides = [
     readTime: "7 Min.",
     date: "1. Juni 2026",
     slug: "mitarbeiterzufriedenheit",
-    image: "https://cdn.pixabay.com/photo/2015/01/09/11/08/hands-593393_1280.jpg",
+    color: "bg-gradient-to-br from-rose-500 to-rose-600",
   },
   {
     title: "Führung auf Distanz: Remote-Teams erfolgreich leiten",
@@ -57,7 +56,7 @@ const guides = [
     readTime: "9 Min.",
     date: "25. Mai 2026",
     slug: "remote-arbeit",
-    image: "https://cdn.pixabay.com/photo/2020/07/08/04/12/work-5382501_1280.jpg",
+    color: "bg-gradient-to-br from-violet-500 to-violet-600",
   },
   {
     title: "Feedbackgespräche: So formulierst du konstruktives Feedback",
@@ -66,16 +65,16 @@ const guides = [
     readTime: "6 Min.",
     date: "20. Mai 2026",
     slug: "feedbackgespraeche",
-    image: "https://cdn.pixabay.com/photo/2017/10/27/15/18/teamwork-2894855_1280.jpg",
+    color: "bg-gradient-to-br from-violet-500 to-violet-600",
   },
   {
     title: "Arbeitgebermarke aufbauen: So wirst du zum attraktiven Arbeitgeber",
-    excerpt: "Employer Branding ist mehr als ein Logo. Erfahre, wie du eine authentische Arbeitgebermarke schaffst, die qualifizierte Bewerber:innen anzieht.",
+    excerpt: "Employer Branding ist mehr als ein Logo. Erfahre, wie du eine authentische Arbeitgebermarke schaffst.",
     category: "Recruiting",
     readTime: "10 Min.",
     date: "18. Juni 2026",
     slug: "arbeitgebermarke",
-    image: "https://cdn.pixabay.com/photo/2016/06/13/09/57/office-1453895_1280.jpg",
+    color: "bg-gradient-to-br from-sky-500 to-sky-600",
   },
   {
     title: "Gehaltsverhandlung meistern: Tipps für faire und transparente Vergütung",
@@ -84,7 +83,7 @@ const guides = [
     readTime: "8 Min.",
     date: "12. Juni 2026",
     slug: "gehaltsverhandlung",
-    image: "https://cdn.pixabay.com/photo/2013/03/07/05/13/money-906140_1280.jpg",
+    color: "bg-gradient-to-br from-emerald-500 to-emerald-600",
   },
   {
     title: "Kündigungsgespräch führen: So trennst du dich fair und professionell",
@@ -93,14 +92,12 @@ const guides = [
     readTime: "7 Min.",
     date: "8. Juni 2026",
     slug: "kuendigungsgespraech",
-    image: "https://cdn.pixabay.com/photo/2016/08/23/07/45/handshake-1614657_1280.jpg",
+    color: "bg-gradient-to-br from-violet-500 to-violet-600",
   },
 ];
 
-const allGuides = guides;
-
 const categories = [
-  { name: "Alle", count: allGuides.length, active: true },
+  { name: "Alle", count: guides.length, active: true },
   { name: "Recruiting", count: 2, color: "bg-sky-100 text-sky-700 hover:bg-sky-200" },
   { name: "Mitarbeiter", count: 2, color: "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" },
   { name: "Führung", count: 3, color: "bg-violet-100 text-violet-700 hover:bg-violet-200" },
@@ -108,17 +105,9 @@ const categories = [
   { name: "Kultur", count: 1, color: "bg-rose-100 text-rose-700 hover:bg-rose-200" },
 ];
 
-const categoryColors: Record<string, string> = {
-  Recruiting: "from-sky-500 to-sky-600",
-  Mitarbeiter: "from-emerald-500 to-emerald-600",
-  Führung: "from-violet-500 to-violet-600",
-  Recht: "from-amber-500 to-amber-600",
-  Kultur: "from-rose-500 to-rose-600",
-};
-
 export default function RatgeberPage() {
-  const featuredGuides = allGuides.filter(g => g.featured);
-  const regularGuides = allGuides.filter(g => !g.featured);
+  const featuredGuides = guides.filter(g => g.featured);
+  const regularGuides = guides.filter(g => !g.featured);
 
   return (
     <div className="min-h-screen bg-surface">
@@ -172,77 +161,49 @@ export default function RatgeberPage() {
       </header>
 
       {/* Suchleiste */}
-      <section className="mx-auto max-w-6xl px-6 -mt-8">
-        <div className="relative rounded-2xl border border-petrol-200 bg-white p-2 shadow-lg">
-          <div className="flex items-center gap-3 px-4">
-            <Search className="h-5 w-5 text-petrol-400" />
-            <input
-              type="text"
-              placeholder="Ratgeber durchsuchen..."
-              className="flex-1 border-0 bg-transparent py-3 text-petrol-900 placeholder-petrol-400 focus:outline-none focus:ring-0"
-            />
-            <button className="btn-primary text-sm">
-              Suchen
-            </button>
-          </div>
+      <section className="mx-auto max-w-6xl px-6 py-8">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-petrol-400" />
+          <input
+            type="text"
+            placeholder="Ratgeber durchsuchen..."
+            className="input pl-12"
+          />
         </div>
       </section>
 
-      {/* Kategorien */}
-      <section className="mx-auto max-w-6xl px-6 py-10">
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {categories.map((cat) => (
-            <button
-              key={cat.name}
-              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
-                cat.active
-                  ? "bg-petrol-800 text-white"
-                  : `bg-white text-petrol-600 border border-petrol-200 hover:bg-petrol-50 ${cat.color || ""}`
-              }`}
-            >
-              {cat.name} ({cat.count})
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured Guides */}
-      <section className="mx-auto max-w-6xl px-6 pb-12">
-        <h2 className="mb-6 text-xl font-bold text-petrol-900">Aktuelle Ratgeber</h2>
-        <div className="grid gap-6 lg:grid-cols-2">
-          {featuredGuides.map((guide) => (
+      {/* Featured Articles */}
+      <section className="mx-auto max-w-6xl px-6 pb-10">
+        <div className="grid gap-6 md:grid-cols-2">
+          {featuredGuides.map((guide, index) => (
             <Link
-              key={guide.title}
+              key={guide.slug}
               href={`/ratgeber/${guide.slug}`}
-              className="group relative overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-xl"
+              className="group relative overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className="relative h-48 w-full">
-                <Image
-                  src={guide.image}
-                  alt={guide.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-petrol-900/80 via-petrol-900/20 to-transparent" />
-                <span className={`absolute bottom-4 left-4 rounded-full px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r ${categoryColors[guide.category]}`}>
-                  {guide.category}
+              <div className={`h-52 w-full ${guide.color} flex items-center justify-center`}>
+                <span className="text-6xl font-bold text-white/30">
+                  {index + 1}
                 </span>
               </div>
               <div className="p-6">
-                <div className="flex flex-wrap items-center gap-3 mb-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`rounded-full px-3 py-0.5 text-xs font-semibold text-white ${guide.color}`}>
+                    {guide.category}
+                  </span>
                   <span className="flex items-center gap-1 text-xs text-petrol-400">
                     <Clock className="h-3 w-3" />
-                    {guide.readTime} Lesezeit
+                    {guide.readTime}
                   </span>
                 </div>
-                <h3 className="text-xl font-bold text-petrol-900 group-hover:text-coral-500 transition-colors">
+                <h3 className="text-xl font-bold text-petrol-900 group-hover:text-coral-500 transition">
                   {guide.title}
                 </h3>
-                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-petrol-500">
+                <p className="mt-2 text-sm leading-relaxed text-petrol-600 line-clamp-2">
                   {guide.excerpt}
                 </p>
                 <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-coral-500">
-                  Weiterlesen
+                  <span>Weiterlesen</span>
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
@@ -251,80 +212,38 @@ export default function RatgeberPage() {
         </div>
       </section>
 
-      {/* Alle Guides */}
+      {/* Alle Artikel */}
       <section className="mx-auto max-w-6xl px-6 pb-20">
         <h2 className="mb-6 text-xl font-bold text-petrol-900">Alle Ratgeber</h2>
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {regularGuides.map((guide) => (
             <Link
-              key={guide.title}
+              key={guide.slug}
               href={`/ratgeber/${guide.slug}`}
-              className="group relative overflow-hidden rounded-xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+              className="group rounded-xl bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
             >
-              <div className="relative h-40 w-full">
-                <Image
-                  src={guide.image}
-                  alt={guide.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-petrol-900/60 to-transparent" />
-                <span className={`absolute bottom-3 left-3 rounded-full px-2 py-0.5 text-xs font-semibold text-white bg-gradient-to-r ${categoryColors[guide.category]}`}>
-                  {guide.category}
-                </span>
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold text-petrol-900 group-hover:text-coral-500 transition-colors line-clamp-2">
-                  {guide.title}
-                </h3>
-                <p className="mt-2 line-clamp-2 text-sm text-petrol-500">
-                  {guide.excerpt}
-                </p>
-                <div className="mt-4 flex items-center justify-between border-t border-petrol-100 pt-3">
-                  <span className="flex items-center gap-1 text-xs text-petrol-400">
-                    <Clock className="h-3 w-3" />
-                    {guide.readTime}
+              <div className="flex items-start gap-4">
+                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white ${guide.color}`}>
+                  <span className="text-lg font-bold">
+                    {guide.title.charAt(0)}
                   </span>
-                  <span className="flex items-center gap-1 text-xs font-semibold text-coral-500">
-                    Lesen <ArrowRight className="h-3 w-3" />
-                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className="text-xs font-semibold text-petrol-500">
+                      {guide.category}
+                    </span>
+                    <span className="text-xs text-petrol-400">
+                      · {guide.readTime}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-petrol-900 group-hover:text-coral-500 transition line-clamp-2">
+                    {guide.title}
+                  </h3>
                 </div>
               </div>
             </Link>
           ))}
-        </div>
-      </section>
-
-      {/* Newsletter CTA */}
-      <section className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-petrol-800 to-petrol-900 px-8 py-12 shadow-xl">
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-coral-500/10 blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-sky-500/10 blur-3xl" />
-          <div className="relative">
-            <div className="flex items-start gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-coral-500/20 text-coral-400">
-                <Lightbulb className="h-7 w-7" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-white">
-                  Verpasse keinen neuen Ratgeber
-                </h2>
-                <p className="mt-2 max-w-lg text-petrol-300">
-                  Erhalte die neuesten Artikel direkt in dein Postfach – kostenlos und ohne Spam.
-                </p>
-                <form className="mt-6 flex flex-wrap gap-3">
-                  <input
-                    type="email"
-                    placeholder="deine@email.de"
-                    className="input max-w-sm flex-1"
-                  />
-                  <button type="button" className="btn-danger">
-                    Newsletter abonnieren
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 

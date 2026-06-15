@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, Calculator, BookOpen, FileText, Users, Shield, Zap, Lightbulb, TrendingUp, Heart, Coffee, Sparkles, ChevronRight, CheckCircle } from "lucide-react";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 
@@ -16,42 +15,48 @@ const services = [
     description: "So schreibst du Stellenanzeigen, die qualifizierte Kandidaten anziehen.",
     link: "/ratgeber/stellenanzeige-schreiben",
     category: "Recruiting",
-    image: "https://cdn.pixabay.com/photo/2017/08/01/08/44/woman-2569346_1280.jpg",
+    color: "bg-gradient-to-br from-sky-500 to-sky-600",
+    icon: Users,
   },
   {
     title: "Onboarding optimieren",
     description: "Der perfekte Onboarding-Prozess: Vom ersten Tag bis zur erfolgreichen Einarbeitung.",
     link: "/ratgeber/onboarding",
     category: "Mitarbeiter",
-    image: "https://cdn.pixabay.com/photo/2015/01/09/11/08/hands-593393_1280.jpg",
+    color: "bg-gradient-to-br from-emerald-500 to-emerald-600",
+    icon: Zap,
   },
   {
     title: "Performance-Gespräche führen",
     description: "So führst du erfolgreich Mitarbeitergespräche: Feedback, Ziele und Entwicklung.",
     link: "/ratgeber/feedbackgespraeche",
     category: "Führung",
-    image: "https://cdn.pixabay.com/photo/2017/10/27/15/18/teamwork-2894855_1280.jpg",
+    color: "bg-gradient-to-br from-violet-500 to-violet-600",
+    icon: TrendingUp,
   },
   {
     title: "DSGVO-konform recruiting",
     description: "Rechtliche Anforderungen an Bewerberdaten: Was du wissen musst.",
     link: "/ratgeber/dsgvo-recruiting",
     category: "Recht",
-    image: "https://cdn.pixabay.com/photo/2016/03/26/18/23/cctv-1280531_1280.jpg",
+    color: "bg-gradient-to-br from-amber-500 to-amber-600",
+    icon: Shield,
   },
   {
     title: "Mitarbeiterzufriedenheit steigern",
     description: "Die wichtigsten Hebel für höhere Zufriedenheit und geringere Fluktuation.",
     link: "/ratgeber/mitarbeiterzufriedenheit",
     category: "Kultur",
-    image: "https://cdn.pixabay.com/photo/2018/07/14/03/38/team-3535401_1280.jpg",
+    color: "bg-gradient-to-br from-rose-500 to-rose-600",
+    icon: Heart,
   },
   {
     title: "Remote-Teams führen",
     description: "Erfolgreiche Führung von verteilten Teams: Tools, Kommunikation und Kultur.",
     link: "/ratgeber/remote-arbeit",
     category: "Führung",
-    image: "https://cdn.pixabay.com/photo/2020/07/08/04/12/work-5382501_1280.jpg",
+    color: "bg-gradient-to-br from-violet-500 to-violet-600",
+    icon: Coffee,
   },
 ];
 
@@ -61,36 +66,42 @@ const tools = [
     description: "Berechne deinen optimalen Stundensatz basierend auf Lebenshaltungskosten und Gewinnmarge.",
     link: "/rechner/stundensatz",
     badge: "Kostenlos",
+    icon: Calculator,
   },
   {
     title: "eNPS-Rechner",
     description: "Misst die Mitarbeiterzufriedenheit und -bindung in deinem Unternehmen.",
     link: "/rechner/enps",
     badge: "Kostenlos",
+    icon: Heart,
   },
   {
     title: "Fluktuationsrechner",
     description: "Berechne deine Fluktuationsrate und vergleiche sie mit dem Branchendurchschnitt.",
     link: "/rechner/fluktuation",
     badge: "Kostenlos",
+    icon: TrendingUp,
   },
   {
     title: "Onboarding-Checkliste",
     description: "Die komplette Checkliste für erfolgreiches Onboarding.",
     link: "/ratgeber/onboarding",
     badge: "Kostenlos",
+    icon: CheckCircle,
   },
   {
     title: "Stellenbeschreibung-Vorlage",
     description: "Downloadbare Vorlage für professionelle Stellenbeschreibungen.",
     link: "/ratgeber/stellenanzeige-schreiben",
     badge: "Kostenlos",
+    icon: FileText,
   },
   {
     title: "Mitarbeiterzufriedenheit-Check",
     description: "Bewerte die wichtigsten Faktoren für Zufriedenheit in deinem Team.",
     link: "/ratgeber/mitarbeiterzufriedenheit",
     badge: "Kostenlos",
+    icon: Coffee,
   },
 ];
 
@@ -101,14 +112,6 @@ const categories = [
   { name: "Recht", count: 4, color: "bg-amber-100 text-amber-700 hover:bg-amber-200" },
   { name: "Kultur", count: 5, color: "bg-rose-100 text-rose-700 hover:bg-rose-200" },
 ];
-
-const categoryGradients: Record<string, string> = {
-  Recruiting: "from-sky-500 to-sky-600",
-  Mitarbeiter: "from-emerald-500 to-emerald-600",
-  Führung: "from-violet-500 to-violet-600",
-  Recht: "from-amber-500 to-amber-600",
-  Kultur: "from-rose-500 to-rose-600",
-};
 
 export default function ServicesPage() {
   return (
@@ -185,38 +188,35 @@ export default function ServicesPage() {
           </span>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {services.map((service) => (
-            <Link
-              key={service.title}
-              href={service.link}
-              className="group overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
-            >
-              <div className="relative h-44 w-full">
-                <Image
-                  src={service.image}
-                  alt={service.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-petrol-900/80 via-petrol-900/30 to-transparent" />
-                <span className={`absolute bottom-3 left-3 rounded-full px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r ${categoryGradients[service.category]}`}>
-                  {service.category}
-                </span>
-              </div>
-              <div className="p-5">
-                <h3 className="text-lg font-bold text-petrol-900 group-hover:text-coral-500 transition-colors">
-                  {service.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-petrol-600">
-                  {service.description}
-                </p>
-                <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-coral-500">
-                  <span>Weiterlesen</span>
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          {services.map((service) => {
+            const IconComponent = service.icon;
+            return (
+              <Link
+                key={service.title}
+                href={service.link}
+                className="group overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
+              >
+                <div className={`h-40 w-full ${service.color} flex items-center justify-center`}>
+                  <IconComponent className="h-16 w-16 text-white/30" />
                 </div>
-              </div>
-            </Link>
-          ))}
+                <div className="p-5">
+                  <span className="rounded-full px-2 py-0.5 text-xs font-semibold text-white bg-petrol-800">
+                    {service.category}
+                  </span>
+                  <h3 className="mt-3 text-lg font-bold text-petrol-900 group-hover:text-coral-500 transition-colors">
+                    {service.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-petrol-600">
+                    {service.description}
+                  </p>
+                  <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-coral-500">
+                    <span>Weiterlesen</span>
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
@@ -242,23 +242,26 @@ export default function ServicesPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {tools.map((tool) => (
-                <Link
-                  key={tool.title}
-                  href={tool.link}
-                  className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-5 transition-all hover:border-white/20 hover:bg-white/10"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-white/80">
-                    <CheckCircle className="h-5 w-5" />
-                  </div>
-                  <h3 className="mt-4 font-bold text-white">{tool.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-petrol-300">{tool.description}</p>
-                  <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-coral-400">
-                    <span>Zum Tool</span>
-                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </Link>
-              ))}
+              {tools.map((tool) => {
+                const IconComponent = tool.icon;
+                return (
+                  <Link
+                    key={tool.title}
+                    href={tool.link}
+                    className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-5 transition-all hover:border-white/20 hover:bg-white/10"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-white/80">
+                      <IconComponent className="h-5 w-5" />
+                    </div>
+                    <h3 className="mt-4 font-bold text-white">{tool.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-petrol-300">{tool.description}</p>
+                    <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-coral-400">
+                      <span>Zum Tool</span>
+                      <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>

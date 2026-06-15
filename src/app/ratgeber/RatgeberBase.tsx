@@ -1,6 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowLeft, Clock, Calendar, Share2, BookOpen, Sparkles, ChevronRight, Lightbulb } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, Share2, BookOpen, Sparkles, ChevronRight } from "lucide-react";
 
 export default function RatgeberBase({
   children,
@@ -9,7 +8,6 @@ export default function RatgeberBase({
   category,
   readTime,
   date,
-  image,
 }: {
   children: React.ReactNode;
   title: string;
@@ -17,7 +15,6 @@ export default function RatgeberBase({
   category: string;
   readTime: string;
   date: string;
-  image?: string;
 }) {
   const categoryColors: Record<string, string> = {
     Recruiting: "bg-sky-500",
@@ -53,19 +50,6 @@ export default function RatgeberBase({
           </div>
         </div>
       </nav>
-
-      {/* Article Hero Banner */}
-      {image && (
-        <div className="relative h-48 md:h-56 w-full overflow-hidden rounded-b-2xl">
-          <Image
-            src={image}
-            alt={title}
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
-      )}
 
       {/* Article Header */}
       <header className="mx-auto max-w-3xl px-6 py-10 bg-white">
