@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Calculator, BookOpen, FileText, Users, Shield, Zap, Lightbulb, TrendingUp, Heart, Coffee, Sparkles } from "lucide-react";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 
@@ -17,7 +18,7 @@ const services = [
     link: "/ratgeber/stellenanzeige-schreiben",
     linkText: "Zum Ratgeber",
     category: "Recruiting",
-    gradient: "from-sky-500 to-sky-600",
+    image: "https://cdn.pixabay.com/photo/2017/08/01/08/44/woman-2569346_1280.jpg",
   },
   {
     icon: Zap,
@@ -26,7 +27,7 @@ const services = [
     link: "/ratgeber/onboarding",
     linkText: "Mehr erfahren",
     category: "Mitarbeiter",
-    gradient: "from-emerald-500 to-emerald-600",
+    image: "https://cdn.pixabay.com/photo/2015/01/09/11/08/hands-593393_1280.jpg",
   },
   {
     icon: TrendingUp,
@@ -35,7 +36,7 @@ const services = [
     link: "/ratgeber/feedbackgespraeche",
     linkText: "Mehr erfahren",
     category: "Führung",
-    gradient: "from-violet-500 to-violet-600",
+    image: "https://cdn.pixabay.com/photo/2017/10/27/15/18/teamwork-2894855_1280.jpg",
   },
   {
     icon: Shield,
@@ -44,7 +45,7 @@ const services = [
     link: "/ratgeber/dsgvo-recruiting",
     linkText: "Mehr erfahren",
     category: "Recht",
-    gradient: "from-amber-500 to-amber-600",
+    image: "https://cdn.pixabay.com/photo/2016/03/26/18/23/cctv-1280531_1280.jpg",
   },
   {
     icon: Heart,
@@ -53,7 +54,7 @@ const services = [
     link: "/ratgeber/mitarbeiterzufriedenheit",
     linkText: "Mehr erfahren",
     category: "Kultur",
-    gradient: "from-rose-500 to-rose-600",
+    image: "https://cdn.pixabay.com/photo/2018/07/14/03/38/team-3535401_1280.jpg",
   },
   {
     icon: Coffee,
@@ -62,7 +63,7 @@ const services = [
     link: "/ratgeber/remote-arbeit",
     linkText: "Mehr erfahren",
     category: "Führung",
-    gradient: "from-violet-500 to-violet-600",
+    image: "https://cdn.pixabay.com/photo/2020/07/08/04/12/work-5382501_1280.jpg",
   },
 ];
 
@@ -74,6 +75,7 @@ const tools = [
     cta: "Zum Rechner",
     link: "/rechner/stundensatz",
     badge: "Kostenlos",
+    image: "https://cdn.pixabay.com/photo/1554224155-8d0d缺/1280.jpg",
   },
   {
     icon: FileText,
@@ -82,6 +84,7 @@ const tools = [
     cta: "Zur Vorlage",
     link: "/ratgeber/stellenanzeige-schreiben",
     badge: "Kostenlos",
+    image: "https://cdn.pixabay.com/photo/1456324504439-367cee3b3c32_1280.jpg",
   },
   {
     icon: BookOpen,
@@ -90,6 +93,7 @@ const tools = [
     cta: "Zur Checkliste",
     link: "/ratgeber/onboarding",
     badge: "Kostenlos",
+    image: "https://cdn.pixabay.com/photo/1517048676732-d65bc937f952_1280.jpg",
   },
 ];
 
@@ -101,6 +105,7 @@ const moreTools = [
     cta: "Zum Rechner",
     link: "/rechner/enps",
     badge: "Kostenlos",
+    image: "https://cdn.pixabay.com/photo/1551288049-bebda4e38f71_1280.jpg",
   },
   {
     icon: Users,
@@ -109,6 +114,7 @@ const moreTools = [
     cta: "Zum Rechner",
     link: "/rechner/fluktuation",
     badge: "Kostenlos",
+    image: "https://cdn.pixabay.com/photo/1552664730-d307ca884978_1280.jpg",
   },
   {
     icon: Heart,
@@ -117,6 +123,7 @@ const moreTools = [
     cta: "Zum Check",
     link: "/ratgeber/mitarbeiterzufriedenheit",
     badge: "Kostenlos",
+    image: "https://cdn.pixabay.com/photo/1521737711867-e3f973156f02_1280.jpg",
   },
 ];
 
@@ -201,25 +208,30 @@ export default function ServicesPage() {
             <Link
               key={service.title}
               href={service.link}
-              className="group relative overflow-hidden rounded-xl bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+              className="group relative overflow-hidden rounded-xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
             >
-              <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${service.gradient}`} />
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`shrink-0 rounded-lg bg-gradient-to-br ${service.gradient} p-2.5 text-white`}>
-                  <service.icon className="h-5 w-5" />
-                </div>
-                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold text-white ${service.gradient}`}>
+              <div className="relative h-36 w-full">
+                <Image
+                  src={service.image}
+                  alt={service.title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-petrol-900/70 to-transparent" />
+                <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-petrol-800">
                   {service.category}
                 </span>
               </div>
-              <h3 className="font-bold text-petrol-900 group-hover:text-coral-500 transition-colors">
-                {service.title}
-              </h3>
-              <p className="mt-2 text-sm text-petrol-500">
-                {service.description}
-              </p>
-              <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-coral-500">
-                {service.linkText} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              <div className="p-4">
+                <h3 className="font-bold text-petrol-900 group-hover:text-coral-500 transition-colors">
+                  {service.title}
+                </h3>
+                <p className="mt-2 text-sm text-petrol-500">
+                  {service.description}
+                </p>
+                <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-coral-500">
+                  {service.linkText} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </div>
               </div>
             </Link>
           ))}

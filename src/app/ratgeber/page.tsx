@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Clock, Users, TrendingUp, Shield, Heart, Coffee, Lightbulb, Search } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Clock, Lightbulb, Search, Sparkles } from "lucide-react";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 
 export const metadata: Metadata = {
@@ -9,9 +10,9 @@ export const metadata: Metadata = {
     "Praxisnahe Ratgeber für HR-Verantwortliche: Recruiting, Mitarbeiterführung, Onboarding und rechtliche Grundlagen.",
 };
 
+// Pixabay Bilder für jeden Ratgeber
 const guides = [
   {
-    icon: Users,
     title: "Die perfekte Stellenanzeige schreiben",
     excerpt: "Erfahre, welche Elemente eine Stellenanzeige haben muss, um qualifizierte Kandidaten anzuziehen. Mit konkreten Beispielen und Vorlagen.",
     category: "Recruiting",
@@ -19,9 +20,9 @@ const guides = [
     date: "15. Juni 2026",
     slug: "stellenanzeige-schreiben",
     featured: true,
+    image: "https://cdn.pixabay.com/photo/2018/01/17/07/06/laptop-3087585_1280.jpg",
   },
   {
-    icon: TrendingUp,
     title: "Onboarding: Die ersten 90 Tage",
     excerpt: "Ein strukturierter Onboarding-Prozess reduziert die Einarbeitungszeit um bis zu 40%. Hier ist der komplette Leitfaden.",
     category: "Mitarbeiter",
@@ -29,69 +30,70 @@ const guides = [
     date: "10. Juni 2026",
     slug: "onboarding",
     featured: true,
+    image: "https://cdn.pixabay.com/photo/2017/09/05/11/46/laptop-2717053_1280.jpg",
   },
   {
-    icon: Shield,
     title: "DSGVO im Recruiting: Was du wissen musst",
     excerpt: "Bewerberdaten richtig handhaben: Von der Einwilligung bis zur sicheren Aufbewahrung. Alle rechtlichen Anforderungen erklärt.",
     category: "Recht",
     readTime: "10 Min.",
     date: "5. Juni 2026",
     slug: "dsgvo-recruiting",
+    image: "https://cdn.pixabay.com/photo/2016/03/26/18/23/cctv-1280531_1280.jpg",
   },
   {
-    icon: Heart,
     title: "Mitarbeiterzufriedenheit messen und verbessern",
     excerpt: "Mit diesen Strategien erhöhst du die Zufriedenheit in deinem Team und reduzierst die Fluktuation nachhaltig.",
     category: "Kultur",
     readTime: "7 Min.",
     date: "1. Juni 2026",
     slug: "mitarbeiterzufriedenheit",
+    image: "https://cdn.pixabay.com/photo/2015/01/09/11/08/hands-593393_1280.jpg",
   },
   {
-    icon: Coffee,
     title: "Führung auf Distanz: Remote-Teams erfolgreich leiten",
     excerpt: "Tools, Kommunikationsregeln und kulturelle Aspekte für die erfolgreiche Führung von verteilten Teams.",
     category: "Führung",
     readTime: "9 Min.",
     date: "25. Mai 2026",
     slug: "remote-arbeit",
+    image: "https://cdn.pixabay.com/photo/2020/07/08/04/12/work-5382501_1280.jpg",
   },
   {
-    icon: TrendingUp,
     title: "Feedbackgespräche: So formulierst du konstruktives Feedback",
     excerpt: "Der richtige Rahmen, die richtigen Worte: So führst du Feedbackgespräche, die wirklich etwas bewirken.",
     category: "Führung",
     readTime: "6 Min.",
     date: "20. Mai 2026",
     slug: "feedbackgespraeche",
+    image: "https://cdn.pixabay.com/photo/2017/10/27/15/18/teamwork-2894855_1280.jpg",
   },
   {
-    icon: Users,
     title: "Arbeitgebermarke aufbauen: So wirst du zum attraktiven Arbeitgeber",
     excerpt: "Employer Branding ist mehr als ein Logo. Erfahre, wie du eine authentische Arbeitgebermarke schaffst, die qualifizierte Bewerber:innen anzieht.",
     category: "Recruiting",
     readTime: "10 Min.",
     date: "18. Juni 2026",
     slug: "arbeitgebermarke",
+    image: "https://cdn.pixabay.com/photo/2016/06/13/09/57/office-1453895_1280.jpg",
   },
   {
-    icon: TrendingUp,
     title: "Gehaltsverhandlung meistern: Tipps für faire und transparente Vergütung",
     excerpt: "Wie du Gehaltsverhandlungen professionell führst – sowohl intern als auch mit Bewerber:innen.",
     category: "Mitarbeiter",
     readTime: "8 Min.",
     date: "12. Juni 2026",
     slug: "gehaltsverhandlung",
+    image: "https://cdn.pixabay.com/photo/2013/03/07/05/13/money-906140_1280.jpg",
   },
   {
-    icon: Shield,
     title: "Kündigungsgespräch führen: So trennst du dich fair und professionell",
     excerpt: "Ein gutes Offboarding ist genauso wichtig wie ein gutes Onboarding. Wie du Kündigungen respektvoll gestaltest.",
     category: "Führung",
     readTime: "7 Min.",
     date: "8. Juni 2026",
     slug: "kuendigungsgespraech",
+    image: "https://cdn.pixabay.com/photo/2016/08/23/07/45/handshake-1614657_1280.jpg",
   },
 ];
 
@@ -156,7 +158,7 @@ export default function RatgeberPage() {
         />
         <div className="relative mx-auto max-w-6xl px-6 py-20 text-center">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-petrol-200">
-            <BookOpen className="h-3.5 w-3.5 text-coral-400" />
+            <Sparkles className="h-3.5 w-3.5 text-coral-400" />
             HR-Wissen kompakt
           </span>
           <h1 className="mt-6 text-4xl font-bold text-white md:text-5xl">
@@ -212,35 +214,36 @@ export default function RatgeberPage() {
             <Link
               key={guide.title}
               href={`/ratgeber/${guide.slug}`}
-              className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-xl"
+              className="group relative overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-xl"
             >
-              {/* Category gradient accent */}
-              <div className={`absolute left-0 top-0 h-full w-1 bg-gradient-to-b ${categoryColors[guide.category]} rounded-l-2xl`} />
-
-              <div className="flex items-start gap-5 pl-3">
-                <div className={`shrink-0 rounded-xl bg-gradient-to-br ${categoryColors[guide.category]} p-4 text-white shadow-lg`}>
-                  <guide.icon className="h-7 w-7" />
+              <div className="relative h-48 w-full">
+                <Image
+                  src={guide.image}
+                  alt={guide.title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-petrol-900/80 via-petrol-900/20 to-transparent" />
+                <span className={`absolute bottom-4 left-4 rounded-full px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r ${categoryColors[guide.category]}`}>
+                  {guide.category}
+                </span>
+              </div>
+              <div className="p-6">
+                <div className="flex flex-wrap items-center gap-3 mb-3">
+                  <span className="flex items-center gap-1 text-xs text-petrol-400">
+                    <Clock className="h-3 w-3" />
+                    {guide.readTime} Lesezeit
+                  </span>
                 </div>
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-3 mb-3">
-                    <span className={`rounded-full px-3 py-1 text-xs font-semibold text-white ${categoryColors[guide.category]}`}>
-                      {guide.category}
-                    </span>
-                    <span className="flex items-center gap-1 text-xs text-petrol-400">
-                      <Clock className="h-3 w-3" />
-                      {guide.readTime} Lesezeit
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-bold text-petrol-900 group-hover:text-coral-500 transition-colors">
-                    {guide.title}
-                  </h3>
-                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-petrol-500">
-                    {guide.excerpt}
-                  </p>
-                  <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-coral-500">
-                    Weiterlesen
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </div>
+                <h3 className="text-xl font-bold text-petrol-900 group-hover:text-coral-500 transition-colors">
+                  {guide.title}
+                </h3>
+                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-petrol-500">
+                  {guide.excerpt}
+                </p>
+                <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-coral-500">
+                  Weiterlesen
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
             </Link>
@@ -256,34 +259,36 @@ export default function RatgeberPage() {
             <Link
               key={guide.title}
               href={`/ratgeber/${guide.slug}`}
-              className="group relative overflow-hidden rounded-xl bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+              className="group relative overflow-hidden rounded-xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
             >
-              <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${categoryColors[guide.category]}`} />
-
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`shrink-0 rounded-lg bg-gradient-to-br ${categoryColors[guide.category]} p-2.5 text-white`}>
-                  <guide.icon className="h-5 w-5" />
-                </div>
-                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold text-white ${categoryColors[guide.category]}`}>
+              <div className="relative h-40 w-full">
+                <Image
+                  src={guide.image}
+                  alt={guide.title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-petrol-900/60 to-transparent" />
+                <span className={`absolute bottom-3 left-3 rounded-full px-2 py-0.5 text-xs font-semibold text-white bg-gradient-to-r ${categoryColors[guide.category]}`}>
                   {guide.category}
                 </span>
               </div>
-
-              <h3 className="font-bold text-petrol-900 group-hover:text-coral-500 transition-colors line-clamp-2">
-                {guide.title}
-              </h3>
-              <p className="mt-2 line-clamp-2 text-sm text-petrol-500">
-                {guide.excerpt}
-              </p>
-
-              <div className="mt-4 flex items-center justify-between border-t border-petrol-100 pt-3">
-                <span className="flex items-center gap-1 text-xs text-petrol-400">
-                  <Clock className="h-3 w-3" />
-                  {guide.readTime}
-                </span>
-                <span className="flex items-center gap-1 text-xs font-semibold text-coral-500">
-                  Lesen <ArrowRight className="h-3 w-3" />
-                </span>
+              <div className="p-4">
+                <h3 className="font-bold text-petrol-900 group-hover:text-coral-500 transition-colors line-clamp-2">
+                  {guide.title}
+                </h3>
+                <p className="mt-2 line-clamp-2 text-sm text-petrol-500">
+                  {guide.excerpt}
+                </p>
+                <div className="mt-4 flex items-center justify-between border-t border-petrol-100 pt-3">
+                  <span className="flex items-center gap-1 text-xs text-petrol-400">
+                    <Clock className="h-3 w-3" />
+                    {guide.readTime}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs font-semibold text-coral-500">
+                    Lesen <ArrowRight className="h-3 w-3" />
+                  </span>
+                </div>
               </div>
             </Link>
           ))}
