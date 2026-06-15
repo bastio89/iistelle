@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { MapPin, Clock, ArrowLeft, Mail, CheckCircle, Sparkles, Send, ExternalLink } from "lucide-react";
 import Footer from "@/components/Footer";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/server";
+import { createServerSupabase } from "@/lib/supabase/server";
 import { Company, Job } from "@/lib/types";
 
 type PageProps = {
@@ -12,7 +12,7 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps) {
   const { slug, id } = await params;
-  const supabase = await createClient();
+  const supabase = await createServerSupabase();
 
   const { data: company } = await supabase
     .from("companies")
@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function JobDetailPage({ params }: PageProps) {
   const { slug, id } = await params;
-  const supabase = await createClient();
+  const supabase = await createServerSupabase();
 
   const { data: company } = await supabase
     .from("companies")
