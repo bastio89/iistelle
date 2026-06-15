@@ -24,6 +24,7 @@ import {
   Sparkles as SparklesIcon,
 } from "lucide-react";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
+import { getPricingPlans, getPricingConfig, formatPrice } from "@/lib/pricing";
 
 const trustItems = [
   { icon: Zap, text: "Startklar in 1 Minute" },
@@ -103,6 +104,12 @@ export default function LandingPage() {
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
   const [mounted, setMounted] = useState(false);
   const yearlySavingsPercent = 17;
+
+  // Zentralisierte Preise basierend auf Standort
+  const pricingPlans = getPricingPlans("DE");
+  const pricingConfig = getPricingConfig("DE");
+  const starterPlan = pricingPlans.find((p) => p.id === "starter");
+  const proPlan = pricingPlans.find((p) => p.id === "professional");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -456,49 +463,17 @@ export default function LandingPage() {
         </div>
 
         <div className="fade-in-stagger mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-2">
-          {[
-            {
-              name: "Starter",
-              monthlyPrice: 39,
-              yearlyPrice: 390,
-              sub: "pro Monat, pro Firma",
-              highlight: false,
-              description: "Für Kleinunternehmen, die Recruiting und Abwesenheiten effizient managen wollen.",
-              items: [
-                "Bis 5 Mitarbeiter",
-                "Bewerber-Pipeline (Kanban)",
-                "Eigene Karriereseite",
-                "CV-Upload & Dokumente",
-                "Abwesenheiten & Kalender",
-                "E-Mail-Benachrichtigungen",
-              ],
-              cta: "14 Tage kostenlos testen",
-            },
-            {
-              name: "Professional",
-              monthlyPrice: 99,
-              yearlyPrice: 990,
-              sub: "pro Monat, pro Firma",
-              highlight: true,
-              description: "Für wachsende Unternehmen, die alle HR-Prozesse an einem Ort brauchen.",
-              items: [
-                "Unbegrenzte Mitarbeiter",
-                "Alles aus Starter",
-                "Gehaltsdaten & Vergütung",
-                "Performance-Gespräche (360°)",
-                "Zeiterfassung",
-                "Rollen & Berechtigungen",
-                "CSV-Exporte & API-Zugriff",
-                "Audit-Log",
-              ],
-              cta: "14 Tage kostenlos testen",
-            },
-          ].map((plan) => {
-            const priceData = getYearlyPrice(plan.monthlyPrice, plan.yearlyPrice);
+          {pricingPlans
+            .filter((p) => p.id === "starter" || p.id === "professional")
+            .map((plan) => {
+            const priceData = getYearlyPrice(plan.monthlyPrice ?? 0, plan.yearlyPrice ?? 0);
+            const currency = plan.currency;
+            const displayPrice = billing === "yearly" ? priceData.monthly : (plan.monthlyPrice ?? 0);
+            const formattedPrice = formatPrice(displayPrice, currency);
 
             return (
               <div
-                key={plan.name}
+                key={plan.id}
                 className={`card relative flex flex-col p-7 transition-all ${
                   plan.highlight ? "border-2 border-coral-500 shadow-cardHover scale-in-spring" : ""
                 }`}
@@ -506,45 +481,45 @@ export default function LandingPage() {
                 {plan.highlight && (
                   <span className="badge-pop absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-coral-500 px-3 py-1 text-xs font-bold text-white">
                     Empfohlen
-                </span>
-              )}
+                  </span>
+                )}
 
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-petrol-900">{plan.name}</h3>
-                  <p className="mt-1 text-sm text-petrol-500">{plan.description}</p>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-petrol-900">{plan.name}</h3>
+                    <p className="mt-1 text-sm text-petrol-500">{plan.tagline}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-4xl font-black text-petrol-900">{formattedPrice}</p>
+                    <p className="text-sm text-petrol-400">pro Monat, pro Firma</p>
+                    {billing === "yearly" && priceData.savings > 0 && (
+                      <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                        <SparklesIcon className="h-3 w-3" />
+                        Sparen: {formatPrice(priceData.savings, currency)}/Jahr
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-4xl font-black text-petrol-900">{priceData.monthly} €</p>
-                  <p className="text-sm text-petrol-400">{plan.sub}</p>
-                  {billing === "yearly" && priceData.savings > 0 && (
-                    <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
-                      <SparklesIcon className="h-3 w-3" />
-                      Sparen: {priceData.savings} €/Jahr
-                    </p>
-                  )}
-                </div>
+
+                <div className="my-5 h-px bg-petrol-100" />
+
+                <ul className="flex-1 space-y-3">
+                  {plan.features.map((item) => (
+                    <li key={item} className="flex items-start gap-2.5 text-sm text-petrol-700">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  href={`/login?plan=${plan.id}${billing === "yearly" ? "&billing=yearly" : ""}`}
+                  className={`${plan.highlight ? "btn-danger" : "btn-secondary"} mt-6 justify-center`}
+                >
+                  {plan.cta}
+                </Link>
               </div>
-
-              <div className="my-5 h-px bg-petrol-100" />
-
-              <ul className="flex-1 space-y-3">
-                {plan.items.map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm text-petrol-700">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href={`/login?plan=${plan.name.toLowerCase()}${billing === "yearly" ? "&billing=yearly" : ""}`}
-                className={`${plan.highlight ? "btn-danger" : "btn-secondary"} mt-6 justify-center`}
-              >
-                {plan.cta}
-              </Link>
-            </div>
-          );
+            );
           })}
         </div>
 

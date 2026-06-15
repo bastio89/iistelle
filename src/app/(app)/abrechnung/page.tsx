@@ -6,6 +6,7 @@ import { Company, PLAN_META } from "@/lib/types";
 import { useRole } from "@/lib/useRole";
 import { PageHeader, StatCard } from "@/components/ui";
 import { CheckCircle2, CreditCard, ExternalLink, ShieldAlert } from "lucide-react";
+import { getPricingPlans, formatPrice, Country } from "@/lib/pricing";
 
 export default function BillingPage() {
   const supabase = createClient();
@@ -15,6 +16,9 @@ export default function BillingPage() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Region-basierte Preis-Erkennung
+  const [country, setCountry] = useState<Country>("DE");
 
   useEffect(() => {
     async function load() {
@@ -31,6 +35,11 @@ export default function BillingPage() {
     }
     load();
 
+    // Region aus Accept-Language Header ableiten
+    fetch("/api/geo").then(r => r.json()).then(data => {
+      if (data.country) setCountry(data.country);
+    }).catch(() => {});
+
     const status = new URLSearchParams(window.location.search).get("status");
     if (status === "erfolg") {
       setMsg("Vielen Dank! Dein Upgrade wird verarbeitet und ist gleich aktiv.");
@@ -39,6 +48,9 @@ export default function BillingPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Hole die Preispläne basierend auf der Region
+  const pricingPlans = getPricingPlans(country);
 
   async function startCheckout() {
     setBusy(true);
@@ -138,31 +150,12 @@ export default function BillingPage() {
       </div>
 
       <div className="mt-8 grid gap-5 md:grid-cols-3">
-        {[
-          {
-            plan: "starter" as const,
-            price: "Kostenlos",
-            sub: "für immer",
-            items: ["Bis 10 aktive Mitarbeiter", "Recruiting-Pipeline", "Eigene Karriereseite", "Abwesenheiten & Kalender"],
-          },
-          {
-            plan: "professional" as const,
-            price: "ab 129 €",
-            sub: "pro Firma / Monat",
-            items: ["Unbegrenzte Mitarbeiter", "Dokumente & CV-Upload", "Gehalt & Performance", "Rollen & Team-Einladungen", "CSV-Exporte", "API-Zugriff"],
-          },
-          {
-            plan: "enterprise" as const,
-            price: "Individuell",
-            sub: "auf Anfrage",
-            items: ["Alles aus Professional", "Onboarding-Begleitung", "Individuelle Anpassungen", "Persönlicher Support"],
-          },
-        ].map((p) => {
-          const meta = PLAN_META[p.plan];
-          const isCurrent = company.plan === p.plan;
+        {pricingPlans.map((plan) => {
+          const meta = PLAN_META[plan.plan];
+          const isCurrent = company.plan === plan.plan;
           return (
             <div
-              key={p.plan}
+              key={plan.id}
               className={`card relative flex flex-col p-7 ${
                 isCurrent ? "border-2 border-petrol-700" : ""
               }`}
@@ -172,24 +165,28 @@ export default function BillingPage() {
                   Dein Plan
                 </span>
               )}
-              <h3 className="font-bold text-petrol-900">{meta.label}</h3>
-              <p className="mt-3 text-4xl font-black text-petrol-900">{p.price}</p>
-              <p className="text-sm text-petrol-400">{p.sub}</p>
+              <h3 className="font-bold text-petrol-900">{plan.name}</h3>
+              <p className="mt-3 text-4xl font-black text-petrol-900">
+                {plan.monthlyPrice === 0 ? "Kostenlos" : formatPrice(plan.monthlyPrice, plan.currency)}
+              </p>
+              <p className="text-sm text-petrol-400">
+                {plan.monthlyPrice === 0 ? "für immer" : "pro Firma / Monat"}
+              </p>
               <ul className="mt-5 flex-1 space-y-2.5">
-                {p.items.map((item) => (
+                {plan.features.map((item) => (
                   <li key={item} className="flex items-start gap-2 text-sm text-petrol-700">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                     {item}
                   </li>
                 ))}
               </ul>
-              {p.plan === "professional" && !isCurrent && (
+              {plan.id === "professional" && !isCurrent && (
                 <button className="btn-danger mt-6 justify-center" onClick={startCheckout} disabled={busy}>
                   <CreditCard className="h-4 w-4" />
                   {busy ? "Einen Moment…" : "Jetzt upgraden"}
                 </button>
               )}
-              {p.plan === "enterprise" && !isCurrent && (
+              {plan.id === "enterprise" && !isCurrent && (
                 <a
                   href="mailto:hello@twenty5ai.com?subject=iistelle%20Enterprise"
                   className="btn-secondary mt-6 justify-center"
@@ -205,6 +202,36 @@ export default function BillingPage() {
             </div>
           );
         })}
+        {/* Enterprise Card - immer individuell */}
+        <div className="card relative flex flex-col p-7">
+          <h3 className="font-bold text-petrol-900">Enterprise</h3>
+          <p className="mt-3 text-4xl font-black text-petrol-900">Individuell</p>
+          <p className="text-sm text-petrol-400">auf Anfrage</p>
+          <ul className="mt-5 flex-1 space-y-2.5">
+            <li className="flex items-start gap-2 text-sm text-petrol-700">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+              Alles aus Professional
+            </li>
+            <li className="flex items-start gap-2 text-sm text-petrol-700">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+              Onboarding-Begleitung
+            </li>
+            <li className="flex items-start gap-2 text-sm text-petrol-700">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+              Individuelle Anpassungen
+            </li>
+            <li className="flex items-start gap-2 text-sm text-petrol-700">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+              Persönlicher Support
+            </li>
+          </ul>
+          <a
+            href="mailto:hello@twenty5ai.com?subject=iistelle%20Enterprise"
+            className="btn-secondary mt-6 justify-center"
+          >
+            Kontakt aufnehmen
+          </a>
+        </div>
       </div>
 
       <p className="mt-6 text-xs text-petrol-400">

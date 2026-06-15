@@ -32,14 +32,14 @@ export interface PricingPlan {
   plan: "starter" | "professional";
 }
 
-// Schweizer Preise (CHF) – Starter: 49 CHF, Professional: 129 CHF
+// Schweizer Preise (CHF) – Starter: kostenlos, Professional: 129 CHF
 const CH_PRICING: Omit<PricingPlan, "currency" | "ctaLink">[] = [
   {
     id: "starter",
     name: "Starter",
     tagline: "Für Kleinunternehmen, die Recruiting und Abwesenheiten effizient managen",
-    monthlyPrice: 49,
-    yearlyPrice: 490,
+    monthlyPrice: 0,
+    yearlyPrice: 0,
     maxEmployees: 5,
     features: [
       "Bis 5 Mitarbeiter",
@@ -57,7 +57,7 @@ const CH_PRICING: Omit<PricingPlan, "currency" | "ctaLink">[] = [
       "API-Zugriff",
       "CSV-Exporte",
     ],
-    cta: "14 Tage kostenlos testen",
+    cta: "Kostenlos starten",
     highlight: false,
     plan: "starter",
   },
@@ -85,14 +85,14 @@ const CH_PRICING: Omit<PricingPlan, "currency" | "ctaLink">[] = [
   },
 ];
 
-// Deutsche Preise (EUR) – Starter: 39 €, Professional: 99 €
+// Deutsche Preise (EUR) – Starter: kostenlos, Professional: 99 €
 const DE_PRICING: Omit<PricingPlan, "currency" | "ctaLink">[] = [
   {
     id: "starter",
     name: "Starter",
     tagline: "Für Kleinunternehmen, die Recruiting und Abwesenheiten effizient managen",
-    monthlyPrice: 39,
-    yearlyPrice: 390,
+    monthlyPrice: 0,
+    yearlyPrice: 0,
     maxEmployees: 5,
     features: [
       "Bis 5 Mitarbeiter",
@@ -110,7 +110,7 @@ const DE_PRICING: Omit<PricingPlan, "currency" | "ctaLink">[] = [
       "API-Zugriff",
       "CSV-Exporte",
     ],
-    cta: "14 Tage kostenlos testen",
+    cta: "Kostenlos starten",
     highlight: false,
     plan: "starter",
   },
