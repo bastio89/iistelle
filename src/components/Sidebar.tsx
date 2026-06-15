@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -102,9 +103,13 @@ export default function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col bg-petrol-950 px-3 py-5">
       <Link href="/dashboard" className="mb-6 flex items-center gap-2 px-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-coral-500 font-black text-white">
-          ii
-        </div>
+        <Image
+          src="/logo.svg"
+          alt="iistelle"
+          width={32}
+          height={32}
+          className="rounded-lg"
+        />
         <span className="text-lg font-bold tracking-tight text-white">
           iistelle HR
         </span>

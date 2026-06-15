@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import {
   Briefcase,
@@ -103,9 +104,7 @@ export default function LoginPage() {
       <div className="relative hidden w-1/2 flex-col justify-between bg-petrol-900 p-12 text-white lg:flex">
         <div>
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-coral-500 text-lg font-black">
-              ii
-            </div>
+            <Image src="/logo.svg" alt="iistelle" width={36} height={36} className="rounded-lg" />
             <span className="text-xl font-bold tracking-tight">iistelle HR</span>
           </div>
           <h1 className="mt-16 max-w-md text-4xl font-bold leading-tight">
@@ -141,9 +140,7 @@ export default function LoginPage() {
       <div className="flex w-full items-center justify-center bg-surface px-6 lg:w-1/2">
         <div className="w-full max-w-md">
           <div className="mb-8 flex items-center gap-2 lg:hidden">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-coral-500 text-lg font-black text-white">
-              ii
-            </div>
+            <Image src="/logo.svg" alt="iistelle" width={36} height={36} className="rounded-lg" />
             <span className="text-xl font-bold text-petrol-900">iistelle HR</span>
           </div>
 
