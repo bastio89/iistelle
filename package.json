@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "vercel-build": "cd iistelle && npm install && npm run build"
+    "build": "cd iistelle && npm run build",
+    "vercel-build": "cd iistelle && npm run build"
   },
   "dependencies": {
     "next": "15.3.9"
