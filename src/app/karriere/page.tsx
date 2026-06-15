@@ -11,30 +11,90 @@ export const metadata = {
 const openPositions = [
   {
     title: "Full-Stack Entwickler:in",
+    slug: "full-stack-entwickler",
     location: "Remote / Menziken",
     type: "Vollzeit",
     color: "from-sky-500 to-sky-600",
     description:
       "Entwickle die nächste Generation unserer HR-Plattform mit Next.js, TypeScript und Supabase.",
     tags: ["Next.js", "TypeScript", "Supabase", "Tailwind CSS"],
+    responsibilities: [
+      "Entwicklung neuer Features für unsere HR-Plattform iistelle",
+      "Gestaltung und Umsetzung von Benutzeroberflächen mit React/Next.js",
+      "Datenbankdesign und API-Entwicklung mit Supabase",
+      "Zusammenarbeit mit dem Produktteam bei der Feature-Planung",
+      "Code-Reviews und Mentoring von Junior-Entwicklern",
+    ],
+    requirements: [
+      "2+ Jahre Erfahrung in der Web-Entwicklung",
+      "Fundierte Kenntnisse in TypeScript und React/Next.js",
+      "Erfahrung mit PostgreSQL und Supabase oder Firebase",
+      "Verständnis für UI/UX-Prinzipien",
+      "Selbstständige Arbeitsweise und Teamfähigkeit",
+    ],
+    niceToHave: [
+      "Erfahrung mit Tailwind CSS",
+      "Beiträge zu Open-Source-Projekten",
+      "Kenntnisse in CI/CD und Deployment",
+    ],
   },
   {
     title: "Product Designer:in",
+    slug: "product-designer",
     location: "Remote",
     type: "Vollzeit",
     color: "from-violet-500 to-violet-600",
     description:
       "Gestalte intuitive Benutzererlebnisse für unser wachsendes Produktportfolio.",
     tags: ["Figma", "UX/UI", "Design Systems"],
+    responsibilities: [
+      "End-to-End Design von neuen Features",
+      "Erstellung von Wireframes, Prototypen und hochauflösenden Designs",
+      "Durchführung von Nutzerforschung und Usability-Tests",
+      "Pflege und Weiterentwicklung des Design-Systems",
+      "Zusammenarbeit mit Entwicklern bei der Umsetzung",
+    ],
+    requirements: [
+      "3+ Jahre Erfahrung im Product Design",
+      "Fortgeschrittene Figma-Kenntnisse",
+      "Erfahrung mit Design-Systemen",
+      "Starkes Verständnis für Usability und Accessibility",
+      "Portfolio mit relevanten Projekten",
+    ],
+    niceToHave: [
+      "Erfahrung mit Frontend-Entwicklung",
+      "Kenntnisse in Motion Design",
+      "Erfahrung im B2B/SaaS-Bereich",
+    ],
   },
   {
     title: "Customer Success Manager:in",
+    slug: "customer-success-manager",
     location: "Remote / Schweiz",
     type: "Vollzeit",
     color: "from-emerald-500 to-emerald-600",
     description:
       "Begleite unsere Kunden auf dem Weg zum Erfolg mit iistelle.",
     tags: ["B2B", "SaaS", "Kundenbetreuung"],
+    responsibilities: [
+      "Onboarding und Einarbeitung neuer Kunden",
+      "Durchführung von Produkt-Schulungen",
+      "Proaktive Kundenbetreuung und Beziehungsaufbau",
+      "Sammlung und Weiterleitung von Kundenfeedback",
+      "Unterstützung bei der Kundenbindung und -erweiterung",
+    ],
+    requirements: [
+      "2+ Jahre Erfahrung im Customer Success oder Support",
+      "Ausgeprägte Kommunikationsfähigkeiten",
+      "Erfahrung mit CRM-Tools und Ticket-Systemen",
+      "Verständnis für HR-Prozesse und -Software",
+      "Deutsch als Muttersprache, Englisch fließend",
+    ],
+    niceToHave: [
+      "Erfahrung mit HR-Software",
+      "Kenntnisse in Salesforce oder HubSpot",
+      "Consulting-Erfahrung",
+    ],
   },
 ];
 
@@ -107,10 +167,10 @@ export default function KarrierePage() {
             Unterschied machen.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <a href="#jobs" className="btn-primary">
+            <Link href={`/karriere/${openPositions[0].slug}`} className="btn-primary">
               Offene Stellen ansehen
-            </a>
-            <a href="#spontaneous" className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20">
+            </Link>
+            <a href="mailto:jobs@twenty5ai.com?subject=Initiativbewerbung" className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20">
               <Send className="h-4 w-4" />
               Initiativbewerbung
             </a>
@@ -156,9 +216,10 @@ export default function KarrierePage() {
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {openPositions.map((position) => (
-            <div
+            <Link
               key={position.title}
-              className="group overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+              href={`/karriere/${position.slug}`}
+              className="group block overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
             >
               <div className={`h-2 w-full bg-gradient-to-r ${position.color}`} />
               <div className="p-6">
@@ -188,11 +249,11 @@ export default function KarrierePage() {
                   ))}
                 </div>
                 <div className="mt-6 flex items-center gap-2 text-sm font-semibold text-coral-500">
-                  <span>Bewerben</span>
+                  <span>Mehr erfahren</span>
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
