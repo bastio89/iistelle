@@ -3,19 +3,36 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Company, Job } from "@/lib/types";
 import ApplyModal from "@/components/ApplyModal";
 import { ArrowRight, Briefcase, Clock, MapPin } from "lucide-react";
 
+// iistelle Job-Slugs, die nicht mit Firmen-Slugs kollidieren können
+const IISTELLE_JOB_SLUGS = [
+  "full-stack-entwickler",
+  "product-designer",
+  "customer-success-manager",
+];
+
 export default function CareerPage() {
   const { slug } = useParams<{ slug: string }>();
+
+  const router = useRouter();
   const supabase = createClient();
   const [company, setCompany] = useState<Company | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [deptFilter, setDeptFilter] = useState("alle");
   const [applyJob, setApplyJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // iistelle Job-Slugs umleiten
+  useEffect(() => {
+    if (IISTELLE_JOB_SLUGS.includes(slug)) {
+      router.replace(`/karriere/jobs/${slug}`);
+    }
+  }, [slug, router]);
 
   useEffect(() => {
     async function load() {
