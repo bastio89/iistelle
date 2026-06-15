@@ -66,18 +66,52 @@ const tools = [
     title: "Stundensatz-Rechner",
     description: "Berechne deinen optimalen Stundensatz basierend auf Lebenshaltungskosten und Gewinnmarge.",
     cta: "Zum Rechner",
+    link: "/rechner/stundensatz",
+    badge: "Kostenlos",
   },
   {
     icon: FileText,
     title: "Stellenbeschreibung-Vorlage",
     description: "Downloadbare Vorlage für professionelle Stellenbeschreibungen nach Schweizer Standard.",
     cta: "Zur Vorlage",
+    link: "/ratgeber/stellenanzeige-schreiben",
+    badge: "Kostenlos",
   },
   {
     icon: BookOpen,
     title: "Onboarding-Checkliste",
     description: "Die komplette Checkliste für erfolgreiches Onboarding – von Tag 1 bis zum 90-Tage-Gespräch.",
     cta: "Zur Checkliste",
+    link: "/ratgeber/onboarding",
+    badge: "Kostenlos",
+  },
+];
+
+// More free tools
+const moreTools = [
+  {
+    icon: TrendingUp,
+    title: "eNPS-Rechner",
+    description: "Misst die Mitarbeiterzufriedenheit und -bindung in deinem Unternehmen.",
+    cta: "Zum Rechner",
+    link: "/rechner/enps",
+    badge: "Kostenlos",
+  },
+  {
+    icon: Users,
+    title: "Fluktuationsrechner",
+    description: "Berechne deine Fluktuationsrate und vergleiche sie mit dem Branchendurchschnitt.",
+    cta: "Zum Rechner",
+    link: "/rechner/fluktuation",
+    badge: "Kostenlos",
+  },
+  {
+    icon: Heart,
+    title: "Mitarbeiterzufriedenheit-Check",
+    description: "Bewerte in 2 Minuten die wichtigsten Faktoren für Zufriedenheit in deinem Team.",
+    cta: "Zum Check",
+    link: "/ratgeber/mitarbeiterzufriedenheit",
+    badge: "Kostenlos",
   },
 ];
 
@@ -197,13 +231,41 @@ export default function ServicesPage() {
           <div className="grid gap-6 md:grid-cols-3">
             {tools.map((tool) => (
               <div key={tool.title} className="rounded-2xl border border-white/10 bg-white/5 p-6">
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-coral-500/20 text-coral-400">
+                {tool.badge && (
+                  <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-400">
+                    {tool.badge}
+                  </span>
+                )}
+                <span className="mt-3 flex h-12 w-12 items-center justify-center rounded-xl bg-coral-500/20 text-coral-400">
                   <tool.icon className="h-6 w-6" />
                 </span>
                 <h3 className="mt-4 font-bold text-white">{tool.title}</h3>
                 <p className="mt-2 text-sm text-petrol-300">{tool.description}</p>
                 <Link
-                  href="/tools"
+                  href={tool.link}
+                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
+                >
+                  {tool.cta} <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 grid gap-6 md:grid-cols-3">
+            {moreTools.map((tool) => (
+              <div key={tool.title} className="rounded-2xl border border-white/10 bg-white/5 p-6">
+                {tool.badge && (
+                  <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-400">
+                    {tool.badge}
+                  </span>
+                )}
+                <span className="mt-3 flex h-12 w-12 items-center justify-center rounded-xl bg-petrol-500/20 text-petrol-300">
+                  <tool.icon className="h-6 w-6" />
+                </span>
+                <h3 className="mt-4 font-bold text-white">{tool.title}</h3>
+                <p className="mt-2 text-sm text-petrol-300">{tool.description}</p>
+                <Link
+                  href={tool.link}
                   className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
                 >
                   {tool.cta} <ArrowRight className="h-4 w-4" />

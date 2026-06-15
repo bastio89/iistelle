@@ -17,6 +17,7 @@ const guides = [
     category: "Recruiting",
     readTime: "8 Min.",
     date: "15. Juni 2026",
+    slug: "stellenanzeige-schreiben",
   },
   {
     icon: TrendingUp,
@@ -25,6 +26,7 @@ const guides = [
     category: "Mitarbeiter",
     readTime: "12 Min.",
     date: "10. Juni 2026",
+    slug: "onboarding",
   },
   {
     icon: Shield,
@@ -33,6 +35,7 @@ const guides = [
     category: "Recht",
     readTime: "10 Min.",
     date: "5. Juni 2026",
+    slug: "dsgvo-recruiting",
   },
   {
     icon: Heart,
@@ -41,6 +44,7 @@ const guides = [
     category: "Kultur",
     readTime: "7 Min.",
     date: "1. Juni 2026",
+    slug: "mitarbeiterzufriedenheit",
   },
   {
     icon: Coffee,
@@ -49,6 +53,7 @@ const guides = [
     category: "Führung",
     readTime: "9 Min.",
     date: "25. Mai 2026",
+    slug: "remote-arbeit",
   },
   {
     icon: TrendingUp,
@@ -57,14 +62,17 @@ const guides = [
     category: "Führung",
     readTime: "6 Min.",
     date: "20. Mai 2026",
+    slug: "feedbackgespraeche",
   },
 ];
 
+const allGuides = [...guides, ...additionalGuides];
+
 const categories = [
-  { name: "Alle", count: guides.length, active: true },
-  { name: "Recruiting", count: 2 },
-  { name: "Mitarbeiter", count: 1 },
-  { name: "Führung", count: 2 },
+  { name: "Alle", count: allGuides.length, active: true },
+  { name: "Recruiting", count: 3 },
+  { name: "Mitarbeiter", count: 2 },
+  { name: "Führung", count: 3 },
   { name: "Recht", count: 1 },
   { name: "Kultur", count: 1 },
 ];
@@ -133,10 +141,10 @@ export default function RatgeberPage() {
       {/* Guides Grid */}
       <section className="mx-auto max-w-6xl px-6 pb-20">
         <div className="grid gap-6 md:grid-cols-2">
-          {guides.map((guide) => (
+          {allGuides.map((guide) => (
             <Link
               key={guide.title}
-              href={`/ratgeber/${guide.title.toLowerCase().replace(/\s+/g, "-")}`}
+              href={`/ratgeber/${guide.slug}`}
               className="card group p-6 transition hover:shadow-cardHover"
             >
               <div className="flex items-start gap-4">
