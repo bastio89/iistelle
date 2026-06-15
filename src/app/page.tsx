@@ -20,7 +20,6 @@ import {
   TrendingUp,
   Clock,
   Briefcase,
-  Sparkles as SparklesIcon,
 } from "lucide-react";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 import { getPricingPlans, getPricingConfig, formatPrice } from "@/lib/pricing";
@@ -483,24 +482,29 @@ export default function LandingPage() {
                   </span>
                 )}
 
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-petrol-900">{plan.name}</h3>
-                    <p className="mt-1 text-sm text-petrol-500">{plan.tagline}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-4xl font-black text-petrol-900">{formattedPrice}</p>
-                    <p className="text-sm text-petrol-400">pro Monat, pro Firma</p>
-                    {billing === "yearly" && priceData.savings > 0 && (
-                      <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
-                        <SparklesIcon className="h-3 w-3" />
-                        Sparen: {formatPrice(priceData.savings, currency)}/Jahr
-                      </p>
-                    )}
-                  </div>
+                <div>
+                  <h3 className="text-xl font-bold text-petrol-900">{plan.name}</h3>
+                  <p className="mt-1 text-sm text-petrol-500">{plan.tagline}</p>
                 </div>
 
                 <div className="my-5 h-px bg-petrol-100" />
+
+                <div className="flex items-baseline justify-between">
+                  <div className="text-right">
+                    <p className="text-4xl font-black text-petrol-900">{formattedPrice}</p>
+                    <p className="text-sm text-petrol-400">pro Monat, pro Firma</p>
+                  </div>
+                  {billing === "yearly" && priceData.savings > 0 && (
+                    <div className="rounded-xl bg-emerald-50 px-4 py-3 text-center">
+                      <p className="text-lg font-black text-emerald-600">
+                        -{yearlySavingsPercent}%
+                      </p>
+                      <p className="text-xs font-semibold text-emerald-700">
+                        2 Monate gratis
+                      </p>
+                    </div>
+                  )}
+                </div>
 
                 <ul className="flex-1 space-y-3">
                   {plan.features.map((item) => (
