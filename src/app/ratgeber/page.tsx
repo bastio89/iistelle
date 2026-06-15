@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Clock, Users, TrendingUp, Shield, Heart, Coffee, Lightbulb } from "lucide-react";
+import { ArrowRight, BookOpen, Clock, Users, TrendingUp, Shield, Heart, Coffee, Lightbulb, Search } from "lucide-react";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 
 export const metadata: Metadata = {
@@ -18,6 +18,7 @@ const guides = [
     readTime: "8 Min.",
     date: "15. Juni 2026",
     slug: "stellenanzeige-schreiben",
+    featured: true,
   },
   {
     icon: TrendingUp,
@@ -27,6 +28,7 @@ const guides = [
     readTime: "12 Min.",
     date: "10. Juni 2026",
     slug: "onboarding",
+    featured: true,
   },
   {
     icon: Shield,
@@ -64,10 +66,6 @@ const guides = [
     date: "20. Mai 2026",
     slug: "feedbackgespraeche",
   },
-];
-
-// Additional guides for more content
-const additionalGuides = [
   {
     icon: Users,
     title: "Arbeitgebermarke aufbauen: So wirst du zum attraktiven Arbeitgeber",
@@ -97,18 +95,29 @@ const additionalGuides = [
   },
 ];
 
-const allGuides = [...guides, ...additionalGuides];
+const allGuides = guides;
 
 const categories = [
   { name: "Alle", count: allGuides.length, active: true },
-  { name: "Recruiting", count: 3 },
-  { name: "Mitarbeiter", count: 2 },
-  { name: "Führung", count: 3 },
-  { name: "Recht", count: 1 },
-  { name: "Kultur", count: 1 },
+  { name: "Recruiting", count: 2, color: "bg-sky-100 text-sky-700 hover:bg-sky-200" },
+  { name: "Mitarbeiter", count: 2, color: "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" },
+  { name: "Führung", count: 3, color: "bg-violet-100 text-violet-700 hover:bg-violet-200" },
+  { name: "Recht", count: 1, color: "bg-amber-100 text-amber-700 hover:bg-amber-200" },
+  { name: "Kultur", count: 1, color: "bg-rose-100 text-rose-700 hover:bg-rose-200" },
 ];
 
+const categoryColors: Record<string, string> = {
+  Recruiting: "from-sky-500 to-sky-600",
+  Mitarbeiter: "from-emerald-500 to-emerald-600",
+  Führung: "from-violet-500 to-violet-600",
+  Recht: "from-amber-500 to-amber-600",
+  Kultur: "from-rose-500 to-rose-600",
+};
+
 export default function RatgeberPage() {
+  const featuredGuides = allGuides.filter(g => g.featured);
+  const regularGuides = allGuides.filter(g => !g.featured);
+
   return (
     <div className="min-h-screen bg-surface">
       {/* Navigation */}
@@ -137,30 +146,56 @@ export default function RatgeberPage() {
       </nav>
 
       {/* Hero */}
-      <header className="mx-auto max-w-6xl px-6 py-16 text-center">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-petrol-200 bg-petrol-50 px-4 py-1.5 text-xs font-semibold text-petrol-600">
-          <BookOpen className="h-3.5 w-3.5 text-coral-500" />
-          HR-Wissen kompakt
-        </span>
-        <h1 className="mt-6 text-4xl font-bold text-petrol-900 md:text-5xl">
-          Ratgeber für modernes HR
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-petrol-500">
-          Praxisnahe Artikel, Expertenwissen und umsetzbare Tipps für HR-Verantwortliche –
-          geschrieben von Praktikern, für Praktiker.
-        </p>
+      <header className="relative overflow-hidden bg-petrol-950">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-30"
+          style={{
+            background:
+              "radial-gradient(50% 50% at 80% 20%, rgba(255,90,80,0.2) 0%, transparent 60%), radial-gradient(40% 40% at 20% 70%, rgba(69,144,154,0.2) 0%, transparent 60%)",
+          }}
+        />
+        <div className="relative mx-auto max-w-6xl px-6 py-20 text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-petrol-200">
+            <BookOpen className="h-3.5 w-3.5 text-coral-400" />
+            HR-Wissen kompakt
+          </span>
+          <h1 className="mt-6 text-4xl font-bold text-white md:text-5xl">
+            Ratgeber für modernes HR
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-petrol-300">
+            Praxisnahe Artikel, Expertenwissen und umsetzbare Tipps für HR-Verantwortliche –
+            geschrieben von Praktikern, für Praktiker.
+          </p>
+        </div>
       </header>
 
+      {/* Suchleiste */}
+      <section className="mx-auto max-w-6xl px-6 -mt-8">
+        <div className="relative rounded-2xl border border-petrol-200 bg-white p-2 shadow-lg">
+          <div className="flex items-center gap-3 px-4">
+            <Search className="h-5 w-5 text-petrol-400" />
+            <input
+              type="text"
+              placeholder="Ratgeber durchsuchen..."
+              className="flex-1 border-0 bg-transparent py-3 text-petrol-900 placeholder-petrol-400 focus:outline-none focus:ring-0"
+            />
+            <button className="btn-primary text-sm">
+              Suchen
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* Kategorien */}
-      <section className="mx-auto max-w-6xl px-6 pb-8">
-        <div className="flex flex-wrap items-center gap-2">
+      <section className="mx-auto max-w-6xl px-6 py-10">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           {categories.map((cat) => (
             <button
               key={cat.name}
               className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
                 cat.active
                   ? "bg-petrol-800 text-white"
-                  : "bg-white text-petrol-600 border border-petrol-200 hover:bg-petrol-50"
+                  : `bg-white text-petrol-600 border border-petrol-200 hover:bg-petrol-50 ${cat.color || ""}`
               }`}
             >
               {cat.name} ({cat.count})
@@ -169,45 +204,86 @@ export default function RatgeberPage() {
         </div>
       </section>
 
-      {/* Guides Grid */}
-      <section className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="grid gap-6 md:grid-cols-2">
-          {allGuides.map((guide) => (
+      {/* Featured Guides */}
+      <section className="mx-auto max-w-6xl px-6 pb-12">
+        <h2 className="mb-6 text-xl font-bold text-petrol-900">Aktuelle Ratgeber</h2>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {featuredGuides.map((guide) => (
             <Link
               key={guide.title}
               href={`/ratgeber/${guide.slug}`}
-              className="card group p-6 transition hover:shadow-cardHover"
+              className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-xl"
             >
-              <div className="flex items-start gap-4">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-petrol-800 text-white">
-                  <guide.icon className="h-6 w-6" />
-                </span>
+              {/* Category gradient accent */}
+              <div className={`absolute left-0 top-0 h-full w-1 bg-gradient-to-b ${categoryColors[guide.category]} rounded-l-2xl`} />
+
+              <div className="flex items-start gap-5 pl-3">
+                <div className={`shrink-0 rounded-xl bg-gradient-to-br ${categoryColors[guide.category]} p-4 text-white shadow-lg`}>
+                  <guide.icon className="h-7 w-7" />
+                </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                      guide.category === "Recruiting" ? "bg-sky-100 text-sky-700" :
-                      guide.category === "Mitarbeiter" ? "bg-emerald-100 text-emerald-700" :
-                      guide.category === "Führung" ? "bg-violet-100 text-violet-700" :
-                      guide.category === "Recht" ? "bg-amber-100 text-amber-700" :
-                      "bg-rose-100 text-rose-700"
-                    }`}>
+                  <div className="flex flex-wrap items-center gap-3 mb-3">
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold text-white ${categoryColors[guide.category]}`}>
                       {guide.category}
                     </span>
                     <span className="flex items-center gap-1 text-xs text-petrol-400">
                       <Clock className="h-3 w-3" />
-                      {guide.readTime}
+                      {guide.readTime} Lesezeit
                     </span>
                   </div>
-                  <h3 className="font-bold text-petrol-900 group-hover:text-coral-500 transition">
+                  <h3 className="text-xl font-bold text-petrol-900 group-hover:text-coral-500 transition-colors">
                     {guide.title}
                   </h3>
-                  <p className="mt-2 text-sm text-petrol-500 line-clamp-2">
+                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-petrol-500">
                     {guide.excerpt}
                   </p>
-                  <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-coral-500">
-                    Weiterlesen <ArrowRight className="h-3.5 w-3.5" />
-                  </span>
+                  <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-coral-500">
+                    Weiterlesen
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </div>
                 </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Alle Guides */}
+      <section className="mx-auto max-w-6xl px-6 pb-20">
+        <h2 className="mb-6 text-xl font-bold text-petrol-900">Alle Ratgeber</h2>
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {regularGuides.map((guide) => (
+            <Link
+              key={guide.title}
+              href={`/ratgeber/${guide.slug}`}
+              className="group relative overflow-hidden rounded-xl bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${categoryColors[guide.category]}`} />
+
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`shrink-0 rounded-lg bg-gradient-to-br ${categoryColors[guide.category]} p-2.5 text-white`}>
+                  <guide.icon className="h-5 w-5" />
+                </div>
+                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold text-white ${categoryColors[guide.category]}`}>
+                  {guide.category}
+                </span>
+              </div>
+
+              <h3 className="font-bold text-petrol-900 group-hover:text-coral-500 transition-colors line-clamp-2">
+                {guide.title}
+              </h3>
+              <p className="mt-2 line-clamp-2 text-sm text-petrol-500">
+                {guide.excerpt}
+              </p>
+
+              <div className="mt-4 flex items-center justify-between border-t border-petrol-100 pt-3">
+                <span className="flex items-center gap-1 text-xs text-petrol-400">
+                  <Clock className="h-3 w-3" />
+                  {guide.readTime}
+                </span>
+                <span className="flex items-center gap-1 text-xs font-semibold text-coral-500">
+                  Lesen <ArrowRight className="h-3 w-3" />
+                </span>
               </div>
             </Link>
           ))}
@@ -216,27 +292,33 @@ export default function RatgeberPage() {
 
       {/* Newsletter CTA */}
       <section className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-petrol-800 to-petrol-900 px-8 py-12">
-          <div className="absolute right-0 top-0 h-full w-1/3 opacity-10">
-            <Lightbulb className="h-full w-full text-white" />
-          </div>
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-petrol-800 to-petrol-900 px-8 py-12 shadow-xl">
+          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-coral-500/10 blur-3xl" />
+          <div className="absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-sky-500/10 blur-3xl" />
           <div className="relative">
-            <h2 className="text-2xl font-bold text-white">
-              Verpasse keinen neuen Ratgeber
-            </h2>
-            <p className="mt-2 text-petrol-200">
-              Erhalte die neuesten Artikel direkt in dein Postfach – kostenlos und ohne Spam.
-            </p>
-            <form className="mt-6 flex flex-wrap gap-3">
-              <input
-                type="email"
-                placeholder="deine@email.de"
-                className="input max-w-sm flex-1"
-              />
-              <button className="btn-danger">
-                Newsletter abonnieren
-              </button>
-            </form>
+            <div className="flex items-start gap-4">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-coral-500/20 text-coral-400">
+                <Lightbulb className="h-7 w-7" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-white">
+                  Verpasse keinen neuen Ratgeber
+                </h2>
+                <p className="mt-2 max-w-lg text-petrol-300">
+                  Erhalte die neuesten Artikel direkt in dein Postfach – kostenlos und ohne Spam.
+                </p>
+                <form className="mt-6 flex flex-wrap gap-3">
+                  <input
+                    type="email"
+                    placeholder="deine@email.de"
+                    className="input max-w-sm flex-1"
+                  />
+                  <button type="button" className="btn-danger">
+                    Newsletter abonnieren
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       </section>

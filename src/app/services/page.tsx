@@ -1,10 +1,10 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Calculator, BookOpen, FileText, Users, Shield, Zap, Lightbulb, TrendingUp, Heart, Coffee } from "lucide-react";
+import { ArrowRight, Calculator, BookOpen, FileText, Users, Shield, Zap, Lightbulb, TrendingUp, Heart, Coffee, Sparkles } from "lucide-react";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 
 export const metadata: Metadata = {
-  title: "Services & Ratgeber – iistelle",
+  title: "Services – iistelle",
   description:
     "Entdecke nützliche HR-Tools, Ratgeber und Insights für Schweizer und deutsche Unternehmen. Von der Stellenausschreibung bis zum Onboarding.",
 };
@@ -17,6 +17,7 @@ const services = [
     link: "/ratgeber/stellenanzeige-schreiben",
     linkText: "Zum Ratgeber",
     category: "Recruiting",
+    gradient: "from-sky-500 to-sky-600",
   },
   {
     icon: Zap,
@@ -25,6 +26,7 @@ const services = [
     link: "/ratgeber/onboarding",
     linkText: "Mehr erfahren",
     category: "Mitarbeiter",
+    gradient: "from-emerald-500 to-emerald-600",
   },
   {
     icon: TrendingUp,
@@ -33,6 +35,7 @@ const services = [
     link: "/ratgeber/feedbackgespraeche",
     linkText: "Mehr erfahren",
     category: "Führung",
+    gradient: "from-violet-500 to-violet-600",
   },
   {
     icon: Shield,
@@ -41,6 +44,7 @@ const services = [
     link: "/ratgeber/dsgvo-recruiting",
     linkText: "Mehr erfahren",
     category: "Recht",
+    gradient: "from-amber-500 to-amber-600",
   },
   {
     icon: Heart,
@@ -49,6 +53,7 @@ const services = [
     link: "/ratgeber/mitarbeiterzufriedenheit",
     linkText: "Mehr erfahren",
     category: "Kultur",
+    gradient: "from-rose-500 to-rose-600",
   },
   {
     icon: Coffee,
@@ -57,6 +62,7 @@ const services = [
     link: "/ratgeber/remote-arbeit",
     linkText: "Mehr erfahren",
     category: "Führung",
+    gradient: "from-violet-500 to-violet-600",
   },
 ];
 
@@ -87,7 +93,6 @@ const tools = [
   },
 ];
 
-// More free tools
 const moreTools = [
   {
     icon: TrendingUp,
@@ -116,11 +121,11 @@ const moreTools = [
 ];
 
 const categories = [
-  { name: "Recruiting", count: 12, color: "bg-sky-100 text-sky-700" },
-  { name: "Mitarbeiter", count: 8, color: "bg-emerald-100 text-emerald-700" },
-  { name: "Führung", count: 6, color: "bg-violet-100 text-violet-700" },
-  { name: "Recht", count: 4, color: "bg-amber-100 text-amber-700" },
-  { name: "Kultur", count: 5, color: "bg-rose-100 text-rose-700" },
+  { name: "Recruiting", count: 12, color: "bg-sky-100 text-sky-700 hover:bg-sky-200" },
+  { name: "Mitarbeiter", count: 8, color: "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" },
+  { name: "Führung", count: 6, color: "bg-violet-100 text-violet-700 hover:bg-violet-200" },
+  { name: "Recht", count: 4, color: "bg-amber-100 text-amber-700 hover:bg-amber-200" },
+  { name: "Kultur", count: 5, color: "bg-rose-100 text-rose-700 hover:bg-rose-200" },
 ];
 
 export default function ServicesPage() {
@@ -137,7 +142,7 @@ export default function ServicesPage() {
           </Link>
           <div className="flex items-center gap-6 text-sm font-semibold text-petrol-600">
             <ServiceDropdown />
-            <Link href="/services" className="text-coral-500 font-bold">Services</Link>
+            <Link href="/ratgeber" className="transition hover:text-petrol-900">Ratgeber</Link>
             <Link href="/preise" className="transition hover:text-petrol-900">Preise</Link>
           </div>
           <div className="flex items-center gap-2">
@@ -152,27 +157,36 @@ export default function ServicesPage() {
       </nav>
 
       {/* Hero */}
-      <header className="mx-auto max-w-6xl px-6 py-16 text-center">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-petrol-200 bg-petrol-50 px-4 py-1.5 text-xs font-semibold text-petrol-600">
-          <Lightbulb className="h-3.5 w-3.5 text-coral-500" />
-          Services & Ratgeber
-        </span>
-        <h1 className="mt-6 text-4xl font-bold text-petrol-900 md:text-5xl">
-          Wissen, das dein HR transformiert
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-petrol-500">
-          Praxisnahe Ratgeber, kostenlose Tools und Expertenwissen für HR-Verantwortliche
-          in der Schweiz und Deutschland – kompakt und direkt anwendbar.
-        </p>
+      <header className="relative overflow-hidden bg-petrol-950">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-30"
+          style={{
+            background:
+              "radial-gradient(50% 60% at 80% 20%, rgba(255,90,80,0.2) 0%, transparent 60%), radial-gradient(40% 40% at 20% 70%, rgba(69,144,154,0.2) 0%, transparent 60%)",
+          }}
+        />
+        <div className="relative mx-auto max-w-6xl px-6 py-20 text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-petrol-200">
+            <Sparkles className="h-3.5 w-3.5 text-coral-400" />
+            Kostenlose Tools & Ratgeber
+          </span>
+          <h1 className="mt-6 text-4xl font-bold text-white md:text-5xl">
+            Wissen, das dein HR transformiert
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-petrol-300">
+            Praxisnahe Ratgeber, kostenlose Tools und Expertenwissen für HR-Verantwortliche
+            in der Schweiz und Deutschland – kompakt und direkt anwendbar.
+          </p>
+        </div>
       </header>
 
       {/* Kategorien */}
-      <section className="mx-auto max-w-6xl px-6 pb-12">
+      <section className="mx-auto max-w-6xl px-6 py-10">
         <div className="flex flex-wrap items-center justify-center gap-3">
           {categories.map((cat) => (
             <button
               key={cat.name}
-              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${cat.color} hover:shadow-md`}
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${cat.color}`}
             >
               {cat.name} ({cat.count})
             </button>
@@ -181,94 +195,72 @@ export default function ServicesPage() {
       </section>
 
       {/* Services/Ratgeber */}
-      <section className="mx-auto max-w-6xl px-6 pb-20">
-        <h2 className="mb-8 text-2xl font-bold text-petrol-900">Aktuelle Ratgeber</h2>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <section className="mx-auto max-w-6xl px-6 pb-12">
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
             <Link
               key={service.title}
               href={service.link}
-              className="card group p-6 transition hover:shadow-cardHover"
+              className="group relative overflow-hidden rounded-xl bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
             >
+              <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${service.gradient}`} />
               <div className="flex items-center gap-3 mb-4">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-petrol-800 text-white">
+                <div className={`shrink-0 rounded-lg bg-gradient-to-br ${service.gradient} p-2.5 text-white`}>
                   <service.icon className="h-5 w-5" />
-                </span>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${service.category === "Recruiting" ? "bg-sky-100 text-sky-700" : service.category === "Mitarbeiter" ? "bg-emerald-100 text-emerald-700" : service.category === "Führung" ? "bg-violet-100 text-violet-700" : service.category === "Recht" ? "bg-amber-100 text-amber-700" : "bg-rose-100 text-rose-700"}`}>
+                </div>
+                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold text-white ${service.gradient}`}>
                   {service.category}
                 </span>
               </div>
-              <h3 className="font-bold text-petrol-900 group-hover:text-coral-500 transition">
+              <h3 className="font-bold text-petrol-900 group-hover:text-coral-500 transition-colors">
                 {service.title}
               </h3>
               <p className="mt-2 text-sm text-petrol-500">
                 {service.description}
               </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-coral-500">
-                {service.linkText} <ArrowRight className="h-3.5 w-3.5" />
-              </span>
+              <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-coral-500">
+                {service.linkText} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </div>
             </Link>
           ))}
         </div>
       </section>
 
       {/* Kostenlose Tools */}
-      <section className="bg-petrol-950 py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="text-center mb-12">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold text-petrol-200">
-              <Calculator className="h-3.5 w-3.5 text-coral-400" />
-              Kostenlose Tools
-            </span>
-            <h2 className="mt-4 text-3xl font-bold text-white md:text-4xl">
-              Nützliche HR-Tools zum sofortigen Nutzen
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-petrol-300">
-              Praktische Rechner und Vorlagen, die dir sofort helfen – ohne Anmeldung.
-            </p>
+      <section className="mx-auto max-w-6xl px-6 pb-20">
+        <div className="rounded-3xl bg-petrol-950 px-8 py-12">
+          <div className="mb-8 flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-coral-500/20 text-coral-400">
+              <Calculator className="h-6 w-6" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white">
+                Kostenlose HR-Tools
+              </h2>
+              <p className="mt-1 max-w-lg text-petrol-300">
+                Praktische Rechner und Vorlagen, die dir sofort helfen – ohne Anmeldung.
+              </p>
+            </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
-            {tools.map((tool) => (
-              <div key={tool.title} className="rounded-2xl border border-white/10 bg-white/5 p-6">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {[...tools, ...moreTools].map((tool) => (
+              <div key={tool.title} className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-5 transition-all hover:border-white/20 hover:bg-white/10">
                 {tool.badge && (
-                  <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-400">
+                  <span className="absolute right-3 top-3 inline-flex items-center rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-400">
                     {tool.badge}
                   </span>
                 )}
-                <span className="mt-3 flex h-12 w-12 items-center justify-center rounded-xl bg-coral-500/20 text-coral-400">
-                  <tool.icon className="h-6 w-6" />
-                </span>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-petrol-700 text-petrol-300">
+                  <tool.icon className="h-5 w-5" />
+                </div>
                 <h3 className="mt-4 font-bold text-white">{tool.title}</h3>
                 <p className="mt-2 text-sm text-petrol-300">{tool.description}</p>
                 <Link
                   href={tool.link}
-                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
+                  className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-coral-400 transition hover:text-coral-300"
                 >
-                  {tool.cta} <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 grid gap-6 md:grid-cols-3">
-            {moreTools.map((tool) => (
-              <div key={tool.title} className="rounded-2xl border border-white/10 bg-white/5 p-6">
-                {tool.badge && (
-                  <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-400">
-                    {tool.badge}
-                  </span>
-                )}
-                <span className="mt-3 flex h-12 w-12 items-center justify-center rounded-xl bg-petrol-500/20 text-petrol-300">
-                  <tool.icon className="h-6 w-6" />
-                </span>
-                <h3 className="mt-4 font-bold text-white">{tool.title}</h3>
-                <p className="mt-2 text-sm text-petrol-300">{tool.description}</p>
-                <Link
-                  href={tool.link}
-                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
-                >
-                  {tool.cta} <ArrowRight className="h-4 w-4" />
+                  {tool.cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
             ))}
@@ -277,23 +269,28 @@ export default function ServicesPage() {
       </section>
 
       {/* Newsletter */}
-      <section className="mx-auto max-w-3xl px-6 py-20 text-center">
-        <h2 className="text-2xl font-bold text-petrol-900">
-          Erhalte neue Ratgeber direkt ins Postfach
-        </h2>
-        <p className="mt-3 text-petrol-500">
-          Kein Spam, nur wertvolle HR-Insights. Jeden Monat ein neuer Artikel.
-        </p>
-        <form className="mt-6 flex flex-wrap gap-3 justify-center">
-          <input
-            type="email"
-            placeholder="deine@email.ch"
-            className="input max-w-sm flex-1"
-          />
-          <button className="btn-primary">
-            Anmelden
-          </button>
-        </form>
+      <section className="mx-auto max-w-3xl px-6 pb-20 text-center">
+        <div className="rounded-2xl bg-petrol-50 p-8">
+          <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-xl bg-coral-100 text-coral-500">
+            <Lightbulb className="h-6 w-6" />
+          </div>
+          <h2 className="mt-4 text-xl font-bold text-petrol-900">
+            Erhalte neue Ratgeber direkt ins Postfach
+          </h2>
+          <p className="mt-2 text-petrol-500">
+            Kein Spam, nur wertvolle HR-Insights. Jeden Monat ein neuer Artikel.
+          </p>
+          <form className="mt-6 flex flex-wrap gap-3 justify-center">
+            <input
+              type="email"
+              placeholder="deine@email.ch"
+              className="input max-w-sm flex-1"
+            />
+            <button type="button" className="btn-primary">
+              Anmelden
+            </button>
+          </form>
+        </div>
       </section>
 
       {/* Footer */}
