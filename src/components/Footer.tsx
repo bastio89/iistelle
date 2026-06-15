@@ -18,22 +18,6 @@ export default function Footer() {
               Recruiting + HR in einer Plattform. Made in Switzerland – für Unternehmen in der
               Schweiz und Deutschland.
             </p>
-            <div className="mt-4 flex gap-4">
-              <a
-                href="https://www.linkedin.com/company/iistelle"
-                target="_blank"
-                className="text-sm font-semibold text-petrol-500 transition hover:text-petrol-900"
-              >
-                LinkedIn
-              </a>
-              <a
-                href="https://twitter.com/iistelle"
-                target="_blank"
-                className="text-sm font-semibold text-petrol-500 transition hover:text-petrol-900"
-              >
-                Twitter
-              </a>
-            </div>
           </div>
 
           {/* Links Column 1 */}
