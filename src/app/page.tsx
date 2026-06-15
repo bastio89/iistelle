@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   FileText,
   Globe,
-  Lock,
   Plane,
   ShieldCheck,
   Sparkles,
@@ -29,7 +28,6 @@ import Footer from "@/components/Footer";
 
 const trustItems = [
   { icon: Zap, text: "Startklar in 1 Minute" },
-  { icon: Lock, text: "Strikte Datentrennung pro Firma" },
   { icon: ShieldCheck, text: "DSGVO-konform, Hosting in Frankfurt" },
   { icon: FileText, text: "CV-Upload & Dokumentenablage" },
 ];
