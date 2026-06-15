@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Users, Sparkles, Mail, MapPin, ArrowRight, Send, Heart } from "lucide-react";
 import Footer from "@/components/Footer";
 
@@ -235,8 +236,13 @@ export default function KarrierePage() {
         </h2>
         <div className="flex flex-wrap justify-center gap-8">
           <div className="text-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-petrol-100 text-petrol-800">
-              <span className="text-3xl font-bold">SO</span>
+            <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white shadow-lg">
+              <Image
+                src="/sebastian.webp"
+                alt="Sebastian Oczachowski"
+                fill
+                className="object-cover"
+              />
             </div>
             <h3 className="mt-4 font-bold text-petrol-900">Sebastian Oczachowski</h3>
             <p className="text-sm text-petrol-500">Founder & CEO</p>
