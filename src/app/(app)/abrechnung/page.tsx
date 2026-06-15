@@ -141,15 +141,15 @@ export default function BillingPage() {
         {[
           {
             plan: "starter" as const,
-            price: "0 €",
+            price: "Kostenlos",
             sub: "für immer",
             items: ["Bis 10 aktive Mitarbeiter", "Recruiting-Pipeline", "Eigene Karriereseite", "Abwesenheiten & Kalender"],
           },
           {
             plan: "professional" as const,
-            price: "4 €",
-            sub: "pro Mitarbeiter / Monat",
-            items: ["Unbegrenzte Mitarbeiter", "Dokumente & CV-Upload", "Gehalt & Performance", "Rollen & Team-Einladungen", "CSV-Exporte"],
+            price: "ab 129 €",
+            sub: "pro Firma / Monat",
+            items: ["Unbegrenzte Mitarbeiter", "Dokumente & CV-Upload", "Gehalt & Performance", "Rollen & Team-Einladungen", "CSV-Exporte", "API-Zugriff"],
           },
           {
             plan: "enterprise" as const,

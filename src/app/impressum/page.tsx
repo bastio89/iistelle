@@ -8,15 +8,26 @@ export const metadata = {
 export default function ImpressumPage() {
   return (
     <div className="min-h-screen bg-surface">
-      <div className="mx-auto max-w-3xl px-6 py-14">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-petrol-500 hover:text-petrol-800"
-        >
-          <ArrowLeft className="h-4 w-4" /> Zur Startseite
-        </Link>
+      {/* Navigation */}
+      <nav className="sticky top-0 z-40 border-b border-petrol-100 bg-white/80 backdrop-blur">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-3.5">
+          <Link href="/" className="flex items-center gap-2">
+            <img src="/logo.svg" alt="iistelle" width={32} height={32} className="rounded-lg" />
+            <span className="text-lg font-bold tracking-tight text-petrol-900">
+              iistelle HR
+            </span>
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-petrol-500 hover:text-petrol-800"
+          >
+            <ArrowLeft className="h-4 w-4" /> Zur Startseite
+          </Link>
+        </div>
+      </nav>
 
-        <h1 className="mt-6 text-3xl font-bold text-petrol-900">Impressum</h1>
+      <div className="mx-auto max-w-3xl px-6 py-10">
+        <h1 className="text-3xl font-bold text-petrol-900">Impressum</h1>
         <p className="mt-1 text-sm text-petrol-400">
           Angaben gemäß schweizerischem Obligationenrecht (OR) und § 5 TMG
         </p>
@@ -112,6 +123,24 @@ export default function ImpressumPage() {
           </p>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="border-t border-petrol-100 bg-white">
+        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-4 px-6 py-8">
+          <div className="flex items-center gap-2">
+            <img src="/logo.svg" alt="iistelle" width={28} height={28} className="rounded-lg" />
+            <span className="font-bold text-petrol-900">iistelle HR</span>
+            <span className="ml-2 text-xs text-petrol-400">
+              © {new Date().getFullYear()} · twenty5ai
+            </span>
+          </div>
+          <div className="flex gap-5 text-sm font-semibold text-petrol-500">
+            <Link href="/impressum" className="transition hover:text-petrol-900">Impressum</Link>
+            <Link href="/datenschutz" className="transition hover:text-petrol-900">Datenschutz</Link>
+            <Link href="/login" className="transition hover:text-petrol-900">Login</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

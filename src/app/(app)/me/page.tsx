@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Employee, Absence, AbsenceType, AbsenceStatus, GOAL_STATUS_META, Goal, REVIEW_TYPE_LABEL, ReviewType, Review } from "@/lib/types";
+import { Employee, Absence, AbsenceType, AbsenceStatus, GOAL_STATUS_META, Goal, REVIEW_TYPE_LABEL, ReviewType, Review, TimeEntry } from "@/lib/types";
 import { useRole } from "@/lib/useRole";
 import { formatDate } from "@/components/ui";
 import {
@@ -15,6 +15,8 @@ import {
   Calendar,
   Download,
   FileText,
+  LogIn,
+  LogOut,
   Mail,
   MapPin,
   Phone,
@@ -40,6 +42,7 @@ export default function SelfServicePage() {
   const [absences, setAbsences] = useState<Absence[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("dashboard");
   const [showAbsence, setShowAbsence] = useState(false);
@@ -90,6 +93,19 @@ export default function SelfServicePage() {
       .eq("employee_id", employee.id)
       .order("created_at", { ascending: false });
     setReviews((r as Review[]) ?? []);
+
+    // Load time entries for this month
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
+    const { data: te } = await supabase
+      .from("time_entries")
+      .select("*")
+      .eq("employee_id", employee.id)
+      .gte("clock_in", monthStart)
+      .lte("clock_in", monthEnd)
+      .order("clock_in", { ascending: false });
+    setTimeEntries((te as TimeEntry[]) ?? []);
 
     setLoading(false);
   }, [supabase]);
@@ -153,17 +169,22 @@ export default function SelfServicePage() {
 
   const tabs: { key: Tab; label: string; icon: React.ElementType }[] = [
     { key: "dashboard", label: "Übersicht", icon: User },
-    { key: "urlaub", label: "Urlaub", icon: Plane },
+    { key: "urlaub", label: "Urlaub & Abwesenheiten", icon: Plane },
     { key: "daten", label: "Meine Daten", icon: Shield },
     { key: "dokumente", label: "Dokumente", icon: FileText },
-    { key: "performance", label: "Performance", icon: TrendingUp },
+    { key: "performance", label: "Ziele & Feedback", icon: TrendingUp },
     { key: "zeiterfassung", label: "Zeiterfassung", icon: Timer },
   ];
 
   return (
     <div>
-      {/* Header */}
-      <div className="card p-6">
+      <PageHeader
+        title={`Willkommen, ${employee.first_name}`}
+        subtitle="Dein persönliches HR-Portal – Urlaub, Daten und mehr."
+      />
+
+      {/* Header Card */}
+      <div className="card mt-6 p-6">
         <div className="flex flex-wrap items-center gap-4">
           <Avatar name={fullName} size="lg" />
           <div>
@@ -666,22 +687,100 @@ export default function SelfServicePage() {
         )}
 
         {tab === "zeiterfassung" && (
-          <div className="card p-6">
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="font-bold text-petrol-900">Meine Zeiterfassung</h3>
-              <a href="/zeiterfassung" className="btn-secondary">
-                <Timer className="h-4 w-4" />
-                Vollständige Zeiterfassung
-              </a>
+          <div className="space-y-6">
+            <div className="card p-6">
+              <div className="mb-6 flex items-center justify-between">
+                <h3 className="font-bold text-petrol-900">Monatsübersicht {new Date().toLocaleDateString("de-DE", { month: "long", year: "numeric" })}</h3>
+                <a href="/zeiterfassung" className="btn-secondary">
+                  <Timer className="h-4 w-4" />
+                  Vollständige Zeiterfassung
+                </a>
+              </div>
+
+              {timeEntries.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-petrol-200 p-8 text-center">
+                  <Timer className="mx-auto h-10 w-10 text-petrol-300" />
+                  <p className="mt-3 text-sm text-petrol-500">
+                    Keine Zeiteinträge in diesem Monat.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {timeEntries.map((entry) => {
+                    const hours = entry.clock_out
+                      ? Math.max(0, (new Date(entry.clock_out).getTime() - new Date(entry.clock_in).getTime()) / 3600000 - (entry.pause_min || 0) / 60)
+                      : null;
+                    return (
+                      <div key={entry.id} className="flex items-center justify-between rounded-lg border border-petrol-100 p-4">
+                        <div className="flex items-center gap-4">
+                          <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${entry.clock_out ? "bg-emerald-100 text-emerald-600" : "bg-amber-100 text-amber-600"}`}>
+                            {entry.clock_out ? <LogOut className="h-5 w-5" /> : <LogIn className="h-5 w-5" />}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-petrol-900">
+                              {formatDateUtil(entry.clock_in)}
+                            </p>
+                            <p className="text-sm text-petrol-500">
+                              {new Date(entry.clock_in).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}
+                              {entry.clock_out ? ` – ${new Date(entry.clock_out).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}` : " (läuft noch)"}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className={`text-lg font-bold ${hours !== null ? "text-petrol-900" : "text-amber-600"}`}>
+                            {hours !== null ? `${hours.toFixed(1)} h` : "⏳"}
+                          </p>
+                          {entry.note && (
+                            <p className="text-xs text-petrol-400">{entry.note}</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-            <p className="text-sm text-petrol-500">
-              Hier siehst du demnächst eine Übersicht deiner Arbeitszeiten, Überstunden und Gleitzeit-Saldo.
-            </p>
-            <div className="mt-6 rounded-xl border border-dashed border-petrol-200 p-8 text-center">
-              <Timer className="mx-auto h-10 w-10 text-petrol-300" />
-              <p className="mt-3 text-sm text-petrol-500">
-                Zeiterfassung wird in Kürze verfügbar sein.
-              </p>
+
+            {/* Quick Clock In/Out */}
+            <div className="card p-6">
+              <h3 className="mb-4 font-bold text-petrol-900">Schnell stempeln</h3>
+              {(() => {
+                const openEntry = timeEntries.find((t) => !t.clock_out);
+                return openEntry ? (
+                  <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white">
+                        <Timer className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-emerald-800">Eingestempelt</p>
+                        <p className="text-sm text-emerald-600">
+                          seit {new Date(openEntry.clock_in).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        await supabase.from("time_entries").update({ clock_out: new Date().toISOString() }).eq("id", openEntry.id);
+                        load();
+                      }}
+                      className="btn-danger"
+                    >
+                      <LogOut className="h-4 w-4" /> Ausstempeln
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      await supabase.from("time_entries").insert({ employee_id: employee.id });
+                      load();
+                    }}
+                    className="btn-primary w-full"
+                  >
+                    <LogIn className="h-4 w-4" /> Jetzt einstempeln
+                  </button>
+                );
+              })()}
             </div>
           </div>
         )}
