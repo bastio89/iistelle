@@ -2,9 +2,29 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "iistelle HR – Recruiting",
+  title: {
+    default: "iistelle HR – Recruiting & HR-Software",
+    template: "%s | iistelle HR",
+  },
   description:
-    "Modernes HR-Tool für schlankes Recruiting: Stellen, Bewerber-Pipeline, Interviews und Auswertungen.",
+    "Die All-in-One-HR-Plattform für kleine und mittlere Unternehmen: Recruiting, Personalakte, Abwesenheiten und Performance – alles an einem Ort.",
+  keywords: ["HR-Software", "Recruiting", "Personalverwaltung", "Bewerbermanagement", "Abwesenheiten", "Performance-Reviews"],
+  authors: [{ name: "Sebastian Oczachowski" }],
+  creator: "iistelle",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/favicon.svg",
+  },
+  openGraph: {
+    type: "website",
+    locale: "de_DE",
+    url: "https://iistelle.de",
+    siteName: "iistelle HR",
+    title: "iistelle HR – Recruiting & HR-Software",
+    description: "Die All-in-One-HR-Plattform für kleine und mittlere Unternehmen.",
+  },
 };
 
 export default function RootLayout({

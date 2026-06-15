@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowRight,
   BarChart3,
@@ -87,9 +88,13 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-40 border-b border-petrol-100/60 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
           <Link href="/" className="group flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-coral-500 font-black text-white shadow-sm transition-all duration-200 group-hover:shadow-md group-hover:scale-105">
-              ii
-            </div>
+            <Image
+              src="/logo.svg"
+              alt="iistelle HR Logo"
+              width={36}
+              height={36}
+              className="rounded-xl"
+            />
             <span className="text-lg font-bold tracking-tight text-petrol-900">
               iistelle HR
             </span>
@@ -328,10 +333,10 @@ export default function LandingPage() {
             },
             {
               name: "Professional",
-              price: "4 €",
-              sub: "pro Mitarbeiter / Monat",
+              price: "ab 129 €",
+              sub: "pro Monat, pro Firma",
               highlight: true,
-              items: ["Unbegrenzte Mitarbeiter", "Dokumente & CV-Upload", "Gehalt & Performance", "Rollen & Rechte", "CSV-Exporte"],
+              items: ["Unbegrenzte Mitarbeiter", "Dokumente & CV-Upload", "Gehalt & Performance", "Rollen & Rechte", "CSV-Exporte", "API-Zugriff"],
               cta: "14 Tage testen",
             },
             {
@@ -412,9 +417,13 @@ export default function LandingPage() {
       <footer className="border-t border-petrol-100 bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-coral-500 text-sm font-black text-white">
-              ii
-            </div>
+            <Image
+              src="/logo.svg"
+              alt="iistelle HR Logo"
+              width={32}
+              height={32}
+              className="rounded-lg"
+            />
             <span className="font-bold text-petrol-900">iistelle HR</span>
             <span className="ml-2 text-xs text-petrol-400">
               © {new Date().getFullYear()} · twenty5ai · Sebastian Oczachowski
