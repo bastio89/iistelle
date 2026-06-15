@@ -130,6 +130,8 @@ export interface Company {
   brand_color: string;
   slack_webhook_url: string;
   candidate_retention_months: number;
+  /** Schweizer Kanton für Feiertagsberechnung (Standard: ZH) */
+  canton: string;
   created_at: string;
 }
 

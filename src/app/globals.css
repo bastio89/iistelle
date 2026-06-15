@@ -2,9 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   Design Engineering Polish - Emil Kowalski Style
+   Key: Specific properties, not "all"
+   ============================================ */
+
 :root {
   --sidebar-bg: #0f2e34;
   --sidebar-hover: #1a4b53;
+
+  /* Timing Functions */
+  --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Durations */
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+
+  /* Scale transforms */
+  --scale-active: 0.97;
+  --scale-hover: 1.02;
 }
 
 html,
@@ -18,37 +39,340 @@ body {
   background: #f6f8f9;
   color: #15282d;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
+
+/* ============================================
+   Custom Scrollbar - Subtle & Refined
+   ============================================ */
 
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #c4d2d5;
   border-radius: 8px;
+  transition: background 150ms ease-out;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 
+::-webkit-scrollbar-thumb:hover {
+  background: #a8b8bc;
+}
+
+/* ============================================
+   Component Styles with Polish
+   ============================================ */
+
 @layer components {
   .card {
     @apply bg-white rounded-xl2 shadow-card border border-petrol-100/60;
+    transition-property: transform, box-shadow, border-color;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(27, 77, 92, 0.1);
+  }
+
   .btn-primary {
-    @apply inline-flex items-center gap-2 rounded-lg bg-petrol-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-petrol-700 disabled:opacity-50;
+    @apply inline-flex items-center gap-2 rounded-lg bg-petrol-800 px-4 py-2 text-sm font-semibold text-white;
+    transition-property: background-color, box-shadow, transform;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }
+
+  .btn-primary:hover {
+    @apply bg-petrol-700;
+    box-shadow: 0 4px 12px rgba(27, 77, 92, 0.25);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.97);
+    transition-duration: 100ms;
+  }
+
+  .btn-primary:disabled {
+    @apply opacity-50;
+    transform: none;
+  }
+
   .btn-secondary {
-    @apply inline-flex items-center gap-2 rounded-lg border border-petrol-200 bg-white px-4 py-2 text-sm font-semibold text-petrol-800 transition hover:bg-petrol-50;
+    @apply inline-flex items-center gap-2 rounded-lg border border-petrol-200 bg-white px-4 py-2 text-sm font-semibold text-petrol-800;
+    transition-property: background-color, border-color, transform;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }
+
+  .btn-secondary:hover {
+    @apply bg-petrol-50 border-petrol-300;
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary:active {
+    transform: scale(0.97);
+    transition-duration: 100ms;
+  }
+
   .btn-danger {
-    @apply inline-flex items-center gap-2 rounded-lg bg-coral-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-coral-600;
+    @apply inline-flex items-center gap-2 rounded-lg bg-coral-500 px-4 py-2 text-sm font-semibold text-white;
+    transition-property: background-color, box-shadow, transform;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }
+
+  .btn-danger:hover {
+    @apply bg-coral-600;
+    box-shadow: 0 4px 12px rgba(255, 90, 80, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-danger:active {
+    transform: scale(0.97);
+    transition-duration: 100ms;
+  }
+
   .input {
-    @apply w-full rounded-lg border border-petrol-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-petrol-500 focus:ring-2 focus:ring-petrol-100;
+    @apply w-full rounded-lg border border-petrol-200 bg-white px-3 py-2 text-sm text-petrol-900;
+    transition-property: border-color, box-shadow, transform;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }
+
+  .input:focus {
+    @apply border-petrol-500 ring-2 ring-petrol-100 outline-none;
+    box-shadow: 0 0 0 3px rgba(27, 77, 92, 0.1);
+  }
+
+  .input:active {
+    transform: scale(0.99);
+  }
+
+  .input::placeholder {
+    @apply text-petrol-400;
+  }
+
   .label {
     @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-petrol-600;
   }
+}
+
+/* ============================================
+   Animation Classes
+   ============================================ */
+
+/* Staggered fade-in for lists */
+.fade-in-stagger > * {
+  animation: fadeInUp 400ms cubic-bezier(0, 0, 0.2, 1) forwards;
+  opacity: 0;
+}
+
+.fade-in-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.fade-in-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.fade-in-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.fade-in-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.fade-in-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.fade-in-stagger > *:nth-child(6) { animation-delay: 250ms; }
+
+/* Scale-in with spring */
+.scale-in-spring {
+  animation: scaleInSpring 400ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+/* Pulse for notifications */
+.pulse-dot {
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+/* Skeleton loading shimmer */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(27, 77, 92, 0.06) 25%,
+    rgba(27, 77, 92, 0.12) 50%,
+    rgba(27, 77, 92, 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ============================================
+   Keyframe Animations
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleInSpring {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ============================================
+   Hover Link Polish
+   ============================================ */
+
+.link-hover {
+  position: relative;
+  text-decoration: none;
+}
+
+.link-hover::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  transition: width 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.link-hover:hover::after {
+  width: 100%;
+}
+
+/* ============================================
+   Badge Animations
+   ============================================ */
+
+.badge-pop {
+  animation: badgePop 300ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes badgePop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   Focus States - Visible Feedback
+   ============================================ */
+
+.focus-visible-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(27, 77, 92, 0.2);
+}
+
+/* ============================================
+   Reduced Motion Support
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+   Interactive Element Polish
+   ============================================ */
+
+.interactive {
+  cursor: pointer;
+  user-select: none;
+  transition-property: transform, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+.interactive:hover {
+  transform: translateY(-1px);
+}
+
+.interactive:active {
+  transform: scale(0.97);
+  transition-duration: 100ms;
+}
+
+/* ============================================
+   Avatar Polish
+   ============================================ */
+
+.avatar-hover {
+  transition-property: transform, box-shadow;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+.avatar-hover:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(27, 77, 92, 0.15);
+}
+
+/* ============================================
+   Progress Bar Animation
+   ============================================ */
+
+.progress-fill {
+  transition: width 400ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* ============================================
+   Table Row Hover
+   ============================================ */
+
+.table-row-hover {
+  transition: background-color 150ms ease-out;
+}
+
+.table-row-hover:hover {
+  background-color: rgba(27, 77, 92, 0.03);
 }

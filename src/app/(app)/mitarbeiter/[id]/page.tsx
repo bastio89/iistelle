@@ -1021,7 +1021,13 @@ function SalaryModal({
       effective_from: form.effective_from,
       note: form.note,
     });
-    logAudit("Gehaltsanpassung erfasst", `gültig ab ${form.effective_from}`);
+    logAudit({
+      action: "salary_created",
+      category: "salary",
+      object_type: "salaries",
+      object_id: employeeId,
+      details: `Gehalt ${form.amount} ${form.pay_interval === "monatlich" ? "mtl." : "jährlich"} erfasst, gültig ab ${form.effective_from}`,
+    });
     onSaved();
   }
 

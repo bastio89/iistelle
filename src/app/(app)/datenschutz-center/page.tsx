@@ -56,7 +56,13 @@ function GdprCenterPage() {
     a.download = `dsgvo-export-${c.last_name.toLowerCase()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    logAudit("DSGVO-Export", `Datenauskunft für ${c.first_name} ${c.last_name} exportiert`);
+    logAudit({
+      action: "gdpr_export_request",
+      category: "data",
+      object_type: "candidates",
+      object_id: c.id,
+      details: `Datenauskunft für ${c.first_name} ${c.last_name} exportiert`,
+    });
   }
 
   async function deleteCandidate(c: Candidate) {
@@ -70,7 +76,13 @@ function GdprCenterPage() {
       await supabase.storage.from("bewerbungen").remove([c.cv_path]);
     }
     await supabase.from("candidates").delete().eq("id", c.id);
-    logAudit("DSGVO-Löschung", `Alle Daten von ${c.first_name} ${c.last_name} gelöscht`);
+    logAudit({
+      action: "personal_data_deleted",
+      category: "data",
+      object_type: "candidates",
+      object_id: c.id,
+      details: `Alle Daten von ${c.first_name} ${c.last_name} gelöscht`,
+    });
     load();
   }
 

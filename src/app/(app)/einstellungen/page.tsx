@@ -140,14 +140,14 @@ export default function SettingsPage() {
       .single();
     if (!error && data) {
       setApiKeys((prev) => [...prev, data as ApiKey]);
-      logAudit("API-Key erstellt", (data as ApiKey).name);
+      logAudit({ action: "api_key_created", category: "api", details: (data as ApiKey).name });
     }
   }
 
   async function deleteApiKey(id: string) {
     await supabase.from("api_keys").delete().eq("id", id);
     setApiKeys((prev) => prev.filter((k) => k.id !== id));
-    logAudit("API-Key gelöscht");
+    logAudit({ action: "api_key_deleted", category: "api" });
   }
 
   async function uploadLogo(e: React.ChangeEvent<HTMLInputElement>) {
@@ -190,7 +190,15 @@ export default function SettingsPage() {
         prev.map((r) => (r.user_id === userId ? { ...r, role } : r))
       );
       const target = roles.find((r) => r.user_id === userId);
-      logAudit("Rolle geändert", `${target?.email ?? userId} → ${role}`);
+      logAudit({
+        action: "role_changed",
+        category: "employee",
+        object_type: "user_roles",
+        object_id: userId,
+        old_value: target?.role,
+        new_value: role,
+        details: `${target?.email ?? userId}: ${target?.role} → ${role}`,
+      });
       setMsg({ type: "ok", text: "Rolle aktualisiert." });
     } else {
       setMsg({ type: "err", text: error.message });

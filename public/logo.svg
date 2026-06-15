@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" fill="none">
+  <!-- Logo Badge -->
+  <rect width="40" height="40" rx="10" fill="#1B4D5C"/>
+  <text x="20" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="900" fill="#FF5A50" text-anchor="middle">ii</text>
+
+  <!-- Text -->
+  <text x="52" y="20" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="#1B4D5C">iistelle</text>
+  <text x="52" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="500" fill="#6B7280">HR & Recruiting</text>
+</svg>
