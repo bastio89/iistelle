@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowRight,
   BarChart3,
@@ -101,7 +101,27 @@ const comparisonRows = [
 
 export default function LandingPage() {
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+  const [mounted, setMounted] = useState(false);
   const yearlySavingsPercent = 17;
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("billing") === "yearly") {
+      setBilling("yearly");
+    } else {
+      const saved = localStorage.getItem("iistelle-billing");
+      if (saved === "yearly" || saved === "monthly") {
+        setBilling(saved);
+      }
+    }
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem("iistelle-billing", billing);
+    }
+  }, [billing, mounted]);
 
   const getYearlyPrice = (monthlyPrice: number, yearlyPrice: number) => {
     if (billing === "yearly") {

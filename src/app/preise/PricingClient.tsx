@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle2, X, ArrowRight, Sparkles, Clock, ShieldCheck, Users, Zap, Sparkles as SparklesIcon } from "lucide-react";
 import { PricingPlan, PricingConfig, formatPrice } from "@/lib/pricing";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
@@ -15,7 +15,31 @@ interface Props {
 type BillingPeriod = "monthly" | "yearly";
 
 export default function PricingClient({ plans, config }: Props) {
+  // URL-Parameter auslesen für Sharing
+  const getInitialBilling = (): BillingPeriod => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("billing") === "yearly") return "yearly";
+      // localStorage für Persistenz
+      const saved = localStorage.getItem("iistelle-billing");
+      if (saved === "yearly" || saved === "monthly") return saved;
+    }
+    return "monthly";
+  };
+
   const [billing, setBilling] = useState<BillingPeriod>("monthly");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setBilling(getInitialBilling());
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem("iistelle-billing", billing);
+    }
+  }, [billing, mounted]);
 
   const yearlySavingsPercent = 17; // 2 Monate gratis = ~17% Rabatt
 
@@ -164,7 +188,7 @@ export default function PricingClient({ plans, config }: Props) {
                   ) : (
                     <>
                       <div className="flex items-baseline gap-2">
-                        <p className="text-3xl font-black text-petrol-900">
+                        <p className="text-3xl font-black text-petrol-900 transition-all duration-300">
                           {formatPrice(display.price, config.currency)}
                         </p>
                         <p className="text-sm text-petrol-400">{display.period}</p>
