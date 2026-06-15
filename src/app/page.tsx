@@ -24,9 +24,11 @@ import {
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 import { getPricingPlans, getPricingConfig, formatPrice } from "@/lib/pricing";
 import Footer from "@/components/Footer";
+import { CreditCard, Users, Calendar } from "lucide-react";
 
 const trustItems = [
   { icon: Zap, text: "Startklar in 1 Minute" },
+  { icon: CreditCard, text: "Keine Kreditkarte nötig" },
   { icon: ShieldCheck, text: "DSGVO-konform, Hosting in Frankfurt" },
   { icon: FileText, text: "CV-Upload & Dokumentenablage" },
 ];
