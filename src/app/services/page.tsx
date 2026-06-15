@@ -1,67 +1,55 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Calculator, BookOpen, FileText, Users, Shield, Zap, Lightbulb, TrendingUp, Heart, Coffee, Sparkles } from "lucide-react";
+import { ArrowRight, Calculator, BookOpen, FileText, Users, Shield, Zap, Lightbulb, TrendingUp, Heart, Coffee, Sparkles, ChevronRight, CheckCircle } from "lucide-react";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 
 export const metadata: Metadata = {
   title: "Services – iistelle",
   description:
-    "Entdecke nützliche HR-Tools, Ratgeber und Insights für Schweizer und deutsche Unternehmen. Von der Stellenausschreibung bis zum Onboarding.",
+    "Entdecke nützliche HR-Tools, Ratgeber und Insights für Schweizer und deutsche Unternehmen.",
 };
 
 const services = [
   {
-    icon: Users,
     title: "Stellenausschreibung erstellen",
-    description: "So schreibst du Stellenanzeigen, die qualifizierte Kandidaten anziehen – mit Tipps für jede Branche.",
+    description: "So schreibst du Stellenanzeigen, die qualifizierte Kandidaten anziehen.",
     link: "/ratgeber/stellenanzeige-schreiben",
-    linkText: "Zum Ratgeber",
     category: "Recruiting",
     image: "https://cdn.pixabay.com/photo/2017/08/01/08/44/woman-2569346_1280.jpg",
   },
   {
-    icon: Zap,
     title: "Onboarding optimieren",
     description: "Der perfekte Onboarding-Prozess: Vom ersten Tag bis zur erfolgreichen Einarbeitung.",
     link: "/ratgeber/onboarding",
-    linkText: "Mehr erfahren",
     category: "Mitarbeiter",
     image: "https://cdn.pixabay.com/photo/2015/01/09/11/08/hands-593393_1280.jpg",
   },
   {
-    icon: TrendingUp,
     title: "Performance-Gespräche führen",
     description: "So führst du erfolgreich Mitarbeitergespräche: Feedback, Ziele und Entwicklung.",
     link: "/ratgeber/feedbackgespraeche",
-    linkText: "Mehr erfahren",
     category: "Führung",
     image: "https://cdn.pixabay.com/photo/2017/10/27/15/18/teamwork-2894855_1280.jpg",
   },
   {
-    icon: Shield,
     title: "DSGVO-konform recruiting",
-    description: "Rechtliche Anforderungen an Bewerberdaten: Was du wissen musst und wie du compliant bleibst.",
+    description: "Rechtliche Anforderungen an Bewerberdaten: Was du wissen musst.",
     link: "/ratgeber/dsgvo-recruiting",
-    linkText: "Mehr erfahren",
     category: "Recht",
     image: "https://cdn.pixabay.com/photo/2016/03/26/18/23/cctv-1280531_1280.jpg",
   },
   {
-    icon: Heart,
     title: "Mitarbeiterzufriedenheit steigern",
     description: "Die wichtigsten Hebel für höhere Zufriedenheit und geringere Fluktuation.",
     link: "/ratgeber/mitarbeiterzufriedenheit",
-    linkText: "Mehr erfahren",
     category: "Kultur",
     image: "https://cdn.pixabay.com/photo/2018/07/14/03/38/team-3535401_1280.jpg",
   },
   {
-    icon: Coffee,
     title: "Remote-Teams führen",
     description: "Erfolgreiche Führung von verteilten Teams: Tools, Kommunikation und Kultur.",
     link: "/ratgeber/remote-arbeit",
-    linkText: "Mehr erfahren",
     category: "Führung",
     image: "https://cdn.pixabay.com/photo/2020/07/08/04/12/work-5382501_1280.jpg",
   },
@@ -69,61 +57,40 @@ const services = [
 
 const tools = [
   {
-    icon: Calculator,
     title: "Stundensatz-Rechner",
     description: "Berechne deinen optimalen Stundensatz basierend auf Lebenshaltungskosten und Gewinnmarge.",
-    cta: "Zum Rechner",
     link: "/rechner/stundensatz",
     badge: "Kostenlos",
-    image: "https://cdn.pixabay.com/photo/1554224155-8d0d缺/1280.jpg",
   },
   {
-    icon: FileText,
-    title: "Stellenbeschreibung-Vorlage",
-    description: "Downloadbare Vorlage für professionelle Stellenbeschreibungen nach Schweizer Standard.",
-    cta: "Zur Vorlage",
-    link: "/ratgeber/stellenanzeige-schreiben",
-    badge: "Kostenlos",
-    image: "https://cdn.pixabay.com/photo/1456324504439-367cee3b3c32_1280.jpg",
-  },
-  {
-    icon: BookOpen,
-    title: "Onboarding-Checkliste",
-    description: "Die komplette Checkliste für erfolgreiches Onboarding – von Tag 1 bis zum 90-Tage-Gespräch.",
-    cta: "Zur Checkliste",
-    link: "/ratgeber/onboarding",
-    badge: "Kostenlos",
-    image: "https://cdn.pixabay.com/photo/1517048676732-d65bc937f952_1280.jpg",
-  },
-];
-
-const moreTools = [
-  {
-    icon: TrendingUp,
     title: "eNPS-Rechner",
     description: "Misst die Mitarbeiterzufriedenheit und -bindung in deinem Unternehmen.",
-    cta: "Zum Rechner",
     link: "/rechner/enps",
     badge: "Kostenlos",
-    image: "https://cdn.pixabay.com/photo/1551288049-bebda4e38f71_1280.jpg",
   },
   {
-    icon: Users,
     title: "Fluktuationsrechner",
     description: "Berechne deine Fluktuationsrate und vergleiche sie mit dem Branchendurchschnitt.",
-    cta: "Zum Rechner",
     link: "/rechner/fluktuation",
     badge: "Kostenlos",
-    image: "https://cdn.pixabay.com/photo/1552664730-d307ca884978_1280.jpg",
   },
   {
-    icon: Heart,
+    title: "Onboarding-Checkliste",
+    description: "Die komplette Checkliste für erfolgreiches Onboarding.",
+    link: "/ratgeber/onboarding",
+    badge: "Kostenlos",
+  },
+  {
+    title: "Stellenbeschreibung-Vorlage",
+    description: "Downloadbare Vorlage für professionelle Stellenbeschreibungen.",
+    link: "/ratgeber/stellenanzeige-schreiben",
+    badge: "Kostenlos",
+  },
+  {
     title: "Mitarbeiterzufriedenheit-Check",
-    description: "Bewerte in 2 Minuten die wichtigsten Faktoren für Zufriedenheit in deinem Team.",
-    cta: "Zum Check",
+    description: "Bewerte die wichtigsten Faktoren für Zufriedenheit in deinem Team.",
     link: "/ratgeber/mitarbeiterzufriedenheit",
     badge: "Kostenlos",
-    image: "https://cdn.pixabay.com/photo/1521737711867-e3f973156f02_1280.jpg",
   },
 ];
 
@@ -134,6 +101,14 @@ const categories = [
   { name: "Recht", count: 4, color: "bg-amber-100 text-amber-700 hover:bg-amber-200" },
   { name: "Kultur", count: 5, color: "bg-rose-100 text-rose-700 hover:bg-rose-200" },
 ];
+
+const categoryGradients: Record<string, string> = {
+  Recruiting: "from-sky-500 to-sky-600",
+  Mitarbeiter: "from-emerald-500 to-emerald-600",
+  Führung: "from-violet-500 to-violet-600",
+  Recht: "from-amber-500 to-amber-600",
+  Kultur: "from-rose-500 to-rose-600",
+};
 
 export default function ServicesPage() {
   return (
@@ -180,9 +155,9 @@ export default function ServicesPage() {
           <h1 className="mt-6 text-4xl font-bold text-white md:text-5xl">
             Wissen, das dein HR transformiert
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-petrol-300">
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-petrol-300">
             Praxisnahe Ratgeber, kostenlose Tools und Expertenwissen für HR-Verantwortliche
-            in der Schweiz und Deutschland – kompakt und direkt anwendbar.
+            – kompakt und direkt anwendbar.
           </p>
         </div>
       </header>
@@ -201,36 +176,43 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Services/Ratgeber */}
-      <section className="mx-auto max-w-6xl px-6 pb-12">
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {/* HR-Ratgeber */}
+      <section className="mx-auto max-w-6xl px-6 pb-16">
+        <div className="mb-8 flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-petrol-900">HR-Ratgeber</h2>
+          <span className="rounded-full bg-petrol-100 px-3 py-1 text-sm font-semibold text-petrol-600">
+            6 Artikel
+          </span>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
             <Link
               key={service.title}
               href={service.link}
-              className="group relative overflow-hidden rounded-xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+              className="group overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className="relative h-36 w-full">
+              <div className="relative h-44 w-full">
                 <Image
                   src={service.image}
                   alt={service.title}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-petrol-900/70 to-transparent" />
-                <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-petrol-800">
+                <div className="absolute inset-0 bg-gradient-to-t from-petrol-900/80 via-petrol-900/30 to-transparent" />
+                <span className={`absolute bottom-3 left-3 rounded-full px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r ${categoryGradients[service.category]}`}>
                   {service.category}
                 </span>
               </div>
-              <div className="p-4">
-                <h3 className="font-bold text-petrol-900 group-hover:text-coral-500 transition-colors">
+              <div className="p-5">
+                <h3 className="text-lg font-bold text-petrol-900 group-hover:text-coral-500 transition-colors">
                   {service.title}
                 </h3>
-                <p className="mt-2 text-sm text-petrol-500">
+                <p className="mt-2 text-sm leading-relaxed text-petrol-600">
                   {service.description}
                 </p>
-                <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-coral-500">
-                  {service.linkText} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-coral-500">
+                  <span>Weiterlesen</span>
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
             </Link>
@@ -240,65 +222,67 @@ export default function ServicesPage() {
 
       {/* Kostenlose Tools */}
       <section className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="rounded-3xl bg-petrol-950 px-8 py-12">
-          <div className="mb-8 flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-coral-500/20 text-coral-400">
-              <Calculator className="h-6 w-6" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white">
-                Kostenlose HR-Tools
-              </h2>
-              <p className="mt-1 max-w-lg text-petrol-300">
-                Praktische Rechner und Vorlagen, die dir sofort helfen – ohne Anmeldung.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[...tools, ...moreTools].map((tool) => (
-              <div key={tool.title} className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-5 transition-all hover:border-white/20 hover:bg-white/10">
-                {tool.badge && (
-                  <span className="absolute right-3 top-3 inline-flex items-center rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-400">
-                    {tool.badge}
-                  </span>
-                )}
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-petrol-700 text-petrol-300">
-                  <tool.icon className="h-5 w-5" />
-                </div>
-                <h3 className="mt-4 font-bold text-white">{tool.title}</h3>
-                <p className="mt-2 text-sm text-petrol-300">{tool.description}</p>
-                <Link
-                  href={tool.link}
-                  className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-coral-400 transition hover:text-coral-300"
-                >
-                  {tool.cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
+        <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-petrol-800 to-petrol-950 shadow-xl">
+          <div className="p-8 md:p-10 lg:p-12">
+            <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-coral-500/20 text-coral-400">
+                <Calculator className="h-7 w-7" />
               </div>
-            ))}
+              <div>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-2xl font-bold text-white">Kostenlose HR-Tools</h2>
+                  <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-400">
+                    Kostenlos
+                  </span>
+                </div>
+                <p className="mt-1 text-petrol-300">
+                  Praktische Rechner und Vorlagen – ohne Anmeldung sofort nutzbar.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {tools.map((tool) => (
+                <Link
+                  key={tool.title}
+                  href={tool.link}
+                  className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-5 transition-all hover:border-white/20 hover:bg-white/10"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-white/80">
+                    <CheckCircle className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-4 font-bold text-white">{tool.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-petrol-300">{tool.description}</p>
+                  <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-coral-400">
+                    <span>Zum Tool</span>
+                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Newsletter */}
       <section className="mx-auto max-w-3xl px-6 pb-20 text-center">
-        <div className="rounded-2xl bg-petrol-50 p-8">
-          <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-xl bg-coral-100 text-coral-500">
-            <Lightbulb className="h-6 w-6" />
+        <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-petrol-50 to-white p-8 shadow-sm border border-petrol-100">
+          <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-2xl bg-coral-100 text-coral-500">
+            <Lightbulb className="h-7 w-7" />
           </div>
-          <h2 className="mt-4 text-xl font-bold text-petrol-900">
+          <h2 className="mt-5 text-xl font-bold text-petrol-900">
             Erhalte neue Ratgeber direkt ins Postfach
           </h2>
-          <p className="mt-2 text-petrol-500">
+          <p className="mt-3 text-petrol-600">
             Kein Spam, nur wertvolle HR-Insights. Jeden Monat ein neuer Artikel.
           </p>
-          <form className="mt-6 flex flex-wrap gap-3 justify-center">
+          <form className="mt-6 flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
             <input
               type="email"
               placeholder="deine@email.ch"
-              className="input max-w-sm flex-1"
+              className="input flex-1"
             />
-            <button type="button" className="btn-primary">
+            <button type="button" className="btn-primary whitespace-nowrap">
               Anmelden
             </button>
           </form>

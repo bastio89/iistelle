@@ -1,8 +1,7 @@
-import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Clock, Calendar, Share2, BookOpen } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, Clock, Calendar, Share2, BookOpen, Sparkles, ChevronRight, Lightbulb } from "lucide-react";
 
-// Base ratgeber page component
 export default function RatgeberBase({
   children,
   title,
@@ -10,6 +9,7 @@ export default function RatgeberBase({
   category,
   readTime,
   date,
+  image,
 }: {
   children: React.ReactNode;
   title: string;
@@ -17,7 +17,16 @@ export default function RatgeberBase({
   category: string;
   readTime: string;
   date: string;
+  image?: string;
 }) {
+  const categoryColors: Record<string, string> = {
+    Recruiting: "bg-sky-500",
+    Mitarbeiter: "bg-emerald-500",
+    Führung: "bg-violet-500",
+    Recht: "bg-amber-500",
+    Kultur: "bg-rose-500",
+  };
+
   return (
     <div className="min-h-screen bg-surface">
       {/* Navigation */}
@@ -31,7 +40,7 @@ export default function RatgeberBase({
           </Link>
           <div className="flex items-center gap-6 text-sm font-semibold text-petrol-600">
             <Link href="/services" className="transition hover:text-petrol-900">Services</Link>
-            <Link href="/ratgeber" className="transition hover:text-petrol-900">Ratgeber</Link>
+            <Link href="/ratgeber" className="text-coral-500 font-bold">Ratgeber</Link>
             <Link href="/preise" className="transition hover:text-petrol-900">Preise</Link>
           </div>
           <div className="flex items-center gap-2">
@@ -45,73 +54,127 @@ export default function RatgeberBase({
         </div>
       </nav>
 
+      {/* Article Hero */}
+      {image && (
+        <div className="relative h-72 md:h-80 lg:h-96 w-full">
+          <Image
+            src={image}
+            alt={title}
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-petrol-950/90 via-petrol-950/50 to-petrol-950/30" />
+        </div>
+      )}
+
       {/* Article Header */}
-      <header className="mx-auto max-w-3xl px-6 py-12">
+      <header className={`mx-auto max-w-3xl px-6 ${image ? '-mt-24 relative z-10 pb-10' : 'py-12'}`}>
         <Link
           href="/ratgeber"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-petrol-500 transition hover:text-petrol-900"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-white/80 transition hover:text-white"
         >
           <ArrowLeft className="h-4 w-4" />
-          Zurück zum Ratgeber
+          Alle Ratgeber
         </Link>
 
-        <div className="mt-8 flex flex-wrap items-center gap-4">
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
-            category === "Recruiting" ? "bg-sky-100 text-sky-700" :
-            category === "Mitarbeiter" ? "bg-emerald-100 text-emerald-700" :
-            category === "Führung" ? "bg-violet-100 text-violet-700" :
-            category === "Recht" ? "bg-amber-100 text-amber-700" :
-            "bg-rose-100 text-rose-700"
-          }`}>
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold text-white ${categoryColors[category] || "bg-petrol-500"}`}>
             {category}
           </span>
-          <span className="flex items-center gap-1 text-sm text-petrol-400">
+          <span className="flex items-center gap-1.5 text-sm text-white/70">
             <Clock className="h-3.5 w-3.5" />
             {readTime} Lesezeit
           </span>
-          <span className="flex items-center gap-1 text-sm text-petrol-400">
+          <span className="flex items-center gap-1.5 text-sm text-white/70">
             <Calendar className="h-3.5 w-3.5" />
             {date}
           </span>
         </div>
 
-        <h1 className="mt-6 text-3xl font-bold text-petrol-900 md:text-4xl">
+        <h1 className="mt-6 text-3xl font-bold leading-tight text-white md:text-4xl lg:text-5xl">
           {title}
         </h1>
-        <p className="mt-4 text-lg text-petrol-600">
-          {excerpt}
-        </p>
+
+        <div className="mt-6 flex items-center gap-4">
+          <button className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20">
+            <Share2 className="h-4 w-4" />
+            Teilen
+          </button>
+        </div>
       </header>
 
       {/* Article Content */}
       <article className="mx-auto max-w-3xl px-6 pb-20">
-        <div className="prose prose-petrol max-w-none">
-          {children}
+        <div className="rounded-2xl bg-white p-8 shadow-sm md:p-10 lg:p-12">
+          {/* Lead paragraph */}
+          <p className="article-lead">
+            {excerpt}
+          </p>
+
+          {/* Content */}
+          <div className="article-content">
+            {children}
+          </div>
         </div>
       </article>
 
       {/* CTA */}
-      <section className="border-t border-petrol-100 bg-petrol-50">
-        <div className="mx-auto max-w-3xl px-6 py-12">
-          <div className="flex items-start gap-4 rounded-2xl bg-white p-6 shadow-sm">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-coral-100 text-coral-500">
-              <BookOpen className="h-6 w-6" />
-            </div>
-            <div>
-              <h3 className="font-bold text-petrol-900">Mehr HR-Wissen gefällig?</h3>
-              <p className="mt-1 text-sm text-petrol-600">
-                Entdecke weitere kostenlose Ratgeber und Tools für dein HR-Management.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <Link href="/ratgeber" className="btn-primary text-sm">
-                  Alle Ratgeber
-                </Link>
-                <Link href="/services" className="btn-secondary text-sm">
-                  Kostenlose Tools
-                </Link>
+      <section className="mx-auto max-w-3xl px-6 pb-16">
+        <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-petrol-800 to-petrol-900 shadow-xl">
+          <div className="p-8 md:p-10">
+            <div className="flex flex-col md:flex-row items-start gap-6">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-coral-500/20 text-coral-400">
+                <BookOpen className="h-7 w-7" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-white">
+                  Mehr HR-Wissen gefällig?
+                </h3>
+                <p className="mt-2 text-petrol-300">
+                  Entdecke weitere kostenlose Ratgeber und Tools für dein HR-Management.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <Link href="/ratgeber" className="btn-primary text-sm">
+                    Alle Ratgeber
+                  </Link>
+                  <Link href="/services" className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20">
+                    Kostenlose Tools
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Related Articles */}
+      <section className="mx-auto max-w-3xl px-6 pb-20">
+        <h3 className="mb-6 text-lg font-bold text-petrol-900">Das könnte dich auch interessieren</h3>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Link href="/ratgeber/onboarding" className="group flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <h4 className="font-semibold text-petrol-900 group-hover:text-coral-500 transition">
+                Onboarding optimieren
+              </h4>
+              <p className="text-sm text-petrol-500">Die ersten 90 Tage</p>
+            </div>
+          </Link>
+          <Link href="/ratgeber/mitarbeiterzufriedenheit" className="group flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-rose-100 text-rose-600">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <h4 className="font-semibold text-petrol-900 group-hover:text-coral-500 transition">
+                Mitarbeiterzufriedenheit
+              </h4>
+              <p className="text-sm text-petrol-500">Fluktuation reduzieren</p>
+            </div>
+          </Link>
         </div>
       </section>
 
