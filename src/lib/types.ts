@@ -354,6 +354,49 @@ export interface Review {
   employee?: Employee;
 }
 
+export interface ReviewCycle {
+  id: string;
+  company_id: string;
+  name: string;
+  start_date: string;
+  end_date: string | null;
+  status: "geplant" | "aktiv" | "abgeschlossen";
+  created_at: string;
+}
+
+export const REVIEW_CYCLE_STATUS_META: Record<ReviewCycle["status"], { label: string; color: string }> = {
+  geplant: { label: "Geplant", color: "bg-sky-100 text-sky-800" },
+  aktiv: { label: "Aktiv", color: "bg-emerald-100 text-emerald-800" },
+  abgeschlossen: { label: "Abgeschlossen", color: "bg-slate-200 text-slate-600" },
+};
+
+export interface PeerFeedbackRequest {
+  id: string;
+  cycle_id: string;
+  from_employee_id: string | null;
+  to_employee_id: string | null;
+  requested_by: string | null;
+  status: "ausstehend" | "eingereicht" | "abgelehnt";
+  due_date: string | null;
+  created_at: string;
+  from_employee?: Employee;
+  to_employee?: Employee;
+  cycle?: ReviewCycle;
+}
+
+export interface PeerFeedback {
+  id: string;
+  request_id: string;
+  from_employee_id: string | null;
+  to_employee_id: string | null;
+  score: number;
+  strengths: string | null;
+  improvements: string | null;
+  submitted_at: string;
+  from_employee?: Employee;
+  to_employee?: Employee;
+}
+
 
 export interface OnboardingTask {
   id: string;

@@ -23,12 +23,14 @@ import {
   Laptop,
   Timer,
   ShieldCheck,
+  User,
 } from "lucide-react";
 import { useRole } from "@/lib/useRole";
 
 const mainNav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/aufgaben", label: "Aufgaben", icon: ListTodo },
+  { href: "/me", label: "Mein Portal", icon: User },
 ];
 
 const recruitingNav = [

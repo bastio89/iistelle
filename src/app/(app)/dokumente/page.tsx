@@ -8,7 +8,8 @@ import {
   COMPANY_FILE_CATEGORY_META,
 } from "@/lib/types";
 import { EmptyState, PageHeader, formatDate } from "@/components/ui";
-import { Download, FileText, Trash2, Upload } from "lucide-react";
+import { Download, FileText, Trash2, Upload, Wand2, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 function formatBytes(n: number) {
   if (n < 1024) return `${n} B`;
@@ -85,6 +86,24 @@ export default function CompanyFilesPage() {
         title="Firmendokumente"
         subtitle="Richtlinien, Vorlagen und Handbücher zentral für das ganze Team."
       />
+
+      <div className="mb-6 card p-4">
+        <Link
+          href="/dokumente/generator"
+          className="flex items-center gap-3 rounded-lg border-2 border-dashed border-coral-200 bg-coral-50/50 p-4 transition hover:border-coral-400 hover:bg-coral-50"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-coral-100 text-coral-600">
+            <Wand2 className="h-5 w-5" />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-coral-900">Dokumenten-Generator</p>
+            <p className="text-sm text-coral-700">
+              Erstelle Arbeitsverträge, Zeugnisse und Bescheinigungen für Mitarbeiter:innen
+            </p>
+          </div>
+          <ChevronRight className="h-5 w-5 text-coral-400" />
+        </Link>
+      </div>
 
       <div className="card mb-6 flex flex-wrap items-end gap-3 p-5">
         <div>
