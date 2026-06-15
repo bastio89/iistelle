@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { CheckCircle2, X, ArrowRight, Sparkles, Clock, ShieldCheck, Users, Zap, Sparkles as SparklesIcon } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { CheckCircle2, X, ArrowRight, Sparkles, Clock, ShieldCheck, Users, Zap, Sparkles as SparklesIcon, Search, ChevronDown } from "lucide-react";
 import { PricingPlan, PricingConfig, formatPrice } from "@/lib/pricing";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 
@@ -13,6 +13,49 @@ interface Props {
 }
 
 type BillingPeriod = "monthly" | "yearly";
+
+// Custom hook for scroll-triggered animations
+function useInView(options?: IntersectionObserverInit) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect(); // Only animate once
+        }
+      },
+      { threshold: 0.1, ...options }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, isInView };
+}
+
+// Animated wrapper for individual cards to avoid hook-in-loop issues
+function AnimatedCard({ children, delay, highlight }: { children: React.ReactNode; delay: number; highlight?: boolean }) {
+  const { ref, isInView } = useInView();
+
+  return (
+    <div
+      ref={ref}
+      className={`card relative flex flex-col transition-all duration-500 ${
+        highlight ? "border-2 border-coral-500 shadow-cardHover" : ""
+      } ${isInView ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function PricingClient({ plans, config }: Props) {
   // URL-Parameter auslesen für Sharing
@@ -29,6 +72,8 @@ export default function PricingClient({ plans, config }: Props) {
 
   const [billing, setBilling] = useState<BillingPeriod>("monthly");
   const [mounted, setMounted] = useState(false);
+  const [faqSearch, setFaqSearch] = useState("");
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setBilling(getInitialBilling());
@@ -112,58 +157,56 @@ export default function PricingClient({ plans, config }: Props) {
           keine Einrichtungsgebühr, keine versteckten Kosten.
         </p>
 
-        {/* Preis-Toggle */}
-        <div className="mt-8 inline-flex items-center gap-1 rounded-full border border-petrol-200 bg-white p-1">
-          <button
-            onClick={() => setBilling("monthly")}
-            className={`rounded-full px-5 py-2 text-sm font-semibold transition-all ${
-              billing === "monthly"
-                ? "bg-petrol-800 text-white shadow-sm"
-                : "text-petrol-600 hover:text-petrol-900"
-            }`}
-          >
-            Monatlich
-          </button>
-          <button
-            onClick={() => setBilling("yearly")}
-            className={`rounded-full px-5 py-2 text-sm font-semibold transition-all flex items-center gap-2 ${
-              billing === "yearly"
-                ? "bg-petrol-800 text-white shadow-sm"
-                : "text-petrol-600 hover:text-petrol-900"
-            }`}
-          >
-            Jährlich
-            <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
-              -{yearlySavingsPercent}%
-            </span>
-          </button>
+        {/* Preis-Toggle - Mobile-optimiert */}
+        <div className="mt-8">
+          <div className="inline-flex items-center gap-1 rounded-full border border-petrol-200 bg-white p-1.5">
+            <button
+              onClick={() => setBilling("monthly")}
+              className={`rounded-full px-4 py-2.5 text-sm font-semibold transition-all md:px-5 md:py-2 ${
+                billing === "monthly"
+                  ? "bg-petrol-800 text-white shadow-sm"
+                  : "text-petrol-600 hover:text-petrol-900"
+              }`}
+            >
+              Monatlich
+            </button>
+            <button
+              onClick={() => setBilling("yearly")}
+              className={`rounded-full px-4 py-2.5 text-sm font-semibold transition-all flex items-center gap-2 md:px-5 md:py-2 ${
+                billing === "yearly"
+                  ? "bg-petrol-800 text-white shadow-sm"
+                  : "text-petrol-600 hover:text-petrol-900"
+              }`}
+            >
+              <span className="md:hidden">-17%</span>
+              <span className="hidden md:inline">Jährlich</span>
+              <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                -{yearlySavingsPercent}%
+              </span>
+            </button>
+          </div>
+          <p className="mt-2 text-sm text-petrol-500">
+            {billing === "yearly" ? (
+              <span className="text-emerald-600 font-medium">
+                Jährliche Abrechnung – 2 Monate gratis!
+              </span>
+            ) : (
+              <span>
+                Jährlich sparen: ca. {yearlySavingsPercent}% (2 Monate gratis)
+              </span>
+            )}
+          </p>
         </div>
-        <p className="mt-2 text-sm text-petrol-500">
-          {billing === "yearly" ? (
-            <span className="text-emerald-600 font-medium">
-              Jährliche Abrechnung – 2 Monate gratis!
-            </span>
-          ) : (
-            <span>
-              Jährlich sparen: ca. {yearlySavingsPercent}% (2 Monate gratis)
-            </span>
-          )}
-        </p>
       </header>
 
       {/* Pricing Cards */}
       <section className="mx-auto max-w-6xl px-6 pb-20">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-          {plans.map((plan) => {
+          {plans.map((plan, index) => {
             const display = getDisplayPrice(plan);
 
             return (
-              <div
-                key={plan.id}
-                className={`card relative flex flex-col ${
-                  plan.highlight ? "border-2 border-coral-500 shadow-cardHover" : ""
-                }`}
-              >
+              <AnimatedCard key={plan.id} delay={index * 100} highlight={plan.highlight}>
                 {plan.badge && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-coral-500 px-4 py-1 text-xs font-bold text-white">
                     {plan.badge}
@@ -247,7 +290,7 @@ export default function PricingClient({ plans, config }: Props) {
                   {plan.cta}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
-              </div>
+              </AnimatedCard>
             );
           })}
         </div>
@@ -274,7 +317,23 @@ export default function PricingClient({ plans, config }: Props) {
         <h2 className="text-center text-2xl font-bold text-petrol-900">
           Häufige Fragen zu den Preisen
         </h2>
-        <div className="mt-8 space-y-4">
+
+        {/* FAQ Search */}
+        <div className="relative mt-6">
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-petrol-400" />
+          <input
+            type="text"
+            placeholder="Frage durchsuchen..."
+            value={faqSearch}
+            onChange={(e) => {
+              setFaqSearch(e.target.value);
+              setOpenFaqIndex(null);
+            }}
+            className="w-full rounded-xl border border-petrol-200 bg-white py-3 pl-11 pr-4 text-sm text-petrol-900 placeholder-petrol-400 transition-shadow focus:border-petrol-400 focus:shadow-sm focus:outline-none"
+          />
+        </div>
+
+        <div className="mt-6 space-y-3">
           {[
             {
               q: "Was passiert nach den 14 Testtagen?",
@@ -300,13 +359,43 @@ export default function PricingClient({ plans, config }: Props) {
                 ? "Alle Preise verstehen sich exklusive MWST. Schweizer Unternehmen können mit UID-Nummer ohne MWST abrechnen."
                 : "Alle Preise verstehen sich inklusive 19% MWST für deutsche Unternehmen.",
             },
-          ].map(({ q, a }) => (
-            <div key={q} className="card p-6">
-              <h3 className="font-bold text-petrol-900">{q}</h3>
-              <p className="mt-2 text-sm text-petrol-600">{a}</p>
-            </div>
-          ))}
+          ].map(({ q, a }, i) => {
+            // Filter by search
+            if (faqSearch && !q.toLowerCase().includes(faqSearch.toLowerCase()) &&
+                !a.toLowerCase().includes(faqSearch.toLowerCase())) {
+              return null;
+            }
+
+            const isOpen = openFaqIndex === i;
+
+            return (
+              <div key={q} className="overflow-hidden rounded-xl border border-petrol-100 bg-white shadow-sm">
+                <button
+                  onClick={() => setOpenFaqIndex(isOpen ? null : i)}
+                  className="flex w-full items-center justify-between p-5 text-left transition-colors hover:bg-petrol-50"
+                >
+                  <h3 className="pr-4 font-bold text-petrol-900">{q}</h3>
+                  <ChevronDown className={`h-5 w-5 shrink-0 text-petrol-400 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+                </button>
+                <div className={`overflow-hidden transition-all duration-300 ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
+                  <p className="px-5 pb-5 text-sm text-petrol-600">{a}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
+
+        {faqSearch && [
+          { q: "Was passiert nach den 14 Testtagen?", a: "" },
+          { q: billing === "yearly" ? "Kann ich auch monatlich zahlen?" : "Kann ich zwischen monatlicher und jährlicher Abrechnung wechseln?", a: "" },
+          { q: `Kann ich zwischen ${config.currencySymbol} und Euro wechseln?`, a: "" },
+          { q: "Gibt es Mengenrabatte?", a: "" },
+          { q: "Sind die Preise inklusive MWST?", a: "" },
+        ].filter(({ q }) => q.toLowerCase().includes(faqSearch.toLowerCase())).length === 0 && (
+          <p className="mt-6 text-center text-petrol-400">
+            Keine passenden Fragen gefunden. <Link href="/login" className="text-petrol-600 underline">Kontaktiere uns</Link> direkt.
+          </p>
+        )}
       </section>
 
       {/* CTA */}
