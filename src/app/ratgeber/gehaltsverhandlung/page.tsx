@@ -79,7 +79,7 @@ export default function GehaltsverhandlungPage() {
         Nicht alles muss Gehalt sein:
       </p>
       <ul>
-        <li>Zusätzliche Ferientage (statt 25 -> 27+)</li>
+        <li>Zusätzliche Ferientage (statt 25 {'->'} 27+)</li>
         <li>Weiterbildungsbudget</li>
         <li>Homeoffice-Regelung</li>
         <li>BVG-Beiträge des Arbeitgebers erhöhen</li>

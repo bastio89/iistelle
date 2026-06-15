@@ -66,6 +66,37 @@ const guides = [
   },
 ];
 
+// Additional guides for more content
+const additionalGuides = [
+  {
+    icon: Users,
+    title: "Arbeitgebermarke aufbauen: So wirst du zum attraktiven Arbeitgeber",
+    excerpt: "Employer Branding ist mehr als ein Logo. Erfahre, wie du eine authentische Arbeitgebermarke schaffst, die qualifizierte Bewerber:innen anzieht.",
+    category: "Recruiting",
+    readTime: "10 Min.",
+    date: "18. Juni 2026",
+    slug: "arbeitgebermarke",
+  },
+  {
+    icon: TrendingUp,
+    title: "Gehaltsverhandlung meistern: Tipps für faire und transparente Vergütung",
+    excerpt: "Wie du Gehaltsverhandlungen professionell führst – sowohl intern als auch mit Bewerber:innen.",
+    category: "Mitarbeiter",
+    readTime: "8 Min.",
+    date: "12. Juni 2026",
+    slug: "gehaltsverhandlung",
+  },
+  {
+    icon: Shield,
+    title: "Kündigungsgespräch führen: So trennst du dich fair und professionell",
+    excerpt: "Ein gutes Offboarding ist genauso wichtig wie ein gutes Onboarding. Wie du Kündigungen respektvoll gestaltest.",
+    category: "Führung",
+    readTime: "7 Min.",
+    date: "8. Juni 2026",
+    slug: "kuendigungsgespraech",
+  },
+];
+
 const allGuides = [...guides, ...additionalGuides];
 
 const categories = [
