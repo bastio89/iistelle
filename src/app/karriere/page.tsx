@@ -167,7 +167,7 @@ export default function KarrierePage() {
             Unterschied machen.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link href={`/karriere/${openPositions[0].slug}`} className="btn-primary">
+            <Link href={`/karriere/jobs/${openPositions[0].slug}`} className="btn-primary">
               Offene Stellen ansehen
             </Link>
             <a href="mailto:jobs@twenty5ai.com?subject=Initiativbewerbung" className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20">
@@ -218,7 +218,7 @@ export default function KarrierePage() {
           {openPositions.map((position) => (
             <Link
               key={position.title}
-              href={`/karriere/${position.slug}`}
+              href={`/karriere/jobs/${position.slug}`}
               className="group block overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
             >
               <div className={`h-2 w-full bg-gradient-to-r ${position.color}`} />
