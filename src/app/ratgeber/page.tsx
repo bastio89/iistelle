@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, Clock, Search, Sparkles } from "lucide-react";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Ratgeber – iistelle",
@@ -247,23 +247,7 @@ export default function RatgeberPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-petrol-100 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8">
-          <div className="flex items-center gap-2">
-            <img src="/logo.svg" alt="iistelle" width={28} height={28} className="rounded-lg" />
-            <span className="font-bold text-petrol-900">iistelle</span>
-            <span className="ml-2 text-xs text-petrol-400">
-              © {new Date().getFullYear()} · twenty5ai
-            </span>
-          </div>
-          <div className="flex gap-5 text-sm font-semibold text-petrol-500">
-            <Link href="/impressum" className="transition hover:text-petrol-900">Impressum</Link>
-            <Link href="/datenschutz" className="transition hover:text-petrol-900">Datenschutz</Link>
-            <Link href="/login" className="transition hover:text-petrol-900">Login</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

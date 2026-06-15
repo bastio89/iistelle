@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { CheckCircle2, X, ArrowRight, Sparkles, Clock, ShieldCheck, Users, Zap, Sparkles as SparklesIcon, Search, ChevronDown } from "lucide-react";
 import { PricingPlan, PricingConfig, formatPrice } from "@/lib/pricing";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
+import Footer from "@/components/Footer";
 
 interface Props {
   plans: PricingPlan[];
@@ -423,29 +424,7 @@ export default function PricingClient({ plans, config }: Props) {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-petrol-100 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8">
-          <div className="flex items-center gap-2">
-            <Image
-              src="/logo.svg"
-              alt="iistelle Logo"
-              width={28}
-              height={28}
-              className="rounded-lg"
-            />
-            <span className="font-bold text-petrol-900">iistelle</span>
-            <span className="ml-2 text-xs text-petrol-400">
-              © {new Date().getFullYear()} · twenty5ai
-            </span>
-          </div>
-          <div className="flex gap-5 text-sm font-semibold text-petrol-500">
-            <Link href="/impressum" className="transition hover:text-petrol-900">Impressum</Link>
-            <Link href="/datenschutz" className="transition hover:text-petrol-900">Datenschutz</Link>
-            <Link href="/login" className="transition hover:text-petrol-900">Login</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

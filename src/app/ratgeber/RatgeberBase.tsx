@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, Clock, Calendar, Share2, BookOpen, Sparkles, ChevronRight } from "lucide-react";
+import Footer from "@/components/Footer";
 
 export default function RatgeberBase({
   children,
@@ -40,14 +41,9 @@ export default function RatgeberBase({
             <Link href="/ratgeber" className="text-coral-500 font-bold">Ratgeber</Link>
             <Link href="/preise" className="transition hover:text-petrol-900">Preise</Link>
           </div>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="rounded-lg px-4 py-2 text-sm font-semibold text-petrol-700 transition hover:bg-petrol-50">
-              Anmelden
-            </Link>
-            <Link href="/login" className="btn-primary">
-              Kostenlos starten
-            </Link>
-          </div>
+          <Link href="/login" className="btn-primary">
+            Kostenlos starten
+          </Link>
         </div>
       </nav>
 
@@ -161,23 +157,7 @@ export default function RatgeberBase({
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-petrol-100 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8">
-          <div className="flex items-center gap-2">
-            <img src="/logo.svg" alt="iistelle" width={28} height={28} className="rounded-lg" />
-            <span className="font-bold text-petrol-900">iistelle</span>
-            <span className="ml-2 text-xs text-petrol-400">
-              © {new Date().getFullYear()} · twenty5ai
-            </span>
-          </div>
-          <div className="flex gap-5 text-sm font-semibold text-petrol-500">
-            <Link href="/impressum" className="transition hover:text-petrol-900">Impressum</Link>
-            <Link href="/datenschutz" className="transition hover:text-petrol-900">Datenschutz</Link>
-            <Link href="/login" className="transition hover:text-petrol-900">Login</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 import { getPricingPlans, getPricingConfig, formatPrice } from "@/lib/pricing";
+import Footer from "@/components/Footer";
 
 const trustItems = [
   { icon: Zap, text: "Startklar in 1 Minute" },
@@ -668,36 +669,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-petrol-100 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8">
-          <div className="flex items-center gap-2">
-            <Image
-              src="/logo.svg"
-              alt="iistelle Logo"
-              width={32}
-              height={32}
-              className="rounded-lg"
-            />
-            <span className="font-bold text-petrol-900">iistelle</span>
-            <span className="ml-2 text-xs text-petrol-400">
-              © {new Date().getFullYear()} · twenty5ai · Sebastian Oczachowski
-            </span>
-          </div>
-
-          <div className="flex gap-5 text-sm font-semibold text-petrol-500">
-            <Link href="/impressum" className="link-hover transition-colors hover:text-petrol-900">
-              Impressum
-            </Link>
-            <Link href="/datenschutz" className="link-hover transition-colors hover:text-petrol-900">
-              Datenschutz
-            </Link>
-            <Link href="/login" className="link-hover transition-colors hover:text-petrol-900">
-              Login
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
