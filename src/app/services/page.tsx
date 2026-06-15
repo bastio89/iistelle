@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Calculator, BookOpen, FileText, Users, Shield, Zap, Lightbulb, TrendingUp, Heart, Coffee } from "lucide-react";
+import { ServiceDropdown } from "@/components/ServiceDropdown";
 
 export const metadata: Metadata = {
   title: "Services & Ratgeber – iistelle HR",
@@ -101,8 +102,8 @@ export default function ServicesPage() {
             </span>
           </Link>
           <div className="flex items-center gap-6 text-sm font-semibold text-petrol-600">
+            <ServiceDropdown />
             <Link href="/services" className="text-coral-500 font-bold">Services</Link>
-            <Link href="/ratgeber" className="transition hover:text-petrol-900">Ratgeber</Link>
             <Link href="/preise" className="transition hover:text-petrol-900">Preise</Link>
           </div>
           <div className="flex items-center gap-2">

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { CheckCircle2, X, ArrowRight, Sparkles, Clock, ShieldCheck, Users, FileText, Zap } from "lucide-react";
 import { PricingPlan, PricingConfig, formatPrice } from "@/lib/pricing";
-import { ServiceDropdown } from "../page";
+import { ServiceDropdown } from "@/components/ServiceDropdown";
 
 interface Props {
   plans: PricingPlan[];
