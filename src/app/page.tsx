@@ -8,6 +8,7 @@ import {
   BarChart3,
   CalendarClock,
   CheckCircle2,
+  CreditCard,
   FileText,
   Globe,
   Plane,
@@ -24,7 +25,6 @@ import {
 import { ServiceDropdown } from "@/components/ServiceDropdown";
 import { getPricingPlans, getPricingConfig, formatPrice } from "@/lib/pricing";
 import Footer from "@/components/Footer";
-import { CreditCard, Users, Calendar } from "lucide-react";
 
 const trustItems = [
   { icon: Zap, text: "Startklar in 1 Minute" },
