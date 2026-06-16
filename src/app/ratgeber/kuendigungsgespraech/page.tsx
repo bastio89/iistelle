@@ -8,6 +8,8 @@ export default function KuendigungsgespraechPage() {
       category="Führung"
       readTime="7 Min."
       date="8. Juni 2026"
+      imageUrl="https://cdn.pixabay.com/photo/2018/03/10/12/00/paperwork-3213929_1280.jpg"
+      imageAlt="Professionelles Gespräch im Büro"
     >
       <h2>Warum gutes Offboarding wichtig ist</h2>
       <p>

@@ -8,6 +8,8 @@ export default function GehaltsverhandlungPage() {
       category="Mitarbeiter"
       readTime="8 Min."
       date="12. Juni 2026"
+      imageUrl="https://cdn.pixabay.com/photo/2017/04/25/21/33/hand-2259624_1280.jpg"
+      imageAlt="Hände mit Geldscheinen"
     >
       <h2>Warum Gehaltstransparenz wichtig ist</h2>
       <p>

@@ -9,6 +9,8 @@ export default function StellenanzeigeSchreiben() {
       category="Recruiting"
       readTime="8 Min."
       date="15. Juni 2026"
+      imageUrl="https://cdn.pixabay.com/photo/2015/01/09/11/08/startup-594090_1280.jpg"
+      imageAlt="Person schreibt an Laptop im Büro"
     >
       <h2>Warum gute Stellenanzeigen entscheidend sind</h2>
       <p>

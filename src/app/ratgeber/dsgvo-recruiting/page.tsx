@@ -8,6 +8,8 @@ export default function DSGVORecruitingPage() {
       category="Recht"
       readTime="10 Min."
       date="5. Juni 2026"
+      imageUrl="https://cdn.pixabay.com/photo/2016/03/26/22/21/magnifying-glass-1280858_1280.jpg"
+      imageAlt="Sicherheit und Datenschutz"
     >
       <h2>Warum DSGVO im Recruiting relevant ist</h2>
       <p>

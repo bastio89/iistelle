@@ -8,6 +8,8 @@ export default function FeedbackgespraechePage() {
       category="Führung"
       readTime="6 Min."
       date="20. Mai 2026"
+      imageUrl="https://cdn.pixabay.com/photo/2015/01/08/18/30/entrepreneur-593371_1280.jpg"
+      imageAlt="Zwei Personen im Gespräch"
     >
       <h2>Warum gutes Feedback so schwer ist</h2>
       <p>

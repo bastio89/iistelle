@@ -8,6 +8,8 @@ export default function RemoteArbeitPage() {
       category="Führung"
       readTime="9 Min."
       date="25. Mai 2026"
+      imageUrl="https://cdn.pixabay.com/photo/2016/06/13/09/57/home-office-1453895_1280.jpg"
+      imageAlt="Home Office mit Laptop und Pflanzen"
     >
       <h2>Warum Remote-Führung anders ist</h2>
       <p>

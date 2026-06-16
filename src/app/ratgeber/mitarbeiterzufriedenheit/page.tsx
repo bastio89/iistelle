@@ -8,6 +8,8 @@ export default function MitarbeiterzufriedenheitPage() {
       category="Kultur"
       readTime="7 Min."
       date="1. Juni 2026"
+      imageUrl="https://cdn.pixabay.com/photo/2015/01/09/02/45/hands-593393_1280.jpg"
+      imageAlt="Hände die sich die Hand geben - Teamwork"
     >
       <h2>Warum Mitarbeiterzufriedenheit entscheidend ist</h2>
       <p>

@@ -8,6 +8,8 @@ export default function ArbeitgebermarkePage() {
       category="Recruiting"
       readTime="10 Min."
       date="18. Juni 2026"
+      imageUrl="https://cdn.pixabay.com/photo/2014/05/02/21/50/office-336377_1280.jpg"
+      imageAlt="Modernes Büro mit Mitarbeitern"
     >
       <h2>Was ist Employer Branding?</h2>
       <p>

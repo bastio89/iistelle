@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Clock, Search, Sparkles } from "lucide-react";
 import { PublicNav } from "@/components/PublicNav";
 import Footer from "@/components/Footer";
@@ -20,6 +21,7 @@ const guides = [
     slug: "stellenanzeige-schreiben",
     featured: true,
     color: "bg-gradient-to-br from-sky-500 to-sky-600",
+    imageUrl: "https://cdn.pixabay.com/photo/2015/01/09/11/08/startup-594090_1280.jpg",
   },
   {
     title: "Onboarding: Die ersten 90 Tage",
@@ -30,6 +32,7 @@ const guides = [
     slug: "onboarding",
     featured: true,
     color: "bg-gradient-to-br from-emerald-500 to-emerald-600",
+    imageUrl: "https://cdn.pixabay.com/photo/2017/07/31/11/34/people-2555032_1280.jpg",
   },
   {
     title: "DSGVO im Recruiting: Was du wissen musst",
@@ -158,16 +161,31 @@ export default function RatgeberPage() {
               href={`/ratgeber/${guide.slug}`}
               className="group relative overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className={`h-52 w-full ${guide.color} flex items-center justify-center`}>
-                <span className="text-6xl font-bold text-white/30">
-                  {index + 1}
-                </span>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="relative h-52 w-full">
+                {guide.imageUrl ? (
+                  <Image
+                    src={guide.imageUrl}
+                    alt={guide.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                ) : (
+                  <div className={`h-full w-full ${guide.color} flex items-center justify-center`}>
+                    <span className="text-6xl font-bold text-white/30">
+                      {index + 1}
+                    </span>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
                   <span className={`rounded-full px-3 py-0.5 text-xs font-semibold text-white ${guide.color}`}>
                     {guide.category}
                   </span>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-3">
                   <span className="flex items-center gap-1 text-xs text-petrol-400">
                     <Clock className="h-3 w-3" />
                     {guide.readTime}

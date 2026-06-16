@@ -8,6 +8,8 @@ export default function OnboardingPage() {
       category="Mitarbeiter"
       readTime="12 Min."
       date="10. Juni 2026"
+      imageUrl="https://cdn.pixabay.com/photo/2017/07/31/11/34/people-2555032_1280.jpg"
+      imageAlt="Team bei Besprechung im Büro"
     >
       <h2>Warum Onboarding so wichtig ist</h2>
       <p>

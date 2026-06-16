@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Clock, Calendar, Share2, BookOpen, Sparkles, ChevronRight } from "lucide-react";
 import { PublicNav } from "@/components/PublicNav";
 import Footer from "@/components/Footer";
@@ -10,6 +11,8 @@ export default function RatgeberBase({
   category,
   readTime,
   date,
+  imageUrl,
+  imageAlt,
 }: {
   children: React.ReactNode;
   title: string;
@@ -17,6 +20,8 @@ export default function RatgeberBase({
   category: string;
   readTime: string;
   date: string;
+  imageUrl?: string;
+  imageAlt?: string;
 }) {
   const categoryColors: Record<string, string> = {
     Recruiting: "bg-sky-500",
@@ -66,6 +71,21 @@ export default function RatgeberBase({
           </button>
         </div>
       </header>
+
+      {/* Article Image */}
+      {imageUrl && (
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="relative aspect-[16/9] overflow-hidden rounded-2xl bg-gray-100">
+            <Image
+              src={imageUrl}
+              alt={imageAlt || title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 768px"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Article Content */}
       <article className="mx-auto max-w-3xl px-6 pb-20">
