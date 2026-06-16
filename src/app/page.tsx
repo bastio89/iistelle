@@ -489,50 +489,46 @@ export default function LandingPage() {
                   </span>
                 )}
 
-                <div>
-                  <h3 className="text-xl font-bold text-petrol-900">{plan.name}</h3>
-                  <p className="mt-1 text-sm text-petrol-500">{plan.tagline}</p>
-                </div>
+                <div className="flex items-start justify-between gap-6">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-petrol-900">{plan.name}</h3>
+                    <p className="mt-1 text-sm text-petrol-500">{plan.tagline}</p>
 
-                <div className="my-5 h-px bg-petrol-100" />
-
-                <div className="flex items-baseline justify-between">
-                  <div className="text-right">
-                    <p className="text-4xl font-black text-petrol-900">{formattedPrice}</p>
-                    <p className="text-sm text-petrol-400">pro Monat, pro Firma</p>
-                  </div>
-                </div>
-
-                <ul className="flex-1 space-y-3">
-                  {plan.features.map((item) => (
-                    <li key={item} className="flex items-start gap-2.5 text-sm text-petrol-700">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-
-                {plan.id === "professional" && (
-                  <div className="mt-4 rounded-xl bg-petrol-50 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-petrol-400">
-                      Enthalten
-                    </p>
-                    <div className="mt-2 space-y-1.5">
-                      <p className="text-sm font-medium text-petrol-700">✓ Unbegrenzte Mitarbeiter</p>
-                      <p className="text-sm font-medium text-petrol-700">✓ Alles aus Starter</p>
-                      <p className="text-sm font-medium text-petrol-700">✓ Gehaltsdaten & Vergütung</p>
-                      <p className="text-sm font-medium text-petrol-700">✓ Performance-Gespräche (360°)</p>
-                      <p className="text-sm font-medium text-petrol-700">✓ Zeiterfassung</p>
-                      <p className="text-sm font-medium text-petrol-700">✓ Rollen & Berechtigungen</p>
-                      <p className="text-sm font-medium text-petrol-700">✓ CSV-Exporte & API-Zugriff</p>
-                      <p className="text-sm font-medium text-petrol-700">✓ Audit-Log</p>
+                    <div className="mt-6 space-y-3">
+                      {plan.features.map((item) => (
+                        <div key={item} className="flex items-start gap-2.5 text-sm text-petrol-700">
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                          {item}
+                        </div>
+                      ))}
                     </div>
+
+                    {plan.id === "professional" && (
+                      <div className="mt-6 space-y-2">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-petrol-400">
+                          Plus
+                        </p>
+                        <p className="text-sm font-medium text-petrol-700">✓ Unbegrenzte Mitarbeiter</p>
+                        <p className="text-sm font-medium text-petrol-700">✓ Alles aus Starter</p>
+                        <p className="text-sm font-medium text-petrol-700">✓ Gehaltsdaten & Vergütung</p>
+                        <p className="text-sm font-medium text-petrol-700">✓ Performance-Gespräche (360°)</p>
+                        <p className="text-sm font-medium text-petrol-700">✓ Zeiterfassung</p>
+                        <p className="text-sm font-medium text-petrol-700">✓ Rollen & Berechtigungen</p>
+                        <p className="text-sm font-medium text-petrol-700">✓ CSV-Exporte & API-Zugriff</p>
+                        <p className="text-sm font-medium text-petrol-700">✓ Audit-Log</p>
+                      </div>
+                    )}
                   </div>
-                )}
+
+                  <div className="w-32 shrink-0 text-right">
+                    <p className="text-3xl font-black text-petrol-900">{formattedPrice}</p>
+                    <p className="text-xs text-petrol-400">pro Monat</p>
+                  </div>
+                </div>
 
                 <Link
                   href={`/login?plan=${plan.id}${billing === "yearly" ? "&billing=yearly" : ""}`}
-                  className={`${plan.highlight ? "btn-danger" : "btn-secondary"} mt-6 justify-center`}
+                  className={`${plan.highlight ? "btn-danger" : "btn-secondary"} mt-6 justify-center flex`}
                 >
                   {plan.cta}
                 </Link>
