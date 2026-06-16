@@ -512,6 +512,24 @@ export default function LandingPage() {
                   ))}
                 </ul>
 
+                {plan.id === "professional" && (
+                  <div className="mt-4 rounded-xl bg-petrol-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-petrol-400">
+                      Enthalten
+                    </p>
+                    <div className="mt-2 space-y-1.5">
+                      <p className="text-sm font-medium text-petrol-700">✓ Unbegrenzte Mitarbeiter</p>
+                      <p className="text-sm font-medium text-petrol-700">✓ Alles aus Starter</p>
+                      <p className="text-sm font-medium text-petrol-700">✓ Gehaltsdaten & Vergütung</p>
+                      <p className="text-sm font-medium text-petrol-700">✓ Performance-Gespräche (360°)</p>
+                      <p className="text-sm font-medium text-petrol-700">✓ Zeiterfassung</p>
+                      <p className="text-sm font-medium text-petrol-700">✓ Rollen & Berechtigungen</p>
+                      <p className="text-sm font-medium text-petrol-700">✓ CSV-Exporte & API-Zugriff</p>
+                      <p className="text-sm font-medium text-petrol-700">✓ Audit-Log</p>
+                    </div>
+                  </div>
+                )}
+
                 <Link
                   href={`/login?plan=${plan.id}${billing === "yearly" ? "&billing=yearly" : ""}`}
                   className={`${plan.highlight ? "btn-danger" : "btn-secondary"} mt-6 justify-center`}
