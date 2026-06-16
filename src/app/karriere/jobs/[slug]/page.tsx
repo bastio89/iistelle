@@ -146,13 +146,13 @@ export default async function IistelleJobPage({ params }: PageProps) {
       {/* Hero */}
       <header className="relative overflow-hidden bg-petrol-950">
         <div
-          className="pointer-events-none absolute inset-0 opacity-30"
+          className="pointer-events-none absolute inset-0 opacity-40"
           style={{
             background:
-              "radial-gradient(50% 50% at 80% 20%, rgba(255,90,80,0.2) 0%, transparent 60%), radial-gradient(40% 40% at 20% 70%, rgba(69,144,154,0.2) 0%, transparent 60%)",
+              "radial-gradient(60% 50% at 70% 20%, rgba(255,90,80,0.25) 0%, transparent 70%), radial-gradient(50% 40% at 20% 80%, rgba(69,144,154,0.3) 0%, transparent 70%)",
           }}
         />
-        <div className="relative mx-auto max-w-4xl px-6 py-16">
+        <div className="relative mx-auto max-w-6xl px-6 py-16 text-center">
           <Link
             href="/karriere"
             className="inline-flex items-center gap-2 text-sm font-semibold text-petrol-300 transition hover:text-white"
@@ -160,7 +160,7 @@ export default async function IistelleJobPage({ params }: PageProps) {
             <ArrowLeft className="h-4 w-4" />
             Alle Stellen
           </Link>
-          <div className="mt-6 flex items-center gap-3">
+          <div className="mt-6 flex items-center justify-center gap-3">
             <span className={`inline-block h-3 w-3 rounded-full ${job.colorBg}`} />
             <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white">
               {job.type}
@@ -170,7 +170,7 @@ export default async function IistelleJobPage({ params }: PageProps) {
               {job.location}
             </span>
           </div>
-          <h1 className="mt-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">
+          <h1 className="mx-auto mt-4 max-w-3xl text-3xl font-bold text-white md:text-4xl lg:text-5xl">
             {job.title}
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-petrol-300">

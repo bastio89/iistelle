@@ -155,26 +155,25 @@ export default function PricingClient({ plans, config }: Props) {
         </div>
       </nav>
 
-      {/* Hero mit Mehrwert */}
+      {/* Hero */}
       <header className="relative overflow-hidden bg-petrol-950">
         <div
           className="pointer-events-none absolute inset-0 opacity-40"
           style={{
-            background: "radial-gradient(60% 50% at 70% 20%, rgba(255,90,80,0.25) 0%, transparent 70%), radial-gradient(50% 40% at 20% 80%, rgba(69,144,154,0.3) 0%, transparent 70%)",
+            background:
+              "radial-gradient(60% 50% at 70% 20%, rgba(255,90,80,0.25) 0%, transparent 70%), radial-gradient(50% 40% at 20% 80%, rgba(69,144,154,0.3) 0%, transparent 70%)",
           }}
         />
         <div className="relative mx-auto max-w-6xl px-6 py-20 text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-petrol-200">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-petrol-200">
             <Sparkles className="h-3.5 w-3.5 text-coral-400" />
             Preiswerte HR-Software für {config.countryName}
-          </span>
+          </div>
           <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-bold text-white md:text-5xl">
-            Recruiting & HR –<br />
-            <span className="text-coral-400">einfach, fair, komplett.</span>
+            Faire Preise, keine Überraschungen
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-petrol-300">
-            Von der Stellenausschreibung bis zum Offboarding: iistelle begleitet dich durch den gesamten Employee Lifecycle.
-            Ohne versteckte Kosten, ohne Setup-Gebühren.
+            Starte kostenlos und wachse mit deinem Team. Monatlich kündbar, keine Einrichtungsgebühr, keine versteckten Kosten.
           </p>
         </div>
       </header>

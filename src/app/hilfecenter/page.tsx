@@ -275,18 +275,19 @@ export default function HelpCenterPage() {
         <div
           className="pointer-events-none absolute inset-0 opacity-40"
           style={{
-            background: "radial-gradient(60% 50% at 70% 20%, rgba(255,90,80,0.25) 0%, transparent 70%), radial-gradient(50% 40% at 20% 80%, rgba(69,144,154,0.3) 0%, transparent 70%)",
+            background:
+              "radial-gradient(60% 50% at 70% 20%, rgba(255,90,80,0.25) 0%, transparent 70%), radial-gradient(50% 40% at 20% 80%, rgba(69,144,154,0.3) 0%, transparent 70%)",
           }}
         />
-        <div className="relative mx-auto max-w-4xl px-6 py-20 text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-petrol-200">
+        <div className="relative mx-auto max-w-6xl px-6 py-20 text-center">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-petrol-200">
             <BookOpen className="h-3.5 w-3.5 text-coral-400" />
             Hilfe & Support
-          </span>
-          <h1 className="mx-auto mt-6 max-w-2xl text-4xl font-bold text-white md:text-5xl">
+          </div>
+          <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-bold text-white md:text-5xl">
             Wie können wir dir helfen?
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-petrol-300">
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-petrol-300">
             Alles, was du über iistelle wissen musst – von der Einrichtung bis zur Lohnabrechnung.
           </p>
 

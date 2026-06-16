@@ -33,21 +33,21 @@ export default function AGBPage() {
       {/* Hero */}
       <header className="relative overflow-hidden bg-petrol-950">
         <div
-          className="pointer-events-none absolute inset-0 opacity-30"
+          className="pointer-events-none absolute inset-0 opacity-40"
           style={{
             background:
-              "radial-gradient(50% 50% at 80% 20%, rgba(255,90,80,0.2) 0%, transparent 60%), radial-gradient(40% 40% at 20% 70%, rgba(69,144,154,0.2) 0%, transparent 60%)",
+              "radial-gradient(60% 50% at 70% 20%, rgba(255,90,80,0.25) 0%, transparent 70%), radial-gradient(50% 40% at 20% 80%, rgba(69,144,154,0.3) 0%, transparent 70%)",
           }}
         />
         <div className="relative mx-auto max-w-6xl px-6 py-16 text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-petrol-200">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-petrol-200">
             <FileText className="h-3.5 w-3.5 text-coral-400" />
             Rechtliche Grundlagen
-          </span>
-          <h1 className="mt-6 text-4xl font-bold text-white md:text-5xl">
+          </div>
+          <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-bold text-white md:text-5xl">
             Allgemeine Geschäftsbedingungen
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-petrol-300">
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-petrol-300">
             Die AGB regeln das Rechtsverhältnis zwischen dem Kunden und twenty5ai
           </p>
         </div>
