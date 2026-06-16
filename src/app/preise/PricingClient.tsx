@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { CheckCircle2, X, ArrowRight, Sparkles, Clock, ShieldCheck, Users, Zap, Search, ChevronDown, Star, Heart, Globe, FileText, Calendar, BarChart3, TrendingUp } from "lucide-react";
 import { PricingPlan, PricingConfig, formatPrice } from "@/lib/pricing";
-import { ServiceDropdown } from "@/components/ServiceDropdown";
+import { PublicNav } from "@/components/PublicNav";
 import Footer from "@/components/Footer";
 
 interface Props {
@@ -134,26 +134,7 @@ export default function PricingClient({ plans, config }: Props) {
   return (
     <div className="min-h-screen bg-surface">
       {/* Navigation */}
-      <nav className="sticky top-0 z-40 border-b border-petrol-100 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
-          <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="iistelle Logo" width={32} height={32} className="rounded-lg" />
-            <span className="text-lg font-bold tracking-tight text-petrol-900">iistelle</span>
-          </Link>
-          <div className="flex items-center gap-6 text-sm font-semibold text-petrol-600">
-            <ServiceDropdown />
-            <Link href="/preise" className="text-coral-500 font-bold">Preise</Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="rounded-lg px-4 py-2 text-sm font-semibold text-petrol-700 transition hover:bg-petrol-50">
-              Anmelden
-            </Link>
-            <Link href="/login" className="btn-primary">
-              Kostenlos starten
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <PublicNav />
 
       {/* Hero */}
       <header className="relative overflow-hidden bg-petrol-950">

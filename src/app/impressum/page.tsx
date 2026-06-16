@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MapPin, Mail, Phone, Globe, Sparkles } from "lucide-react";
+import { PublicNav } from "@/components/PublicNav";
 import Footer from "@/components/Footer";
 
 export const metadata = {
@@ -11,24 +12,7 @@ export default function ImpressumPage() {
   return (
     <div className="min-h-screen bg-surface">
       {/* Navigation */}
-      <nav className="sticky top-0 z-40 border-b border-petrol-100 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.svg" alt="iistelle" width={32} height={32} className="rounded-lg" />
-            <span className="text-lg font-bold tracking-tight text-petrol-900">
-              iistelle
-            </span>
-          </Link>
-          <div className="flex items-center gap-6 text-sm font-semibold text-petrol-600">
-            <Link href="/services" className="transition hover:text-petrol-900">Services</Link>
-            <Link href="/ratgeber" className="transition hover:text-petrol-900">Ratgeber</Link>
-            <Link href="/preise" className="transition hover:text-petrol-900">Preise</Link>
-          </div>
-          <Link href="/login" className="btn-primary">
-            Kostenlos starten
-          </Link>
-        </div>
-      </nav>
+      <PublicNav />
 
       {/* Hero */}
       <header className="relative overflow-hidden bg-petrol-950">
