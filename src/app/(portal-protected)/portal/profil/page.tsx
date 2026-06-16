@@ -38,21 +38,27 @@ export default function PortalProfilePage() {
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    const { data: profile } = await supabase
-      .from("employee_profiles")
-      .select("employee_id")
+    // Get employee directly via user_id (not through employee_profiles)
+    const { data: employee } = await supabase
+      .from("employees")
+      .select("*")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
-    if (profile?.employee_id) {
-      const [emp, abs] = await Promise.all([
-        supabase.from("employees").select("*").eq("id", profile.employee_id).single(),
-        supabase.from("absences").select("*").eq("employee_id", profile.employee_id).order("start_date", { ascending: false }).limit(10),
-      ]);
-      setEmployee(emp.data);
-      setAbsences(abs.data || []);
+    if (employee) {
+      setEmployee(employee);
+      const { data: abs } = await supabase
+        .from("absences")
+        .select("*")
+        .eq("employee_id", employee.id)
+        .order("start_date", { ascending: false })
+        .limit(10);
+      setAbsences(abs || []);
     }
     setLoading(false);
   }, [supabase]);

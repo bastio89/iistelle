@@ -12,12 +12,10 @@ import {
   Clock,
   FileText,
   Target,
-  Settings,
   LogOut,
   Menu,
   X,
   User,
-  ChevronDown,
 } from "lucide-react";
 
 type NavItem = {
@@ -116,15 +114,11 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                 </Link>
               ))}
               <div className="my-2 border-t border-gray-100" />
-              <Link
-                href="/me"
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-petrol-700 hover:bg-gray-100"
-              >
-                <Settings className="h-5 w-5" />
-                Admin-Bereich
-              </Link>
               <button
-                onClick={handleSignOut}
+                onClick={() => {
+                  handleSignOut();
+                  setMobileMenuOpen(false);
+                }}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50"
               >
                 <LogOut className="h-5 w-5" />
@@ -183,13 +177,6 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           {/* Bottom Actions */}
           <div className="border-t border-gray-100 p-4">
             <div className="space-y-1">
-              <Link
-                href="/me"
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-petrol-600 transition hover:bg-gray-100 hover:text-petrol-900"
-              >
-                <Settings className="h-5 w-5" />
-                Admin-Bereich
-              </Link>
               <button
                 onClick={handleSignOut}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-rose-600 transition hover:bg-rose-50"

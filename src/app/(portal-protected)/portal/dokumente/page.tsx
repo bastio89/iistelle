@@ -25,12 +25,16 @@ export default function PortalDokumentePage() {
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
+    // Get employee directly via user_id
     const { data: emp } = await supabase
       .from("employees")
       .select("*")
-      .eq("email", user.email)
+      .eq("user_id", user.id)
       .maybeSingle();
 
     if (!emp) {

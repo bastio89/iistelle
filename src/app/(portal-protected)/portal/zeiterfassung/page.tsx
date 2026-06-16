@@ -31,33 +31,36 @@ export default function PortalZeiterfassungPage() {
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    const { data: profile } = await supabase
-      .from("employee_profiles")
-      .select("employee_id")
+    // Get employee directly via user_id (not through employee_profiles)
+    const { data: employee } = await supabase
+      .from("employees")
+      .select("*")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
-    if (profile?.employee_id) {
+    if (employee) {
+      setEmployee(employee);
       const today = new Date().toISOString().split("T")[0];
-      const [emp, ents, active] = await Promise.all([
-        supabase.from("employees").select("*").eq("id", profile.employee_id).single(),
+      const [ents, active] = await Promise.all([
         supabase
           .from("time_entries")
           .select("*")
-          .eq("employee_id", profile.employee_id)
+          .eq("employee_id", employee.id)
           .gte("clock_in", `${today}T00:00:00`)
           .lte("clock_in", `${today}T23:59:59`)
           .order("clock_in", { ascending: true }),
         supabase
           .from("time_entries")
           .select("*")
-          .eq("employee_id", profile.employee_id)
+          .eq("employee_id", employee.id)
           .is("clock_out", null)
           .single(),
       ]);
-      setEmployee(emp.data);
       setEntries(ents.data || []);
       setActiveEntry(active.data);
     }
