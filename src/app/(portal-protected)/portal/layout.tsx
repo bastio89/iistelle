@@ -14,6 +14,39 @@ export default async function PortalLayout({
     redirect("/portal-login");
   }
 
+  // Automatisch user_roles verknüpfen wenn noch nicht vorhanden
+  const { data: existingRole } = await supabase
+    .from("user_roles")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!existingRole) {
+    // Hole Company ID
+    const { data: companies } = await supabase
+      .from("companies")
+      .select("id")
+      .limit(1);
+
+    const companyId = companies?.[0]?.id;
+
+    if (companyId) {
+      // Erstelle user_roles
+      await supabase.from("user_roles").insert({
+        user_id: user.id,
+        email: user.email,
+        role: "admin",
+        company_id: companyId,
+      });
+
+      // Verknüpfe auch den Mitarbeiter mit der user_id
+      await supabase
+        .from("employees")
+        .update({ user_id: user.id })
+        .eq("email", user.email);
+    }
+  }
+
   return (
     <div className="flex min-h-screen bg-surface">
       {/* Simplified Portal Sidebar */}
