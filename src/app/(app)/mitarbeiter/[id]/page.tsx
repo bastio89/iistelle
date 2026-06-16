@@ -42,6 +42,7 @@ import {
   CalendarDays,
   Download,
   FileText,
+  KeyRound,
   Mail,
   MapPin,
   Pencil,
@@ -85,6 +86,8 @@ export default function EmployeeDetailPage() {
   const [showGoal, setShowGoal] = useState(false);
   const [showReview, setShowReview] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [portalInviteLoading, setPortalInviteLoading] = useState(false);
+  const [portalInviteStatus, setPortalInviteStatus] = useState<"idle" | "success" | "error">("idle");
 
   const load = useCallback(async () => {
     const [e, a, s, g, r, ob] = await Promise.all([
@@ -247,6 +250,32 @@ export default function EmployeeDetailPage() {
     router.push("/mitarbeiter");
   }
 
+  async function sendPortalInvite() {
+    if (!employee) return;
+    setPortalInviteLoading(true);
+    setPortalInviteStatus("idle");
+    try {
+      const response = await fetch("/api/portal/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          employee_id: id,
+          email: employee.email,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setPortalInviteStatus("success");
+      } else {
+        setPortalInviteStatus("error");
+      }
+    } catch {
+      setPortalInviteStatus("error");
+    } finally {
+      setPortalInviteLoading(false);
+    }
+  }
+
   if (loading || !employee) {
     return <p className="py-20 text-center text-petrol-400">Lade Personalakte…</p>;
   }
@@ -331,6 +360,29 @@ export default function EmployeeDetailPage() {
             </div>
           </div>
           <div className="flex gap-2">
+            {portalInviteStatus === "success" ? (
+              <button className="btn-secondary cursor-default" disabled>
+                <KeyRound className="h-4 w-4" /> Einladung gesendet ✓
+              </button>
+            ) : (
+              <button
+                className="btn-secondary"
+                onClick={sendPortalInvite}
+                disabled={portalInviteLoading}
+                title="Magic Link für Portal-Zugang senden"
+              >
+                {portalInviteLoading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-petrol-200 border-t-petrol-600" />
+                    Wird gesendet...
+                  </span>
+                ) : (
+                  <>
+                    <KeyRound className="h-4 w-4" /> Portal-Einladung
+                  </>
+                )}
+              </button>
+            )}
             <button className="btn-secondary" onClick={() => setShowEdit(true)}>
               <Pencil className="h-4 w-4" /> Bearbeiten
             </button>

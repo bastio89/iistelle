@@ -36,12 +36,23 @@ export function PublicNav({ showLogin = true, showCta = "Kostenlos starten" }: P
 
         <div className="flex items-center gap-3">
           {showLogin && (
-            <Link
-              href="/login"
-              className="rounded-lg px-4 py-2 text-sm font-semibold text-petrol-700 transition-all hover:bg-petrol-50"
-            >
-              Anmelden
-            </Link>
+            <>
+              <Link
+                href="/portal-login"
+                className="flex items-center gap-2 rounded-lg border border-petrol-200 bg-white px-4 py-2 text-sm font-semibold text-petrol-700 transition-all hover:border-petrol-300 hover:bg-petrol-50"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Portal-Login
+              </Link>
+              <Link
+                href="/login"
+                className="rounded-lg px-4 py-2 text-sm font-semibold text-petrol-700 transition-all hover:bg-petrol-50"
+              >
+                Anmelden
+              </Link>
+            </>
           )}
           <Link href="/login" className="btn-primary">
             {showCta}

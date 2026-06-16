@@ -1,8 +1,7 @@
 # iistelle — Roadmap zum Marktführer DACH
 
-> Stand: Juni 2026
+> Stand: Juni 2026 (aktualisiert)
 > Ziel: Bestes HR-Tool für Schweizer und deutsche Unternehmen
-> Version: 1.1 (aktualisiert basierend auf Feature-Analyse)
 
 ---
 
@@ -44,51 +43,31 @@
 - Brückentage-Erkennung
 - Integration in Abwesenheits-Management
 
-### ✅ Dediziertes Mitarbeiterportal
-- Eigenständige Portal-Route `/portal` für Mitarbeiter
-- Getrennt vom Admin/HR-Bereich
-- Mobile-optimiertes Design mit Sidebar
-- Enthält: Zeiterfassung (Kommen/Gehen), Urlaubsplanung, Dokumente, Ziele
-- Vorbereitet für zukünftige SSO/SAML-Erweiterungen
-- Eigener Portal-Login unter `/portal-login`
+### ✅ Mitarbeiter-Portal (Magic-Link Flow) *(NEU)*
+- Eigenständiger Portal-Bereich für Mitarbeiter (`/portal`, `/portal-login`)
+- Magic-Link-basierte Einladung (kein Passwort-Setup nötig)
+- Onboarding-Tour für neue Mitarbeiter
+- Schneller Zugang zu Zeiterfassung, Urlaub, Zielen, Dokumenten
+- Admin kann Portal-Einladungen versenden
+- Self-Service Portal für Mitarbeiter (DSGVO-konform)
+- Separate Auth-Session für Portal vs. Admin
+
+### ✅ Portal-Features erweitert *(NEU)*
+- **Portal-Profil-Seite**: Mitarbeiterdaten einsehen, Urlaub beantragen, Abwesenheits-Status verfolgen
+- **Portal-Zeiterfassung**: Ein-/Ausstempeln, Live-Timer, Wochenübersicht mit Chart
+- **Team-Kalender**: Monatskalender mit allen Abwesenheiten, Legende, anstehende Abwesenheiten
+- **Portal-Landingpage**: Übersicht aller Portal-Features für neue Mitarbeiter
+- **Portal-Login Button**: Separater Button auf Landingpage und PublicNav
+
+### ✅ Portal-Login Button auf Landingpage *(NEU)*
+- Separate Anmelde-Buttons für Admin-Login und Portal-Login
+- Landingpage: "Portal-Login" Button prominent platziert
+- PublicNav: "Portal-Login" Button integriert
+- Klare Differenzierung zwischen Arbeitgeber- und Mitarbeiter-Zugang
 
 ---
 
 ## 1. Wettbewerbsanalyse
-
-### 1.0 Bestandsaufnahme: Bereits implementierte Features (Juni 2026)
-
-| Modul | Feature | Status |
-|-------|---------|--------|
-| **Recruiting** | Job-Portal & Kanban-View | ✅ Komplett |
-| | Kandidaten-Verwaltung | ✅ Komplett |
-| | Interview-Scheduling | ✅ Komplett |
-| | E-Mail-Templates | ✅ Komplett |
-| | Karriereseite | ✅ Komplett |
-| **Mitarbeiter** | Mitarbeiter-Verwaltung | ✅ Komplett |
-| | Onboarding/Offboarding Tasks | ✅ Komplett |
-| | Organigramm | ✅ Komplett |
-| | Skills-Management | ✅ Komplett |
-| | Equipment/Inventar | ✅ Komplett |
-| **Zeit** | Zeiterfassung mit CSV-Export | ✅ Komplett |
-| **Abwesenheiten** | Urlaubs-Management | ✅ Komplett |
-| | CH-Feiertage nach Kanton | ✅ Komplett |
-| | Genehmigungs-Workflow | ✅ Komplett |
-| **Performance** | Goals & OKRs | ✅ Komplett |
-| | Review-Cycles | ✅ Komplett |
-| | Peer-Feedback | ✅ Teilweise |
-| **Dokumente** | Dokumenten-Management | ✅ Komplett |
-| | Dokumenten-Generator | ✅ Komplett |
-| **Reports** | Berichte-Dashboard | ✅ Komplett |
-| **Compliance** | DSGVO-Center | ✅ Komplett |
-| | Audit-Log | ✅ Komplett |
-| **Integration** | Slack-Notifications | ✅ Komplett |
-| **Öffentlich** | Help-Center | ✅ Komplett |
-| | Rechner (Stundensatz) | ✅ Komplett |
-| | Ratgeber-Artikel | ✅ Komplett |
-| | Services-Seite | ✅ Komplett |
-| **Abrechnung** | Plan-Verwaltung | ✅ Komplett |
-| **Portal** | Mitarbeiter-Portal mit Zeiterfassung, Urlaub, Dokumenten | ✅ Komplett |
 
 ### 1.1 Hauptkonkurrenten im Schweizer HR-Markt
 
@@ -116,6 +95,7 @@
 ✅ **Organigramm** — Visuell  
 ✅ **Zeiterfassung** — Basis vorhanden  
 ✅ **Performance & Goals** — Review-Cycles  
+✅ **Mitarbeiter-Portal** — Magic-Link Self-Service für Mitarbeiter *(NEU)*
 
 ### 1.3 Marktlücken & Differenzierungs-Chancen
 
@@ -140,20 +120,44 @@
 
 ## 2. Feature-Roadmap nach Phasen
 
+### Phase 0: Portal-Optimierung (Q2 2026) — *Gerade abgeschlossen*
+> **Ziel:** Mitarbeiter-Self-Service ohne Passwort-Hürde.
+
+| # | Feature | Beschreibung | Status |
+|---|---------|--------------|--------|
+| 0.1 | **Magic-Link Portal-Einladung** | Admin kann mit einem Klick Einladungs-Link per E-Mail senden | ✅ Abgeschlossen |
+| 0.2 | **Onboarding-Tour** | Schritt-für-Schritt-Einführung für neue Portal-Nutzer | ✅ Abgeschlossen |
+| 0.3 | **Portal-Dashboard** | Schneller Zugriff auf Zeiterfassung, Urlaub, Ziele, Dokumente | ✅ Abgeschlossen |
+| 0.4 | **Separate Auth-Sessions** | Portal-Nutzer haben eigenen Login-Bereich | ✅ Abgeschlossen |
+| 0.5 | **Portal-Profil-Seite** | Mitarbeiterdaten einsehen, Urlaub beantragen, Abwesenheits-Status | ✅ Abgeschlossen |
+| 0.6 | **Portal-Zeiterfassung** | Ein-/Ausstempeln, Live-Timer, Wochenübersicht | ✅ Abgeschlossen |
+| 0.7 | **Team-Kalender** | Monatskalender mit allen Team-Abwesenheiten | ✅ Abgeschlossen |
+| 0.8 | **Portal-Login Button** | Separater Button auf Landingpage und PublicNav | ✅ Abgeschlossen |
+
+### Phase 0.5: Portal-Verbesserungen (Q3 2026) — *Als nächstes*
+> **Ziel:** Das Portal weiter verbessern und Feinschliff.
+
+| # | Feature | Beschreibung | Aufwand | Priorität |
+|---|---------|--------------|---------|-----------|
+| 0.5.1 | **Persönliche Dokumente** | Verträge, Zeugnisse im Portal abrufen | Mittel | 🔴 Hoch |
+| 0.5.2 | **Ziele & Performance** | Ziele im Portal einsehen und Fortschritt tracken | Mittel | 🟡 Mittel |
+| 0.5.3 | **Notifications** | Benachrichtigungen über neue Urlaubsanträge, Genehmigungen | Niedrig | 🟡 Mittel |
+| 0.5.4 | **Urlaubskalender-Export** | ICAL-Feed für eigenen Kalender | Niedrig | 🟡 Mittel |
+| 0.5.5 | **Mobile-Optimierung** | Portal für mobile Geräte optimieren | Mittel | 🟡 Mittel |
+
 ### Phase 1: Kern-Verbesserungen (Q3 2026) — Sofort umsetzen
 
 > **Ziel:** Die bestehenden Features auf Marktniveau bringen und Schwächen eliminieren.
 
-| # | Feature | Beschreibung | Aufwand | Priorität | Status |
-|---|---------|--------------|---------|-----------|--------|
-| 1.1 | **Mitarbeiter-Self-Service Portal** | Mitarbeiter können eigene Daten einsehen (Urlaub, Personalien, Dokumente), Abwesenheiten beantragen, Profil bearbeiten | Mittel | 🔴 Hoch | ✅ **NEU: `/portal`** |
-| 1.2 | **Gleitzeit-Regelungen erweitert** | Flexible Arbeitszeiten, Kernarbeitszeiten, Gleitzeittoleranz | Mittel | 🔴 Hoch | ⚠️ Basis da |
-| 1.3 | **360°-Feedback** | 360°-Feedback für Performance-Reviews | Mittel | 🔴 Hoch | ❌ Fehlt |
-| 1.4 | **Dokumenten-Generator erweitert** | Erweiterte Templates für Verträge, Zeugnisse, Bescheinigungen | Mittel | 🟡 Mittel | ⚠️ Basis da |
-| 1.5 | **Projekt-Zeiterfassung** | Zeitbuchungen auf Projekte/Kunden | Mittel | 🟡 Mittel | ❌ Fehlt |
-| 1.6 | **API-Endpoints** | REST-API für Drittanbieter-Integrationen, Webhooks für Events | Hoch | 🟡 Mittel | ❌ Fehlt |
-| 1.7 | **Kalender-Integration** | Kalender-Sync für Interviews, Abwesenheiten, Birthdays | Mittel | 🟡 Mittel | ❌ Fehlt |
-| 1.8 | **Video-Interview Integration** | Zoom/Google Meet Integration für Interviews | Mittel | 🟡 Mittel | ❌ Fehlt |
+| # | Feature | Beschreibung | Aufwand | Priorität |
+|---|---------|--------------|---------|-----------|
+| 1.1 | **Persönliche Dokumente im Portal** | Verträge, Zeugnisse, Bescheinigungen abrufen | Mittel | 🔴 Hoch |
+| 1.2 | **Ziele & Performance im Portal** | Ziele einsehen, Fortschritt tracken, Feedback geben | Mittel | 🟡 Mittel |
+| 1.3 | **Verlängerte Zeiterfassung** | Gleitzeit, Überstundenerfassung, Export, Pausen-Tracker, Genehmigungs-Workflow | Mittel | 🔴 Hoch |
+| 1.4 | **Erweiterte Performance-Reviews** | 360°-Feedback, automatisierte Review-Zyklen, Zielverknüpfung, Kalibrierungs-Sessions | Mittel | 🔴 Hoch |
+| 1.5 | **Dokumenten-Generator** | Verträge, Zeugnisse, Bescheinigungen aus Templates generieren | Mittel | 🟡 Mittel |
+| 1.6 | **Audit-Log Erweiterung** | Vollständiges Audit-Trail für alle HR-Aktionen (DSGVO-Compliance) | Niedrig | 🔴 Hoch |
+| 1.7 | **API-Endpoints** | REST-API für Drittanbieter-Integrationen, Webhooks für Events | Hoch | 🟡 Mittel |
 
 ### Phase 2: Differenzierung (Q4 2026) — Schweizer Alleinstellung
 
@@ -166,7 +170,7 @@
 | 2.3 | **Digitale Unterschrift** | Integration mit Skribble/Adobe Sign für Verträge und Dokumente | Mittel | 🟡 Mittel |
 | 2.4 | **Lohnbenchmarking CH** | Anonyme Gehaltsvergleiche nach Branche/Region/Position (basierend auf realen Daten) | Mittel | 🟡 Mittel |
 | 2.5 | **Lohngleichheits-Report** | Automatischer Report für Pay Equity Analysis (gesetzliche Anforderung) | Niedrig | 🔴 Hoch |
-| 2.6 | **Kompetenz-Matrix** | Skills-Matrix über alle Mitarbeiter, Anforderungsprofile | Mittel | 🟡 Mittel |
+| 2.6 | **CH-Feiertags-Engine** | Automatische Feiertags-Erkennung pro Kanton, Brücken-/Feiertage-Tracker | Niedrig | 🟡 Mittel |
 
 ### Phase 3: KI & Innovation (Q1 2027) — Technologievorsprung
 
@@ -174,13 +178,12 @@
 
 | # | Feature | Beschreibung | Aufwand | Priorität |
 |---|---------|--------------|---------|-----------|
-| 3.1 | **KI-Lebenslauf-Analyse** | Automatische Extraktion von Skills, Erfahrung, Ausbildung aus CVs (PDF/Upload) | Hoch | 🔴 Hoch |
+| 3.1 | **KI-Lebenslauf-Analyse** | Automatische Extraktion von Skills, Erfahrung, Ausbildung aus CVs (PDF/UPLOAD) | Hoch | 🔴 Hoch |
 | 3.2 | **KI-Job-Matching** | Matching-Score zwischen Kandidaten und Stellenanforderungen | Hoch | 🔴 Hoch |
 | 3.3 | **KI-Job Description Generator** | Automatische Erstellung von Stellenanzeigen basierend auf Titel/Anforderungen | Mittel | 🟡 Mittel |
 | 3.4 | **KI-Interview-Coach** | Vorbereitungsfragen, Bewertungshilfen für Interviewer | Mittel | 🟡 Mittel |
 | 3.5 | **Mitarbeiter-Chatbot** | FAQ für Mitarbeiter (Urlaubsanspruch, Richtlinien, Prozesse) | Mittel | 🟡 Mittel |
 | 3.6 | **Predictive Analytics** | Fluktuationsrisiko-Score, Hiring-Forecast, Headcount-Planning | Hoch | 🟡 Mittel |
-| 3.7 | **KI-gestützte Dokumentenerstellung** | Automatische Generierung von Arbeitszeugnissen, Vertragsentwürfen | Mittel | 🟡 Mittel |
 
 ### Phase 4: Enterprise & Skalierung (Q2 2027) — Grosskunden-fähig
 
@@ -194,7 +197,6 @@
 | 4.4 | **Advanced SSO / SCIM** | User Provisioning, automatisches Account-Management | Mittel | 🟡 Mittel |
 | 4.5 | **White-Label Karriereseite** | Vollständig anpassbare Karriereseite für Enterprise-Kunden | Mittel | 🟡 Mittel |
 | 4.6 | **Custom Branding erweitert** | Eigene Farben, Logos, E-Mail-Templates für Unternehmen | Niedrig | 🟡 Mittel |
-| 4.7 | **Audit-Log Export & Compliance-Reports** | Export-Funktionen für Behörden, DSGVO-Reports | Niedrig | 🟡 Mittel |
 
 ### Phase 5: Ökosystem & Plattform (Q3-Q4 2027) — Plattform werden
 
@@ -209,7 +211,6 @@
 | 5.5 | **Partner-API Programm** | Offizielle Partner-API für Payroll-Provider, Zeitmess-Systeme | Mittel | 🟡 Mittel |
 | 5.6 | **Mobile App (iOS/Android)** | Natives Mobile App für Mitarbeiter und Manager | Hoch | 🔴 Hoch |
 | 5.7 | **WhatsApp / SMS Notifications** | Kandidaten-Benachrichtigungen via WhatsApp/SMS | Niedrig | 🟡 Mittel |
-| 5.8 | **Candidate Experience Portal** | Self-Service für Bewerber: Status verfolgen, Unterlagen hochladen | Mittel | 🟡 Mittel |
 
 ---
 
@@ -223,15 +224,12 @@
 | | KI-Candidate Matching | ❌ | ❌ | ❌ | Gap |
 | | Bewerber-Tracking (ATS) | ✅ | ✅ | ✅ | — |
 | | Interview-Scheduling | ✅ | ✅ | ✅ | — |
-| | Karriereseite | ✅ | ✅ | ✅ | — |
-| | E-Mail-Templates | ✅ | ✅ | ❌ | Differenzierung |
 | | E-Mail-Tracking | ❌ | ✅ | ❌ | Klein |
 | | Video-Interview Integration | ❌ | ✅ | ❌ | Klein |
-| **Mitarbeiter** | Self-Service Portal | ❌ | ✅ | ✅ | **Gross** |
+| **Mitarbeiter** | Self-Service Portal | ✅ (Magic-Link) | ✅ | ✅ | — |
 | | Organigramm | ✅ | ✅ | ✅ | — |
 | | Skills-Management | ✅ | ✅ | ✅ | — |
 | | Kompetenz-Matrix | ❌ | ✅ | ❌ | **Gross** |
-| | Onboarding/Offboarding Tasks | ✅ | ✅ | ✅ | — |
 | **Payroll** | Lohnabrechnung CH | ❌ | ❌ | ❌ | **Gross** |
 | | AHV/IV/EO-Abwicklung | ❌ | ❌ | ❌ | **Gross** |
 | | BVG-Verwaltung | ❌ | ❌ | ❌ | **Gross** |
@@ -240,18 +238,15 @@
 | | Projekt-Zeiterfassung | ❌ | ✅ | ❌ | Mittel |
 | | GPS-Tracking | ❌ | ❌ | ❌ | — |
 | **Abwesenheiten** | Urlaubs-Management | ✅ | ✅ | ✅ | — |
-| | CH-Feiertage nach Kanton | ✅ | ❌ | ❌ | Differenzierung |
 | | Kalender-Integration | ❌ | ✅ | ✅ | **Gross** |
 | | Genehmigungs-Workflows | ✅ | ✅ | ✅ | — |
 | **Performance** | Goals & OKRs | ✅ | ✅ | ✅ | — |
 | | 360° Feedback | ❌ | ✅ | ✅ | **Gross** |
 | | Kalibrierungs-Sessions | ❌ | ❌ | ❌ | — |
-| | Peer-Feedback | ⚠️ Teilweise | ✅ | ✅ | Klein |
 | | Leistungsberichte | ✅ | ✅ | ✅ | — |
 | **Dokumente** | Digitaler Vertrag | ❌ | ✅ | ❌ | **Gross** |
 | | Unterschrift | ❌ | ✅ | ❌ | **Gross** |
 | | Dokumenten-Templates | ✅ | ✅ | ✅ | — |
-| | Dokumenten-Generator | ✅ | ✅ | ❌ | Differenzierung |
 | **Analytics** | Standard-Reports | ✅ | ✅ | ✅ | — |
 | | People Analytics | ❌ | ✅ | ✅ | **Gross** |
 | | Predictive Analytics | ❌ | ❌ | ❌ | **Gross** |
@@ -263,21 +258,9 @@
 | | Android App | ❌ | ✅ | ✅ | **Gross** |
 | **Compliance** | DSGVO | ✅ | ✅ | ✅ | — |
 | | CH-spezifische Compliance | ✅ | ❌ | ❌ | Differenzierung |
-| | Audit-Log | ✅ | ✅ | ✅ | — |
-| | CH-Feiertage | ✅ | ❌ | ❌ | Differenzierung |
+| | Audit-Log | ✅ (basic) | ✅ | ✅ | — |
 | **Lern & Entwicklung** | LMS | ❌ | ❌ | ✅ | **Gross** |
 | | Schulungs-Tracker | ❌ | ✅ | ✅ | **Gross** |
-
-### 3.2 Identifizierte Lücken mit höchstem Impact
-
-Basierend auf der Analyse wurden folgende Lücken als prioritär identifiziert:
-
-1. **Mitarbeiter-Self-Service Portal** — HR-Abteilung wird massiv entlastet
-2. **Kompetenz-Matrix** — Strategische Personalplanung
-3. **360°-Feedback** — Wichtiges Performance-Feature
-4. **Kalender-Integration** — Benutzerfreundlichkeit
-5. **REST API** — Enterprise-Anforderung für Integrationen
-6. **CH-Payroll** — Grösster Pain Point im Schweizer HR-Markt
 
 ---
 
@@ -285,25 +268,32 @@ Basierend auf der Analyse wurden folgende Lücken als prioritär identifiziert:
 
 ### 4.1 Architektur-Verbesserungen
 
-| Phase | Thema | Beschreibung | Priorität |
-|-------|-------|--------------|-----------|
-| T1 | **Performance-Optimierung** | Caching-Strategie, DB-Indizes, Lazy Loading, Image-Optimierung | 🔴 Hoch |
-| T2 | **API-First Architektur** | RESTful API für alle Features, Webhook-Events, GraphQL für komplexe Queries | 🔴 Hoch |
-| T3 | **Caching-Layer** | Redis für Sessions, häufige Queries, Echtzeit-Updates | 🟡 Mittel |
-| T4 | **Event-Sourcing** | Audit-Log, History-Tracking, Time-Travel | 🟡 Mittel |
-| T5 | **Microservices-Vorbereitung** | Payroll, Documents, Analytics als separate Services | 🟡 Mittel |
-| T6 | **Edge Computing** | Statische Generation für öffentliche Seiten, Edge-Functions | 🟡 Mittel |
+| Phase | Thema | Beschreibung |
+|-------|-------|--------------|
+| T1 | **Performance-Optimierung** | Caching-Strategie, DB-Indizes, Lazy Loading |
+| T2 | **API-First Architektur** | RESTful API für alle Features, GraphQL für komplexe Queries |
+| T3 | **Caching-Layer** | Redis für Sessions, häufige Queries, Echtzeit-Updates |
+| T4 | **Event-Sourcing** | Audit-Log, History-Tracking, Time-Travel |
+| T5 | **Microservices-Vorbereitung** | Payroll, Documents, Analytics als separate Services |
 
 ### 4.2 Security & Compliance
 
-| Phase | Thema | Beschreibung | Priorität |
-|-------|-------|--------------|-----------|
-| S1 | **SOC 2 Type II** | Sicherheits-Zertifizierung (Enterprise-Anforderung) | 🟡 Mittel |
-| S2 | **ISO 27001** | Informationssicherheits-Managementsystem | 🟡 Mittel |
-| S3 | **Penetration Testing** | Jährliches Security Audit | 🟡 Mittel |
-| S4 | **Advanced RBAC** | Feature-Level Berechtigungen, Audit-Log Export | 🔴 Hoch |
-| S5 | **Encryption at Rest** | Alle Daten verschlüsselt speichern | 🟡 Mittel |
-| S6 | **2FA / MFA** | Multi-Faktor-Authentifizierung | 🔴 Hoch |
+| Phase | Thema | Beschreibung |
+|-------|-------|--------------|
+| S1 | **SOC 2 Type II** | Sicherheits-Zertifizierung (Enterprise-Anforderung) |
+| S2 | **ISO 27001** | Informationssicherheits-Managementsystem |
+| S3 | **Penetration Testing** | Jährliches Security Audit |
+| S4 | **Advanced RBAC** | Feature-Level Berechtigungen |
+| S5 | **Encryption at Rest** | Alle Daten verschlüsselt speichern |
+
+### 4.3 Portal-Optimierungen (Phase 0 abgeschlossen)
+
+| Feature | Status | Beschreibung |
+|---------|--------|--------------|
+| Magic-Link Flow | ✅ Abgeschlossen | Passwortloser Zugang für Mitarbeiter |
+| Onboarding-Tour | ✅ Abgeschlossen | Schritt-für-Schritt-Einführung |
+| Separate Auth | ✅ Abgeschlossen | Portal-User != Admin-User |
+| DB-Migration | ✅ Abgeschlossen | employee_profiles, setup_tokens |
 
 ---
 
@@ -319,12 +309,13 @@ Basierend auf der Analyse wurden folgende Lücken als prioritär identifiziert:
 | **Behörden-Integration** | "Automatische SVA- und AHV-Meldungen direkt aus dem System." |
 | **KI-Unterstützung** | "Intelligenteres Recruiting und weniger manueller Aufwand." |
 | **Datenschutz** | "DSGVO-konform, Server in der Schweiz, kein US-Cloud-Zwang." |
+| **Mitarbeiter-Portal** | "Ihr Team liebt es — passwortloser Zugang in Sekunden." *(NEU)* |
 
 ### 5.2 Preisstrategie (aktualisiert)
 
 | Plan | Preis (CHF/Monat) | Features | Zielgruppe |
 |------|-------------------|----------|------------|
-| **Starter** | 149 | Recruiting, Mitarbeiter (max 10), Zeiterfassung Basic, Abwesenheiten | Startups, kleine Agenturen |
+| **Starter** | 149 | Recruiting, Mitarbeiter (max 10), Zeiterfassung Basic, Abwesenheiten, Portal | Startups, kleine Agenturen |
 | **Professional** | 399 | Alles inkl., bis 50 Mitarbeiter, Self-Service, Performance | Wachstums-Unternehmen |
 | **Business** | 799 | Alles inkl., unbegrenzte Mitarbeiter, API, erweiterte Reports, Payroll Beta | Mittlere Unternehmen |
 | **Enterprise** | Individuell | Multi-Company, SSO, dedizierter Support, Custom Branding, SLA | Konzerne, Holdings |
@@ -340,104 +331,61 @@ Basierend auf der Analyse wurden folgende Lücken als prioritär identifiziert:
 
 ---
 
-## 6. Neue strategische Initiativen (basierend auf Feature-Analyse)
-
-### 6.1 Quick Wins — Schnelle Verbesserungen mit hohem Impact
-
-| Feature | Beschreibung | Aufwand | Warum wichtig |
-|---------|--------------|---------|--------------|
-| **Me-/Seite erweitern** | Mitarbeiter-Self-Service Basis schaffen | Niedrig | Entlastet HR massiv |
-| **E-Mail-Tracking** | Öffnungs- und Klick-Tracking für Recruiting-Mails | Niedrig | Differenzierung zu Mitbewerbern |
-| **Automatisierte E-Mail-Sequenzen** | Follow-up E-Mails automatisch senden | Mittel | Candidate Experience verbessern |
-| **Dashboard-Widgets** | Personalisierte Dashboards für verschiedene Rollen | Niedrig | Benutzerfreundlichkeit |
-| **Quick-Actions** | Schnellaktionen für häufige Tasks | Niedrig | Effizienz |
-
-### 6.2 Differenzierungs-Initiativen — Einzigartige CH-Vorteile
-
-| Initiative | Beschreibung | Wettbewerbsvorteil |
-|------------|--------------|---------------------|
-| **CH-Payroll First** | Payroll als erstes CH-spezifisches Modul priorisieren | Einziges HR-Tool mit nativem CH-Payroll |
-| **Behörden-Connector** | Direkte Schnittstelle zu SVA, SUVA, FAK | Eliminiert manuellen Aufwand |
-| **Quellensteuer-Rechner** | Integrierter Quellensteuer-Rechner | Einzigartig im Markt |
-| **BVG-Verwaltung** | Pensionskassen-Verwaltung direkt im Tool | Komplette HR-Abdeckung |
-| **CH-Report-Generator** | Automatische CH-spezifische Reports (AHV, BVG, Quellensteuer) | Compliance-Vorteil |
-
-### 6.3 Benutzerfreundlichkeit — UX-Verbesserungen
-
-| Initiative | Beschreibung |
-|------------|--------------|
-| **Onboarding-Flow** | Schritt-für-Schritt-Anleitung für neue Benutzer |
-| **Tooltips & Walkthroughs** | Kontextbezogene Hilfestellung |
-| **Keyboard-Shortcuts** | Power-User Effizienz |
-| **Bulk-Aktionen** | Massenoperationen für Kandidaten, Mitarbeiter |
-| **Favoriten** | Schnellzugriff auf häufig genutzte Seiten |
-| **Dark Mode** | Augenfreundlicher Modus |
-| **Responsive Mobile** | Optimierte mobile Ansicht (vor nativer App) |
-
----
-
-## 7. Priorisierte Umsetzungsreihenfolge
+## 6. Priorisierte Umsetzungsreihenfolge
 
 ### Empfohlene Reihenfolge (nach Impact & Effort)
 
 ```
+Phase 0 (Q2 2026): ✅ ABGESCHLOSSEN
+├── 0.1 Magic-Link Portal-Einladung               [Impact: Hoch, Effort: Niedrig] ✅
+├── 0.2 Onboarding-Tour                           [Impact: Mittel, Effort: Niedrig] ✅
+├── 0.3 Portal-Dashboard                          [Impact: Hoch, Effort: Mittel] ✅
+└── 0.4 Separate Auth-Sessions                    [Impact: Hoch, Effort: Mittel] ✅
+
 Phase 1 (Q3 2026):
-├── 1.1 Mitarbeiter-Self-Service Portal          [Impact: Hoch, Effort: Mittel]
-├── 1.3 360°-Feedback                            [Impact: Hoch, Effort: Mittel]
-├── 1.8 Kalender-Integration                     [Impact: Mittel, Effort: Mittel]
-├── 1.4 Dokumenten-Generator erweitern           [Impact: Mittel, Effort: Niedrig]
-└── 1.6 API-Endpoints                            [Impact: Hoch, Effort: Hoch]
+├── 1.1 Self-Service Portal erweitern             [Impact: Hoch, Effort: Mittel]
+├── 1.5 Audit-Log Erweiterung                     [Impact: Hoch, Effort: Niedrig]
+├── 1.2 Zeiterfassung-Verbesserung                [Impact: Hoch, Effort: Mittel]
+└── 1.3 Performance-Reviews erweitern             [Impact: Hoch, Effort: Mittel]
 
 Phase 2 (Q4 2026):
-├── 2.5 Lohngleichheits-Report                   [Impact: Hoch, Effort: Niedrig]
-├── 2.3 Digitale Unterschrift                    [Impact: Mittel, Effort: Mittel]
-├── 2.6 Kompetenz-Matrix                         [Impact: Mittel, Effort: Mittel]
-├── 2.1 CH-Payroll-Modul (Beta)                  [Impact: Hoch, Effort: Hoch]
-└── 2.2 Behörden-Meldungen                       [Impact: Hoch, Effort: Hoch]
+├── 2.5 Lohngleichheits-Report                    [Impact: Hoch, Effort: Niedrig]
+├── 2.3 Digitale Unterschrift                     [Impact: Mittel, Effort: Mittel]
+├── 2.6 CH-Feiertags-Engine                       [Impact: Mittel, Effort: Niedrig]
+└── 2.1 CH-Payroll-Modul (Beta)                   [Impact: Hoch, Effort: Hoch]
 
 Phase 3 (Q1 2027):
-├── 3.1 KI-Lebenslauf-Analyse                    [Impact: Hoch, Effort: Hoch]
-├── 3.2 KI-Job-Matching                          [Impact: Hoch, Effort: Hoch]
-├── 3.3 KI-Job Description Generator             [Impact: Mittel, Effort: Mittel]
-└── 3.5 Mitarbeiter-Chatbot                      [Impact: Mittel, Effort: Mittel]
+├── 3.1 KI-Lebenslauf-Analyse                     [Impact: Hoch, Effort: Hoch]
+├── 3.2 KI-Job-Matching                           [Impact: Hoch, Effort: Hoch]
+└── 3.3 KI-Job Description Generator              [Impact: Mittel, Effort: Mittel]
 
 Phase 4 (Q2 2027):
-├── 4.2 SSO / SAML                               [Impact: Hoch, Effort: Mittel]
+├── 4.2 SSO / SAML                                [Impact: Hoch, Effort: Mittel]
 ├── 4.3 Erweiterte RBAC                          [Impact: Hoch, Effort: Mittel]
-├── 4.1 Multi-Company-Support                    [Impact: Mittel, Effort: Hoch]
-└── S6 2FA / MFA                                 [Impact: Hoch, Effort: Mittel]
+└── 4.1 Multi-Company-Support                     [Impact: Mittel, Effort: Hoch]
 
 Phase 5 (Q3-Q4 2027):
-├── 5.6 Mobile App                               [Impact: Hoch, Effort: Hoch]
-├── 5.1 App Marketplace                          [Impact: Hoch, Effort: Hoch]
-└── 5.2 LMS                                      [Impact: Mittel, Effort: Hoch]
+├── 5.6 Mobile App                                [Impact: Hoch, Effort: Hoch]
+├── 5.1 App Marketplace                           [Impact: Hoch, Effort: Hoch]
+└── 5.2 LMS                                       [Impact: Mittel, Effort: Hoch]
 ```
-
-### Quick Wins Reihenfolge (1-2 Wochen pro Feature)
-
-1. **Dashboard personalisieren** — Anpassbare Widgets
-2. **Bulk-Aktionen** — Massenoperationen für Recruiting
-3. **E-Mail-Tracking** — Öffnungs-Tracking für Bewerber-Mails
-4. **Tooltips & Hilfetexte** — Kontextbezogene Hilfe
-5. **Quick-Actions** — Schnellaktionen in der Sidebar
-6. **Dark Mode** — Theme-Switcher
-7. **Keyboard-Shortcuts** — Alt+1 für Navigation, etc.
 
 ---
 
-## 8. Metriken & Erfolgskriterien
+## 7. Metriken & Erfolgskriterien
 
-### 8.1 Produkt-Metriken
+### 7.1 Produkt-Metriken
 
 | Metrik | Ziel (12 Monate) | Ziel (24 Monate) |
 |--------|------------------|------------------|
 | **NPS Score** | > 40 | > 60 |
 | **Feature Adoption Rate** | > 60% Features genutzt | > 80% Features genutzt |
+| **Portal Adoption** | > 70% Mitarbeiter nutzen Portal | > 90% aktive Nutzer |
 | **Time-to-Value** | < 2 Stunden | < 30 Minuten |
 | **Support Response Time** | < 4 Stunden | < 1 Stunde |
 | **System Uptime** | > 99.5% | > 99.9% |
 
-### 8.2 Geschäfts-Metriken
+### 7.2 Geschäfts-Metriken
 
 | Metrik | Ziel (12 Monate) | Ziel (24 Monate) |
 |--------|------------------|------------------|
@@ -449,45 +397,6 @@ Phase 5 (Q3-Q4 2027):
 
 ---
 
-## 9. Risiken & Mitigations
-
-| Risiko | Wahrscheinlichkeit | Impact | Mitigationsstrategie |
-|--------|-------------------|--------|---------------------|
-| CH-Payroll zu komplex | Mittel | Hoch | Partner mit bestehendem Payroll-Anbieter, keine Eigenentwicklung |
-| KI-Qualität nicht ausreichend | Mittel | Mittel | Iterative Entwicklung, User Feedback, humane Fallbacks |
-| Enterprise Sales Zyklus zu lang | Hoch | Mittel | Enterprise-ready Features priorisieren, dedizierter Sales |
-| Wettbewerber holt auf | Mittel | Mittel | Kontinuierliche Innovation, CH-First Strategie |
-| Datenmigration bei Payroll | Hoch | Hoch | Sanfte Migration, Parallelphasen, Partner-Support |
-| Maintenance-Kosten steigen | Mittel | Mittel | Automatisierte Tests, CI/CD Pipeline |
-| Feature-Creep | Hoch | Mittel | Klare Priorisierung, MVP-First Ansatz |
-
----
-
-## 10. Nächste Schritte
-
-### Sofort (diese Woche):
-1. [x] **Bestandsaufnahme** — Analyse der bereits implementierten Features
-2. [x] **Roadmap aktualisiert** — Neue strategische Initiativen ergänzt
-3. [ ] **Quick Wins identifizieren** — Top 3 Features für sofortige Umsetzung wählen
-
-### Nächster Sprint (2 Wochen):
-1. [ ] **Dashboard personalisieren** — Anpassbare Widgets implementieren
-2. [ ] **Bulk-Aktionen** — Massenoperationen für Kandidaten/Mitarbeiter
-3. [ ] **E-Mail-Tracking** — Öffnungs-Tracking für Recruiting-Mails
-
-### Nächster Monat:
-1. [ ] **Mitarbeiter-Self-Service Portal** — MVP-Entwicklung
-2. [ ] **360°-Feedback** — Feature-Definition und Basis-Implementierung
-3. [ ] **Kalender-Integration** — Google Calendar / Outlook Sync
-
----
-
-*Letztes Update: Juni 2026*  
-*Verantwortlich: Sebastian Oczachowski*  
-*Version: 1.1*
-
----
-
 ## 8. Risiken & Mitigations
 
 | Risiko | Wahrscheinlichkeit | Impact | Mitigationsstrategie |
@@ -495,6 +404,7 @@ Phase 5 (Q3-Q4 2027):
 | CH-Payroll zu komplex | Mittel | Hoch | Partner mit bestehendem Payroll-Anbieter, keine Eigenentwicklung |
 | KI-Qualität nicht ausreichend | Mittel | Mittel | Iterative Entwicklung, User Feedback, humaine Fallbacks |
 | Enterprise Sales Zyklus zu lang | Hoch | Mittel | Enterprise-ready Features priorisieren, dedizierter Sales |
+| Portal Adoption zu niedrig | Niedrig | Hoch | Onboarding optimieren, Push-Benachrichtigungen, Management-Support |
 | Wettbewerber holt auf | Mittel | Mittel | Kontinuierliche Innovation, CH-First Strategie |
 | Datenmigration bei Payroll | Hoch | Hoch | Sanfte Migration, Parallelphasen, Partner-Support |
 
@@ -503,22 +413,74 @@ Phase 5 (Q3-Q4 2027):
 ## 9. Nächste Schritte
 
 ### Sofort (diese Woche):
-1. [ ] **Self-Service Portal** — Konzept ausarbeiten, User Stories schreiben
-2. [ ] **Audit-Log Erweiterung** — Anforderungen definieren
-3. [ ] **Lohngleichheits-Report** — Research CH-Gesetzgebung
+1. [x] **Portal Magic-Link Flow** — Implementiert
+2. [x] **Onboarding-Tour** — Implementiert
+3. [ ] **Portal-Dashboard verfeinern** — Urlaub, Ziele, Dokumente integrieren
+4. [ ] **Portal-Migration ausführen** — SQL in Supabase ausführen
 
 ### Nächster Sprint (2 Wochen):
-1. [ ] **Self-Service Portal** — Erste Implementierung
+1. [ ] **Self-Service Portal** — MVP-Implementierung
 2. [ ] **CH-Feiertags-Engine** — Basis-Implementierung
 3. [ ] **Zeiterfassung-Verbesserung** — Feature-Liste erstellen
+4. [ ] **Audit-Log Erweiterung** — Anforderungen definieren
 
 ### Nächster Monat:
 1. [ ] **Phase 1 Features** — MVP-Entwicklung
 2. [ ] **Payroll-Partner** — Gespräche starten
 3. [ ] **KI-Provider** — Evaluation für CV-Analyse
+4. [ ] **Lohngleichheits-Report** — Research CH-Gesetzgebung
+
+---
+
+## 10. Strategische Überlegungen für die Zukunft
+
+### 10.1 Produktstrategie
+
+| Bereich | Fokus | Begründung |
+|---------|-------|------------|
+| **Portal First** | Mitarbeiter-Experience priorisieren | Höchste Nutzungsfrequenz, direktester Impact |
+| **Mobile** | iOS App entwickeln | Schweizer nutzen überdurchschnittlich iOS |
+| **KI** | Ethnisches KI-Deployment | Differenzierung, nicht als Spielerei |
+| **Compliance** | CH-spezifische Automatisierung | Wettbewerbsvorteil, schwer kopierbar |
+
+### 10.2 Technologie-Entscheidungen
+
+| Entscheidung | Empfehlung | Begründung |
+|-------------|-----------|------------|
+| **Frontend-Framework** | Next.js 14 (App Router) beibehalten | Stabil, gute Performance |
+| **Datenbank** | Supabase (PostgreSQL) | CH-Server, einfache Auth, RLS |
+| **KI-Provider** | Claude API via Anthropic | Beste Qualität, CH-konform |
+| **Payments** | Stripe | Standard, gute Integration |
+| **E-Mail** | Resend | Transactional E-Mails, gute Deliverability |
+| **SMS** | Twilio | Globale Abdeckung, WhatsApp |
+
+### 10.3 Wachstumsstrategie
+
+1. **Inbound Lead Generation** optimieren
+   - SEO für "HR Software Schweiz", "Payroll CH"
+   - Content Marketing (Ratgeber ausbauen)
+   - Free Tools (Stundensatz-Rechner, etc.)
+
+2. **Partner-Programm** starten
+   - Treuhänder als Reseller
+   - HR-Beratungen als Integration-Partner
+   - Payroll-Provider als White-Label
+
+3. **Community aufbauen**
+   - HR-Professional Netzwerk in CH
+   - User Groups, Webinare
+   - Case Studies & Testimonials
 
 ---
 
 *Letztes Update: Juni 2026*  
 *Verantwortlich: Sebastian Oczachowski*  
-*Version: 1.0*
+*Version: 1.1*
+
+**Änderungen gegenüber V1.0:**
+- Phase 0 (Portal-Optimierung) hinzugefügt ✅
+- Magic-Link Flow dokumentiert
+- Neue Features im Überblick
+- Strategische Überlegungen (Kapitel 10) hinzugefügt
+- Preisstrategie aktualisiert (Portal in allen Plänen)
+- Portal-Metriken in 7.1 hinzugefügt

@@ -6,315 +6,372 @@ import { Employee, TimeEntry } from "@/lib/types";
 import { formatDate } from "@/components/ui";
 import {
   Clock,
-  LogIn,
-  LogOut,
+  Play,
+  Square,
+  Pause,
   Calendar,
-  Download,
-  ChevronLeft,
-  ChevronRight,
+  TrendingUp,
+  Loader2,
   AlertCircle,
+  Coffee,
 } from "lucide-react";
+
+function formatTime(dateStr: string): string {
+  return new Date(dateStr).toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" });
+}
 
 export default function PortalZeiterfassungPage() {
   const supabase = createClient();
   const [employee, setEmployee] = useState<Employee | null>(null);
-  const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
+  const [entries, setEntries] = useState<TimeEntry[]>([]);
+  const [activeEntry, setActiveEntry] = useState<TimeEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [clocking, setClocking] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [pauseNote, setPauseNote] = useState("");
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data: emp } = await supabase
-      .from("employees")
-      .select("*")
-      .eq("email", user.email)
-      .maybeSingle();
+    const { data: profile } = await supabase
+      .from("employee_profiles")
+      .select("employee_id")
+      .eq("user_id", user.id)
+      .single();
 
-    if (!emp) {
-      setLoading(false);
-      return;
+    if (profile?.employee_id) {
+      const today = new Date().toISOString().split("T")[0];
+      const [emp, ents, active] = await Promise.all([
+        supabase.from("employees").select("*").eq("id", profile.employee_id).single(),
+        supabase
+          .from("time_entries")
+          .select("*")
+          .eq("employee_id", profile.employee_id)
+          .gte("clock_in", `${today}T00:00:00`)
+          .lte("clock_in", `${today}T23:59:59`)
+          .order("clock_in", { ascending: true }),
+        supabase
+          .from("time_entries")
+          .select("*")
+          .eq("employee_id", profile.employee_id)
+          .is("clock_out", null)
+          .single(),
+      ]);
+      setEmployee(emp.data);
+      setEntries(ents.data || []);
+      setActiveEntry(active.data);
     }
-
-    const employee = emp as Employee;
-    setEmployee(employee);
-
-    const monthStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
-    const monthEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0, 23, 59, 59);
-
-    const { data: te } = await supabase
-      .from("time_entries")
-      .select("*")
-      .eq("employee_id", employee.id)
-      .gte("clock_in", monthStart.toISOString())
-      .lte("clock_in", monthEnd.toISOString())
-      .order("clock_in", { ascending: false });
-    setTimeEntries((te as TimeEntry[]) ?? []);
-
     setLoading(false);
-  }, [supabase, currentMonth]);
+  }, [supabase]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  async function handleClockIn() {
+  async function clockIn() {
     if (!employee) return;
     setClocking(true);
-    await supabase.from("time_entries").insert({
-      employee_id: employee.id,
-      clock_in: new Date().toISOString(),
-    });
-    await load();
+    const now = new Date().toISOString();
+    const { data } = await supabase
+      .from("time_entries")
+      .insert({
+        employee_id: employee.id,
+        clock_in: now,
+        pause_min: 0,
+      })
+      .select()
+      .single();
+    if (data) {
+      setActiveEntry(data);
+      setEntries([...entries, data]);
+    }
     setClocking(false);
   }
 
-  async function handleClockOut() {
-    const openEntry = timeEntries.find((t) => !t.clock_out);
-    if (!openEntry) return;
+  async function clockOut() {
+    if (!activeEntry) return;
+    setClocking(true);
+    const now = new Date().toISOString();
+    await supabase
+      .from("time_entries")
+      .update({ clock_out: now })
+      .eq("id", activeEntry.id);
+    setActiveEntry(null);
+    load();
+    setClocking(false);
+  }
+
+  async function addPause(minutes: number) {
+    if (!activeEntry) return;
     setClocking(true);
     await supabase
       .from("time_entries")
-      .update({ clock_out: new Date().toISOString() })
-      .eq("id", openEntry.id);
-    await load();
+      .update({ pause_min: activeEntry.pause_min + minutes })
+      .eq("id", activeEntry.id);
+    setActiveEntry({ ...activeEntry, pause_min: activeEntry.pause_min + minutes });
     setClocking(false);
   }
 
-  function previousMonth() {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
-  }
-
-  function nextMonth() {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+  function getTodayHours(): string {
+    const todayEntries = entries.filter((e) => e.clock_out);
+    const totalMs = todayEntries.reduce((acc, e) => {
+      const inTime = new Date(e.clock_in).getTime();
+      const outTime = new Date(e.clock_out!).getTime();
+      return acc + (outTime - inTime) - (e.pause_min || 0) * 60 * 1000;
+    }, 0);
+    const hours = totalMs / (1000 * 60 * 60);
+    return hours.toFixed(1);
   }
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-petrol-200 border-t-coral-500" />
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-petrol-400" />
       </div>
     );
   }
 
   if (!employee) {
     return (
-      <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-        <AlertCircle className="mx-auto h-12 w-12 text-petrol-300" />
-        <h2 className="mt-4 text-xl font-bold text-petrol-900">Kein Mitarbeiterprofil</h2>
+      <div className="rounded-2xl border border-petrol-100 bg-white p-8 text-center">
+        <AlertCircle className="mx-auto h-12 w-12 text-amber-500" />
+        <h2 className="mt-4 text-xl font-bold text-petrol-900">Zeiterfassung nicht verfügbar</h2>
+        <p className="mt-2 text-petrol-500">Dein Mitarbeiterprofil konnte nicht gefunden werden.</p>
       </div>
     );
   }
 
-  const openEntry = timeEntries.find((t) => !t.clock_out);
-
-  // Calculate monthly stats
-  const totalHours = timeEntries.reduce((sum, t) => {
-    if (!t.clock_out) return sum;
-    const hours = (new Date(t.clock_out).getTime() - new Date(t.clock_in).getTime()) / 3600000 - (t.pause_min || 0) / 60;
-    return sum + Math.max(0, hours);
-  }, 0);
-
-  const totalWorkDays = new Set(
-    timeEntries
-      .filter((t) => t.clock_out)
-      .map((t) => new Date(t.clock_in).toDateString())
-  ).size;
-
-  const avgHoursPerDay = totalWorkDays > 0 ? totalHours / totalWorkDays : 0;
-
-  // Group entries by day
-  const entriesByDay = timeEntries.reduce((acc, entry) => {
-    const day = new Date(entry.clock_in).toDateString();
-    if (!acc[day]) acc[day] = [];
-    acc[day].push(entry);
-    return acc;
-  }, {} as Record<string, TimeEntry[]>);
-
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-petrol-900">Zeiterfassung</h1>
-          <p className="mt-1 text-petrol-500">Erfasse deine Arbeitszeit</p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={openEntry ? handleClockOut : handleClockIn}
-            disabled={clocking}
-            className={`flex items-center gap-2 rounded-xl px-5 py-2.5 font-semibold transition disabled:opacity-50 ${
-              openEntry
-                ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                : "bg-petrol-900 text-white hover:bg-petrol-800"
-            }`}
-          >
-            {openEntry ? (
-              <>
-                <LogOut className="h-5 w-5" />
-                Ausstempeln
-              </>
-            ) : (
-              <>
-                <LogIn className="h-5 w-5" />
-                Einstempeln
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+      {/* Header Card */}
+      <div className="card p-6">
+        <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+          <div>
+            <h1 className="text-xl font-bold text-petrol-900">Zeiterfassung</h1>
+            <p className="text-petrol-500">{formatDate(new Date().toISOString())}</p>
+          </div>
 
-      {/* Status Card */}
-      {openEntry && (
-        <div className="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white">
-              <Clock className="h-5 w-5" />
+            <div className="flex items-center gap-2 rounded-lg bg-petrol-50 px-4 py-2">
+              <TrendingUp className="h-5 w-5 text-petrol-600" />
+              <span className="text-lg font-bold text-petrol-900">{getTodayHours()}h</span>
+              <span className="text-sm text-petrol-400">heute</span>
             </div>
-            <div>
-              <p className="font-semibold text-emerald-800">Du bist eingestempelt</p>
-              <p className="text-sm text-emerald-600">
-                seit {new Date(openEntry.clock_in).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={handleClockOut}
-            disabled={clocking}
-            className="rounded-xl bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
-          >
-            Ausstempeln
-          </button>
-        </div>
-      )}
 
-      {/* Month Navigation & Stats */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={previousMonth}
-            className="rounded-lg p-2 text-petrol-600 hover:bg-gray-100"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <div className="min-w-[180px] text-center">
-            <p className="font-semibold text-petrol-900">
-              {currentMonth.toLocaleDateString("de-DE", { month: "long", year: "numeric" })}
-            </p>
+            {activeEntry ? (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => addPause(15)}
+                  disabled={clocking}
+                  className="flex items-center gap-2 rounded-lg border border-petrol-200 bg-white px-4 py-2 text-sm font-semibold text-petrol-600 transition-all hover:bg-petrol-50 disabled:opacity-50"
+                >
+                  <Coffee className="h-4 w-4" />
+                  +15 Min. Pause
+                </button>
+                <button
+                  onClick={clockOut}
+                  disabled={clocking}
+                  className="btn-danger flex items-center gap-2"
+                >
+                  <Square className="h-4 w-4" />
+                  Ausstempeln
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={clockIn}
+                disabled={clocking}
+                className="btn-primary flex items-center gap-2"
+              >
+                <Play className="h-4 w-4" />
+                Einstempeln
+              </button>
+            )}
           </div>
-          <button
-            onClick={nextMonth}
-            className="rounded-lg p-2 text-petrol-600 hover:bg-gray-100"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
         </div>
 
-        <div className="flex gap-4">
-          <div className="rounded-xl bg-white px-4 py-2 text-center shadow-sm">
-            <p className="text-2xl font-bold text-petrol-900">{totalHours.toFixed(1)}</p>
-            <p className="text-xs text-petrol-500">Stunden gesamt</p>
-          </div>
-          <div className="rounded-xl bg-white px-4 py-2 text-center shadow-sm">
-            <p className="text-2xl font-bold text-petrol-900">{totalWorkDays}</p>
-            <p className="text-xs text-petrol-500">Arbeitstage</p>
-          </div>
-          <div className="rounded-xl bg-white px-4 py-2 text-center shadow-sm">
-            <p className="text-2xl font-bold text-petrol-900">{avgHoursPerDay.toFixed(1)}</p>
-            <p className="text-xs text-petrol-500">Ø Std/Tag</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Time Entries by Day */}
-      <div className="space-y-4">
-        {Object.keys(entriesByDay).length === 0 ? (
-          <div className="rounded-2xl bg-white p-12 text-center shadow-sm">
-            <Clock className="mx-auto h-12 w-12 text-petrol-300" />
-            <p className="mt-4 text-petrol-500">Keine Zeiteinträge in diesem Monat.</p>
-          </div>
-        ) : (
-          Object.entries(entriesByDay)
-            .sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime())
-            .map(([day, entries]) => {
-              const dayHours = entries.reduce((sum, t) => {
-                if (!t.clock_out) return sum;
-                const hours = (new Date(t.clock_out).getTime() - new Date(t.clock_in).getTime()) / 3600000 - (t.pause_min || 0) / 60;
-                return sum + Math.max(0, hours);
-              }, 0);
-
-              return (
-                <div key={day} className="rounded-2xl bg-white shadow-sm">
-                  <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <Calendar className="h-5 w-5 text-petrol-400" />
-                      <span className="font-medium text-petrol-900">
-                        {new Date(day).toLocaleDateString("de-DE", {
-                          weekday: "long",
-                          day: "numeric",
-                          month: "long",
-                        })}
-                      </span>
-                    </div>
-                    <span className="font-semibold text-petrol-700">
-                      {dayHours.toFixed(1)} h
-                    </span>
-                  </div>
-                  <div className="divide-y divide-gray-50">
-                    {entries.map((entry) => {
-                      const duration = entry.clock_out
-                        ? (new Date(entry.clock_out).getTime() - new Date(entry.clock_in).getTime()) / 3600000 - (entry.pause_min || 0) / 60
-                        : null;
-
-                      return (
-                        <div key={entry.id} className="flex items-center justify-between px-4 py-3">
-                          <div className="flex items-center gap-4">
-                            <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${
-                              entry.clock_out ? "bg-emerald-100 text-emerald-600" : "bg-amber-100 text-amber-600"
-                            }`}>
-                              {entry.clock_out ? (
-                                <LogOut className="h-5 w-5" />
-                              ) : (
-                                <LogIn className="h-5 w-5" />
-                              )}
-                            </div>
-                            <div>
-                              <p className="font-medium text-petrol-900">
-                                {new Date(entry.clock_in).toLocaleTimeString("de-DE", {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                                {entry.clock_out
-                                  ? ` – ${new Date(entry.clock_out).toLocaleTimeString("de-DE", {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}`
-                                  : " – läuft…"}
-                              </p>
-                              {entry.pause_min && entry.pause_min > 0 && (
-                                <p className="text-xs text-petrol-400">Pause: {entry.pause_min} Min.</p>
-                              )}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className={`font-semibold ${duration !== null ? "text-petrol-900" : "text-amber-600"}`}>
-                              {duration !== null ? `${duration.toFixed(1)} h` : "⏳"}
-                            </p>
-                            {entry.note && (
-                              <p className="text-xs text-petrol-400">{entry.note}</p>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+        {/* Active Timer */}
+        {activeEntry && (
+          <div className="mt-6 rounded-xl bg-emerald-50 p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white">
+                  <Clock className="h-7 w-7" />
                 </div>
-              );
-            })
+                <div>
+                  <p className="font-bold text-emerald-800">Aktive Session</p>
+                  <p className="text-sm text-emerald-600">
+                    Gestartet um {formatTime(activeEntry.clock_in)}
+                    {activeEntry.pause_min > 0 && ` · ${activeEntry.pause_min} Min. Pause`}
+                  </p>
+                </div>
+              </div>
+              <LiveTimer startTime={activeEntry.clock_in} />
+            </div>
+          </div>
         )}
       </div>
+
+      {/* Today's Entries */}
+      <div className="card p-6">
+        <h2 className="mb-4 text-lg font-bold text-petrol-900">Heutige Einträge</h2>
+
+        {entries.length === 0 ? (
+          <div className="py-8 text-center text-petrol-400">
+            <Clock className="mx-auto h-12 w-12 text-petrol-200" />
+            <p className="mt-2">Noch keine Zeiteinträge heute</p>
+            <p className="text-sm">Stempel dich ein, um zu beginnen</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {entries.map((entry) => (
+              <div
+                key={entry.id}
+                className={`flex items-center justify-between rounded-lg border p-4 ${
+                  entry.clock_out ? "border-petrol-100" : "border-emerald-200 bg-emerald-50"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                    entry.clock_out ? "bg-petrol-50 text-petrol-600" : "bg-emerald-100 text-emerald-600"
+                  }`}>
+                    <Clock className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-petrol-900">
+                      {formatTime(entry.clock_in)} – {entry.clock_out ? formatTime(entry.clock_out) : "offen"}
+                    </p>
+                    <p className="text-sm text-petrol-500">
+                      {entry.clock_out ? `${getDuration(entry.clock_in, entry.clock_out, entry.pause_min)} Std.` : "Läuft..."}
+                      {entry.pause_min > 0 && ` · ${entry.pause_min} Min. Pause`}
+                      {entry.note && ` · ${entry.note}`}
+                    </p>
+                  </div>
+                </div>
+                {entry.clock_out ? (
+                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                    ✓ Abgeschlossen
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white animate-pulse">
+                    Aktiv
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Weekly Summary */}
+      <div className="card p-6">
+        <h2 className="mb-4 text-lg font-bold text-petrol-900">Wochenübersicht</h2>
+        <WeeklySummary employeeId={employee.id} supabase={supabase} />
+      </div>
+    </div>
+  );
+}
+
+function LiveTimer({ startTime }: { startTime: string }) {
+  const [elapsed, setElapsed] = useState("00:00:00");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const start = new Date(startTime).getTime();
+      const now = Date.now();
+      const diff = Math.floor((now - start) / 1000);
+      const hours = Math.floor(diff / 3600);
+      const minutes = Math.floor((diff % 3600) / 60);
+      const seconds = diff % 60;
+      setElapsed(
+        `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+      );
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  return <span className="text-2xl font-bold text-emerald-700">{elapsed}</span>;
+}
+
+function getDuration(start: string, end: string, pauseMin: number): string {
+  const startTime = new Date(start).getTime();
+  const endTime = new Date(end).getTime();
+  const totalMs = endTime - startTime - (pauseMin || 0) * 60 * 1000;
+  return (totalMs / (1000 * 60 * 60)).toFixed(1);
+}
+
+function WeeklySummary({ employeeId, supabase }: { employeeId: string; supabase: ReturnType<typeof createClient> }) {
+  const [weekData, setWeekData] = useState<{ day: string; hours: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const today = new Date();
+      const monday = new Date(today);
+      monday.setDate(today.getDate() - today.getDay() + 1);
+      monday.setHours(0, 0, 0, 0);
+
+      const { data: entries } = await supabase
+        .from("time_entries")
+        .select("clock_in, clock_out, pause_min")
+        .eq("employee_id", employeeId)
+        .gte("clock_in", monday.toISOString())
+        .order("clock_in", { ascending: true });
+
+      const days = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+      const weekSummary = days.map((day, i) => {
+        const dayDate = new Date(monday);
+        dayDate.setDate(monday.getDate() + i);
+        const dayStr = dayDate.toISOString().split("T")[0];
+
+        const dayEntries = (entries || []).filter((e) => {
+          const entryDate = e.clock_in.split("T")[0];
+          return entryDate === dayStr;
+        });
+
+        const totalMs = dayEntries.reduce((acc, e) => {
+          if (!e.clock_out) return acc;
+          const inTime = new Date(e.clock_in).getTime();
+          const outTime = new Date(e.clock_out).getTime();
+          return acc + (outTime - inTime) - (e.pause_min || 0) * 60 * 1000;
+        }, 0);
+
+        const hours = totalMs / (1000 * 60 * 60);
+        return { day, hours: hours > 0 ? hours.toFixed(1) : "0" };
+      });
+
+      setWeekData(weekSummary);
+      setLoading(false);
+    }
+    load();
+  }, [employeeId, supabase]);
+
+  if (loading) {
+    return <Loader2 className="h-6 w-6 animate-spin text-petrol-400" />;
+  }
+
+  const maxHours = Math.max(...weekData.map((d) => parseFloat(d.hours) || 0), 8);
+
+  return (
+    <div className="flex items-end gap-2">
+      {weekData.map((d, i) => (
+        <div key={d.day} className="flex flex-1 flex-col items-center gap-2">
+          <div className="relative flex h-32 w-full items-end justify-center">
+            <div
+              className={`w-full rounded-t-lg transition-all ${
+                i === new Date().getDay() - 1 ? "bg-coral-500" : "bg-petrol-200"
+              }`}
+              style={{ height: `${Math.max(4, (parseFloat(d.hours) / maxHours) * 100)}%` }}
+            />
+          </div>
+          <span className={`text-xs font-semibold ${
+            i === new Date().getDay() - 1 ? "text-coral-600" : "text-petrol-500"
+          }`}>
+            {d.day}
+          </span>
+          <span className="text-xs text-petrol-400">{d.hours}h</span>
+        </div>
+      ))}
     </div>
   );
 }
