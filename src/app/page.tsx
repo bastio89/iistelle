@@ -503,23 +503,6 @@ export default function LandingPage() {
                       ))}
                     </div>
 
-                    {plan.id === "professional" && (
-                      <div className="mt-6">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-petrol-400 mb-2">
-                          Plus
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Unbegrenzte Mitarbeiter</span>
-                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Alles aus Starter</span>
-                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Gehaltsdaten</span>
-                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">360°-Feedback</span>
-                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Zeiterfassung</span>
-                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Rollen</span>
-                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">API-Zugriff</span>
-                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Audit-Log</span>
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   <div className="w-32 shrink-0 text-right">
