@@ -311,14 +311,16 @@
 | **Datenschutz** | "DSGVO-konform, Server in der Schweiz, kein US-Cloud-Zwang." |
 | **Mitarbeiter-Portal** | "Ihr Team liebt es — passwortloser Zugang in Sekunden." *(NEU)* |
 
-### 5.2 Preisstrategie (aktualisiert)
+### 5.2 Preisstrategie (harmonisiert mit Implementierung)
 
-| Plan | Preis (CHF/Monat) | Features | Zielgruppe |
-|------|-------------------|----------|------------|
-| **Starter** | 149 | Recruiting, Mitarbeiter (max 10), Zeiterfassung Basic, Abwesenheiten, Portal | Startups, kleine Agenturen |
-| **Professional** | 399 | Alles inkl., bis 50 Mitarbeiter, Self-Service, Performance | Wachstums-Unternehmen |
-| **Business** | 799 | Alles inkl., unbegrenzte Mitarbeiter, API, erweiterte Reports, Payroll Beta | Mittlere Unternehmen |
-| **Enterprise** | Individuell | Multi-Company, SSO, dedizierter Support, Custom Branding, SLA | Konzerne, Holdings |
+| Plan | Preis CH (CHF/Monat) | Preis DE (EUR/Monat) | Features | Zielgruppe |
+|------|---------------------|---------------------|----------|------------|
+| **Starter** | 0 (kostenlos) | 0 (kostenlos) | Bis 5 Mitarbeiter, Recruiting-Basis, Karriereseite, Abwesenheiten | Startups, kleine Agenturen |
+| **Professional** | 129 | 99 | Alles inkl., unbegrenzte Mitarbeiter, Zeiterfassung, Performance, Audit-Log | Wachstums-Unternehmen |
+| **Enterprise** | Individuell | Individuell | Multi-Company, SSO, dedizierter Support, Custom Branding, SLA | Konzerne, Holdings |
+
+> **Jährliche Abrechnung:** 2 Monate gratis (ca. 17% Rabatt)
+> **Geo-IP:** Automatische Währungserkennung (CHF für CH, EUR für DE/AT)
 
 ### 5.3 Partnerschaften
 
