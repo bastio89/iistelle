@@ -26,7 +26,7 @@ export function Logo({ size = 32, className = "", showText = false, href }: Logo
         priority
       />
       {showText && (
-        <span className="text-xl font-handwriting font-semibold tracking-wide text-petrol-900">
+        <span className="text-lg font-bold tracking-tight text-petrol-900">
           iistelle
         </span>
       )}
@@ -74,7 +74,7 @@ export function SidebarLogo({ className = "" }: { className?: string }) {
         className="rounded-lg"
         priority
       />
-      <span className="font-handwriting text-lg font-semibold text-petrol-900">iistelle</span>
+      <span className="font-bold text-petrol-900">iistelle</span>
     </div>
   );
 }

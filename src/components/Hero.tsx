@@ -22,7 +22,7 @@ export default function Hero({ badge, title, subtitle, showCtas = false, showDem
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
           <Link href="/" className="flex items-center gap-2">
             <Image src="/logo.svg" alt="iistelle" width={32} height={32} className="rounded-lg" />
-            <span className="text-xl font-handwriting font-semibold tracking-wide text-petrol-900">iistelle</span>
+            <span className="text-lg font-bold tracking-tight text-petrol-900">iistelle</span>
           </Link>
           <div className="flex items-center gap-6 text-sm font-semibold text-petrol-600">
             <ServiceDropdown />

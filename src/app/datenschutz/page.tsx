@@ -139,7 +139,7 @@ export default function DatenschutzPage() {
               <div>
                 <h3 className="font-semibold text-petrol-800">Verantwortliche Stelle</h3>
                 <div className="mt-2 rounded-lg bg-petrol-50 p-4">
-                  <p className="font-handwriting font-semibold text-petrol-900">iistelle / twenty5ai</p>
+                  <p className="font-semibold text-petrol-900">iistelle / twenty5ai</p>
                   <p className="text-petrol-600">Sebastian Oczachowski</p>
                   <p className="text-petrol-600">Risistrasse 19</p>
                   <p className="text-petrol-600">5737 Menziken, Schweiz</p>

@@ -131,7 +131,7 @@ export default function PortalSetupPage() {
         <div>
           <div className="flex items-center gap-2">
             <Image src="/logo.svg" alt="iistelle" width={36} height={36} className="rounded-lg" />
-            <span className="text-xl font-handwriting font-semibold tracking-wide text-petrol-900">iistelle</span>
+            <span className="text-xl font-bold tracking-tight">iistelle</span>
           </div>
         </div>
 
