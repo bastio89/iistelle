@@ -337,37 +337,42 @@ export default function PricingClient({ plans, config }: Props) {
         <div className="mt-12 space-y-8">
           {featureCategories.map((cat) => (
             <div key={cat.title} className="overflow-hidden rounded-2xl border border-petrol-100 bg-white shadow-sm">
-              <div className="flex items-center gap-3 border-b border-petrol-100 bg-petrol-50 px-6 py-4">
-                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${cat.color}`}>
-                  <cat.icon className="h-5 w-5" />
+              {/* Header mit Kategorie und Spaltenüberschriften */}
+              <div className="flex items-center justify-between border-b border-petrol-100 bg-petrol-50 px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${cat.color}`}>
+                    <cat.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-lg font-bold text-petrol-900">{cat.title}</h3>
                 </div>
-                <h3 className="text-lg font-bold text-petrol-900">{cat.title}</h3>
+                <div className="flex items-center gap-8 pr-4">
+                  <span className="w-20 text-center text-xs font-bold text-petrol-500">Starter</span>
+                  <span className="w-20 text-center text-xs font-bold text-petrol-500">Professional</span>
+                </div>
               </div>
+              {/* Datenzeilen */}
               <div className="divide-y divide-petrol-50">
                 {cat.features.map((f) => (
                   <div key={f.name} className="flex items-center justify-between px-6 py-3">
                     <span className="text-sm text-petrol-700">{f.name}</span>
-                    <div className="flex items-center gap-4">
-                      {f.starter ? (
-                        <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                      ) : (
-                        <X className="h-5 w-5 text-petrol-300" />
-                      )}
-                      {f.pro ? (
-                        <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                      ) : (
-                        <X className="h-5 w-5 text-petrol-300" />
-                      )}
+                    <div className="flex items-center gap-8">
+                      <div className="w-20 flex justify-center">
+                        {f.starter ? (
+                          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                        ) : (
+                          <X className="h-5 w-5 text-petrol-300" />
+                        )}
+                      </div>
+                      <div className="w-20 flex justify-center">
+                        {f.pro ? (
+                          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                        ) : (
+                          <X className="h-5 w-5 text-petrol-300" />
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
-              </div>
-              <div className="flex items-center justify-between border-t border-petrol-100 bg-petrol-50 px-6 py-3 text-xs font-semibold text-petrol-500">
-                <span></span>
-                <div className="flex items-center gap-8">
-                  <span className="w-20 text-center">Starter</span>
-                  <span className="w-20 text-center">Professional</span>
-                </div>
               </div>
             </div>
           ))}
