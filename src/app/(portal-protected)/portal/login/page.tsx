@@ -42,7 +42,7 @@ export default function PortalLoginPage() {
           <div>
             <div className="flex items-center gap-2">
               <Image src="/logo.svg" alt="iistelle" width={36} height={36} className="rounded-lg" />
-              <span className="text-xl font-bold tracking-tight">iistelle</span>
+              <span className="text-xl font-handwriting font-semibold tracking-wide text-petrol-900">iistelle</span>
             </div>
           </div>
 
@@ -111,7 +111,7 @@ export default function PortalLoginPage() {
         <div>
           <div className="flex items-center gap-2">
             <Image src="/logo.svg" alt="iistelle" width={36} height={36} className="rounded-lg" />
-            <span className="text-xl font-bold tracking-tight">iistelle</span>
+            <span className="text-xl font-handwriting font-semibold tracking-wide text-petrol-900">iistelle</span>
           </div>
         </div>
 
@@ -154,7 +154,7 @@ export default function PortalLoginPage() {
           <div className="mb-8 lg:hidden">
             <div className="flex items-center gap-2">
               <Image src="/logo.svg" alt="iistelle" width={32} height={32} className="rounded" />
-              <span className="font-bold text-petrol-900">iistelle</span>
+              <span className="font-handwriting text-lg font-semibold text-petrol-900">iistelle</span>
             </div>
           </div>
 

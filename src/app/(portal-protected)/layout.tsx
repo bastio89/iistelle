@@ -87,7 +87,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         <div className="flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <Image src="/logo.svg" alt="iistelle" width={28} height={28} className="rounded" />
-            <span className="font-bold text-petrol-900">iistelle</span>
+            <span className="font-handwriting text-lg font-semibold text-petrol-900">iistelle</span>
             <span className="ml-1 rounded bg-coral-100 px-2 py-0.5 text-xs font-medium text-coral-700">Portal</span>
           </div>
           <div className="flex items-center gap-2">
@@ -142,7 +142,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           <div className="flex h-16 items-center gap-3 border-b border-gray-100 px-6">
             <Image src="/logo.svg" alt="iistelle" width={32} height={32} className="rounded" />
             <div>
-              <span className="font-bold text-petrol-900">iistelle</span>
+              <span className="font-handwriting text-lg font-semibold text-petrol-900">iistelle</span>
               <span className="ml-2 rounded bg-coral-100 px-2 py-0.5 text-xs font-medium text-coral-700">Portal</span>
             </div>
           </div>

@@ -33,6 +33,10 @@ const config: Config = {
       borderRadius: {
         xl2: "14px",
       },
+      fontFamily: {
+        sans: ["DM Sans", "system-ui", "sans-serif"],
+        handwriting: ["Caveat", "cursive"],
+      },
     },
   },
   plugins: [],

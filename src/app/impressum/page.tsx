@@ -48,7 +48,7 @@ export default function ImpressumPage() {
             <div className="p-6">
               <div className="flex flex-col md:flex-row gap-8">
                 <div className="flex-1">
-                  <p className="text-lg font-semibold text-petrol-900">iistelle</p>
+                  <p className="font-handwriting text-lg font-semibold text-petrol-900">iistelle</p>
                   <p className="mt-2 text-petrol-600">
                     Ein Produkt von twenty5ai
                   </p>
