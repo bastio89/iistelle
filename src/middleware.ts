@@ -35,8 +35,10 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isAuthPage = request.nextUrl.pathname.startsWith("/login");
+  const isPortalAuthPage = request.nextUrl.pathname.startsWith("/portal-login");
   const isPublic =
     isAuthPage ||
+    isPortalAuthPage ||
     request.nextUrl.pathname === "/" ||
     request.nextUrl.pathname.startsWith("/karriere") ||
     request.nextUrl.pathname.startsWith("/impressum") ||
@@ -50,15 +52,26 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/rechner") ||
     request.nextUrl.pathname.startsWith("/preise");
 
+  // Portal-Route: Nur für authentifizierte Nutzer
+  const isPortal = request.nextUrl.pathname.startsWith("/portal");
+
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  if (user && isAuthPage) {
+  // Portal-Zugang: Authentifizierte Nutzer, aber eigene Portal-Seite
+  if (user && isPortal && !isPortalAuthPage) {
+    // Optional: Portal-Zugang nur für Mitarbeiter-Rolle
+    // Für jetzt: Alle authentifizierten Nutzer können das Portal nutzen
+    return response;
+  }
+
+  if (user && (isAuthPage || isPortalAuthPage)) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    // Bei Portal-Login: direkt zum Portal
+    url.pathname = isPortalAuthPage ? "/portal" : "/dashboard";
     return NextResponse.redirect(url);
   }
 
