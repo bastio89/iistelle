@@ -504,18 +504,20 @@ export default function LandingPage() {
                     </div>
 
                     {plan.id === "professional" && (
-                      <div className="mt-6 space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-petrol-400">
+                      <div className="mt-6">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-petrol-400 mb-2">
                           Plus
                         </p>
-                        <p className="text-sm font-medium text-petrol-700">✓ Unbegrenzte Mitarbeiter</p>
-                        <p className="text-sm font-medium text-petrol-700">✓ Alles aus Starter</p>
-                        <p className="text-sm font-medium text-petrol-700">✓ Gehaltsdaten & Vergütung</p>
-                        <p className="text-sm font-medium text-petrol-700">✓ Performance-Gespräche (360°)</p>
-                        <p className="text-sm font-medium text-petrol-700">✓ Zeiterfassung</p>
-                        <p className="text-sm font-medium text-petrol-700">✓ Rollen & Berechtigungen</p>
-                        <p className="text-sm font-medium text-petrol-700">✓ CSV-Exporte & API-Zugriff</p>
-                        <p className="text-sm font-medium text-petrol-700">✓ Audit-Log</p>
+                        <div className="flex flex-wrap gap-2">
+                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Unbegrenzte Mitarbeiter</span>
+                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Alles aus Starter</span>
+                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Gehaltsdaten</span>
+                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">360°-Feedback</span>
+                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Zeiterfassung</span>
+                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Rollen</span>
+                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">API-Zugriff</span>
+                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Audit-Log</span>
+                        </div>
                       </div>
                     )}
                   </div>
