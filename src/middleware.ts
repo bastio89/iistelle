@@ -41,8 +41,14 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/karriere") ||
     request.nextUrl.pathname.startsWith("/impressum") ||
     request.nextUrl.pathname.startsWith("/datenschutz") ||
+    request.nextUrl.pathname.startsWith("/agb") ||
     request.nextUrl.pathname.startsWith("/status") ||
-    request.nextUrl.pathname.startsWith("/termin");
+    request.nextUrl.pathname.startsWith("/termin") ||
+    request.nextUrl.pathname.startsWith("/services") ||
+    request.nextUrl.pathname.startsWith("/ratgeber") ||
+    request.nextUrl.pathname.startsWith("/hilfecenter") ||
+    request.nextUrl.pathname.startsWith("/rechner") ||
+    request.nextUrl.pathname.startsWith("/preise");
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
