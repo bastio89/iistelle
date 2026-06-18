@@ -1,0 +1,4 @@
+[submodule "iistelle"]
+	path = iistelle
+	url = https://github.com/bastio89/iistelle.git
+	branch = main
