@@ -231,7 +231,7 @@ export default function LandingPage() {
               className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-6 py-3 text-base font-semibold text-white transition-all hover:bg-white/10"
             >
               <Star className="h-4 w-4" />
-              Live-Demo ansehen
+              Produkt ansehen
             </a>
           </div>
 
@@ -239,7 +239,7 @@ export default function LandingPage() {
             Keine Kreditkarte nötig · In unter einer Minute startklar · Daten in Frankfurt gehostet
           </p>
 
-          {/* Produkt-Mockup */}
+          {/* Produktvorschau */}
           <div className="hero-mockup relative mx-auto mt-14 max-w-4xl">
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl">
               {/* Fenster-Kopf */}

@@ -1,6 +1,8 @@
 # iistelle
 
-Modernes HR-Tool mit Fokus auf Recruiting – inspiriert vom Aufbau führender HR-Plattformen, mit eigenem Branding.
+iistelle ist eine startup-grade SaaS-Plattform für Schweizer HR-Teams. Die Anwendung wird als langfristig wachsendes Produkt entwickelt – nicht als MVP, Demo, Prototyp oder Wegwerf-App.
+
+Der Fokus liegt auf professionellen HR-Prozessen, Datenschutz, Compliance, Sicherheit, Auditierbarkeit, skalierbarer Architektur und einer glaubwürdigen Nutzererfahrung für echte Unternehmen.
 
 ## Funktionen
 
@@ -17,8 +19,6 @@ Modernes HR-Tool mit Fokus auf Recruiting – inspiriert vom Aufbau führender H
 **Performance:** Zielvereinbarungen mit Fortschritt sowie Review-Zyklen mit Bewertung.
 
 **Einstellungen:** Firmendaten (Name, Standard-Urlaubstage, Probezeit), Profil und Passwortänderung.
-
-**Demo-Zugang:** `demo@iistelle.de` / `iistelle2026`
 
 ## Lokale Entwicklung
 

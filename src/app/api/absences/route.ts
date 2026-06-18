@@ -1,35 +1,79 @@
 import { createServerSupabase } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
+type ActorContext = {
+  userId: string;
+  role: string | null;
+  companyId: string | null;
+  employeeId: string | null;
+};
+
+async function getActorContext(supabase: Awaited<ReturnType<typeof createServerSupabase>>) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const [{ data: role }, { data: employee }] = await Promise.all([
+    supabase.from("user_roles").select("role, company_id").eq("user_id", user.id).maybeSingle(),
+    supabase.from("employees").select("id, company_id").eq("user_id", user.id).maybeSingle(),
+  ]);
+
+  return {
+    userId: user.id,
+    role: role?.role ?? null,
+    companyId: role?.company_id ?? employee?.company_id ?? null,
+    employeeId: employee?.id ?? null,
+  } satisfies ActorContext;
+}
+
+function isAdmin(actor: ActorContext) {
+  return actor.role === "admin";
+}
+
 // =====================================================
 // GET /api/absences - List absences
 // =====================================================
 export async function GET(request: Request) {
   const supabase = await createServerSupabase();
+  const actor = await getActorContext(supabase);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!actor) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     const { searchParams } = new URL(request.url);
-    const employeeId = searchParams.get("employee_id");
+    const requestedEmployeeId = searchParams.get("employee_id");
     const status = searchParams.get("status");
     const startDate = searchParams.get("start_date");
     const endDate = searchParams.get("end_date");
     const pending = searchParams.get("pending"); // "true" for pending approvals
 
+    if (!isAdmin(actor) && requestedEmployeeId && requestedEmployeeId !== actor.employeeId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     let query = supabase
       .from("absences")
-      .select("*, employee:employees(*)", { count: "exact" })
+      .select("*, employee:employees!inner(*)", { count: "exact" })
       .order("created_at", { ascending: false });
 
-    if (employeeId) {
-      query = query.eq("employee_id", employeeId);
+    if (isAdmin(actor)) {
+      if (!actor.companyId) {
+        return NextResponse.json({ error: "Company context missing" }, { status: 403 });
+      }
+      query = query.eq("employee.company_id", actor.companyId);
+    } else {
+      if (!actor.employeeId) {
+        return NextResponse.json({ error: "Employee context missing" }, { status: 403 });
+      }
+      query = query.eq("employee_id", requestedEmployeeId ?? actor.employeeId);
+    }
+
+    if (requestedEmployeeId) {
+      query = query.eq("employee_id", requestedEmployeeId);
     }
     if (status) {
       query = query.eq("status", status);
@@ -67,20 +111,38 @@ export async function GET(request: Request) {
 // =====================================================
 export async function POST(request: Request) {
   const supabase = await createServerSupabase();
+  const actor = await getActorContext(supabase);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!actor) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     const body = await request.json();
+    const employeeId = isAdmin(actor) ? body.employee_id : actor.employeeId;
 
-    // Validate required fields
-    const requiredFields = ["employee_id", "absence_type", "start_date", "end_date", "days"];
+    if (!employeeId) {
+      return NextResponse.json(
+        { error: "Employee context missing" },
+        { status: 403 }
+      );
+    }
+
+    if (isAdmin(actor)) {
+      const { data: employee } = await supabase
+        .from("employees")
+        .select("id")
+        .eq("id", employeeId)
+        .eq("company_id", actor.companyId)
+        .maybeSingle();
+      if (!employee) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+    } else if (body.employee_id && body.employee_id !== actor.employeeId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const requiredFields = ["absence_type", "start_date", "end_date", "days"];
     for (const field of requiredFields) {
       if (!body[field]) {
         return NextResponse.json(
@@ -90,7 +152,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // Validate absence type
     const validTypes = ["urlaub", "krank", "sonderurlaub", "unbezahlt"];
     if (!validTypes.includes(body.absence_type)) {
       return NextResponse.json(
@@ -102,12 +163,12 @@ export async function POST(request: Request) {
     const { data: absence, error } = await supabase
       .from("absences")
       .insert({
-        employee_id: body.employee_id,
+        employee_id: employeeId,
         absence_type: body.absence_type,
         start_date: body.start_date,
         end_date: body.end_date,
         days: body.days,
-        status: "beantragt", // Always start as pending
+        status: "beantragt",
         comment: body.comment || null,
         attachment_path: body.attachment_path || null,
       })
@@ -130,13 +191,14 @@ export async function POST(request: Request) {
 // =====================================================
 export async function PATCH(request: Request) {
   const supabase = await createServerSupabase();
+  const actor = await getActorContext(supabase);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!actor) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!isAdmin(actor) || !actor.companyId) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
@@ -151,6 +213,17 @@ export async function PATCH(request: Request) {
         { error: "Invalid status. Must be 'genehmigt' or 'abgelehnt'" },
         { status: 400 }
       );
+    }
+
+    const { data: existing } = await supabase
+      .from("absences")
+      .select("id, employee:employees!inner(company_id)")
+      .eq("id", body.id)
+      .eq("employee.company_id", actor.companyId)
+      .maybeSingle();
+
+    if (!existing) {
+      return NextResponse.json({ error: "Absence not found" }, { status: 404 });
     }
 
     const { data: absence, error } = await supabase

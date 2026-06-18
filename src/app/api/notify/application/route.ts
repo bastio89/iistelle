@@ -9,11 +9,9 @@ import { createClient } from "@supabase/supabase-js";
  */
 export async function POST(req: NextRequest) {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supabaseUrl =
-    process.env.NEXT_PUBLIC_SUPABASE_URL ??
-    "https://afmjpjwipjsgvvrfrojo.supabase.co";
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-  if (!serviceKey) {
+  if (!serviceKey || !supabaseUrl) {
     return NextResponse.json({ skipped: true });
   }
 

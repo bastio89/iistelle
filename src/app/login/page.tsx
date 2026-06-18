@@ -23,8 +23,8 @@ export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
   const [mode, setMode] = useState<"login" | "register">("login");
-  const [email, setEmail] = useState("demo@iistelle.de");
-  const [password, setPassword] = useState("iistelle2026");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [invite, setInvite] = useState<InviteInfo | null>(null);
@@ -262,9 +262,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="mt-4 rounded-xl border border-dashed border-petrol-300 bg-petrol-50 px-4 py-3 text-center text-xs text-petrol-600">
-            Demo-Zugang: <strong>demo@iistelle.de</strong> / <strong>iistelle2026</strong>
-          </div>
         </div>
       </div>
     </div>

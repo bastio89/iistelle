@@ -1,6 +1,7 @@
 {
   "name": "iistelle-hr",
   "version": "0.1.0",
+  "description": "Startup-grade SaaS platform for Swiss HR teams",
   "private": true,
   "scripts": {
     "dev": "next dev",

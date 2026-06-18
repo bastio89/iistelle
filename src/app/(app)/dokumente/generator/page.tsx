@@ -99,41 +99,10 @@ export default function DocumentGeneratorPage() {
     if (!selectedEmployee) return;
     setGenerating(true);
 
-    // Simulate document generation (in production, this would call a PDF generation service)
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Generate mock content based on document type
     const docContent = generateDocContent(selectedEmployee, docType);
     setGeneratedDoc(docContent);
     setGenerating(false);
     setTab("vorschau");
-  }
-
-  async function downloadDocument() {
-    if (!selectedEmployee || !generatedDoc) return;
-
-    // In production, this would generate and download a real PDF
-    // For now, create a text file download
-    const blob = new Blob([generatedDoc], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${DOC_TYPE_META[docType].label.replace(/\s+/g, "_")}_${selectedEmployee.last_name}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    // Save to documents table
-    const path = `${selectedEmployee.id}/${Date.now()}_${docType}.txt`;
-    await supabase.storage.from("dokumente").upload(path, blob);
-    await supabase.from("documents").insert({
-      employee_id: selectedEmployee.id,
-      name: `${DOC_TYPE_META[docType].label} - ${selectedEmployee.first_name} ${selectedEmployee.last_name}`,
-      category: DOC_TYPE_META[docType].category,
-      storage_path: path,
-      size_bytes: blob.size,
-    });
   }
 
   if (!isAdmin) {
@@ -324,9 +293,9 @@ export default function DocumentGeneratorPage() {
                     <ChevronRight className="h-4 w-4 rotate-180" />
                     Zurück
                   </button>
-                  <button onClick={downloadDocument} className="btn-primary">
+                  <button disabled className="btn-secondary cursor-not-allowed opacity-60" title="PDF-Export wird erst nach produktionsreifer Dokumentenprüfung aktiviert.">
                     <Download className="h-4 w-4" />
-                    Herunterladen
+                    Export in Vorbereitung
                   </button>
                 </div>
               )}

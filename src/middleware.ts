@@ -1,12 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ??
-  "https://afmjpjwipjsgvvrfrojo.supabase.co";
-const KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmbWpwandpcGpzZ3Z2cmZyb2pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMzA5MTIsImV4cCI6MjA5NjYwNjkxMn0.kAgOQotAWFv0euTUP4GL52dyQuo9OMk6V41xofDmPAY";
+function requireEnv(name: "NEXT_PUBLIC_SUPABASE_URL" | "NEXT_PUBLIC_SUPABASE_ANON_KEY") {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+}
+
+const URL = requireEnv("NEXT_PUBLIC_SUPABASE_URL");
+const KEY = requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -61,10 +65,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Portal-Zugang: Authentifizierte Nutzer, aber eigene Portal-Seite
+  // Portal-Zugang: nur für authentifizierte Nutzer mit Mitarbeiterprofil.
   if (user && isPortal && !isPortalAuthPage) {
-    // Optional: Portal-Zugang nur für Mitarbeiter-Rolle
-    // Für jetzt: Alle authentifizierten Nutzer können das Portal nutzen
+    const { data: employee } = await supabase
+      .from("employees")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (!employee) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
+
     return response;
   }
 

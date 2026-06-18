@@ -16,11 +16,9 @@ export async function POST(req: NextRequest) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supabaseUrl =
-    process.env.NEXT_PUBLIC_SUPABASE_URL ??
-    "https://afmjpjwipjsgvvrfrojo.supabase.co";
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-  if (!secretKey || !webhookSecret || !serviceKey) {
+  if (!secretKey || !webhookSecret || !serviceKey || !supabaseUrl) {
     return NextResponse.json(
       { error: "Webhook noch nicht konfiguriert." },
       { status: 503 }

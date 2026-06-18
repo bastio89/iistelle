@@ -11,10 +11,10 @@ interface HeroProps {
   title: string | React.ReactNode;
   subtitle?: string;
   showCtas?: boolean;
-  showDemo?: boolean;
+  showProductPreview?: boolean;
 }
 
-export default function Hero({ badge, title, subtitle, showCtas = false, showDemo = false }: HeroProps) {
+export default function Hero({ badge, title, subtitle, showCtas = false, showProductPreview = false }: HeroProps) {
   return (
     <>
       {/* Navigation */}
@@ -68,20 +68,20 @@ export default function Hero({ badge, title, subtitle, showCtas = false, showDem
             </p>
           )}
 
-          {(showCtas || showDemo) && (
+          {(showCtas || showProductPreview) && (
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Link href="/login" className="btn-danger group px-6 py-3 text-base">
                 14 Tage kostenlos testen
                 <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
-              {showDemo && (
+              {showProductPreview && (
                 <a
                   href="/karriere/iistelle"
                   target="_blank"
                   className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-6 py-3 text-base font-semibold text-white transition-all hover:bg-white/10"
                 >
                   <Star className="h-4 w-4" />
-                  Live-Demo ansehen
+                  Produkt ansehen
                 </a>
               )}
             </div>

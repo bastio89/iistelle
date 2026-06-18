@@ -213,7 +213,7 @@ const faqs = [
   },
   {
     q: "Kann ich die Zeiterfassung auch offline nutzen?",
-    a: "Ja! iistelle funktioniert auch offline. Sobald du wieder online bist, werden alle Daten synchronisiert.",
+    a: "Die Zeiterfassung ist aktuell online-first ausgelegt. Eine robuste Offline-Synchronisierung ist Teil der Produkt-Roadmap und wird erst aktiviert, wenn Konfliktbehandlung und Datensicherheit zuverlässig umgesetzt sind.",
   },
 ];
 
