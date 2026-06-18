@@ -1,3 +1,6 @@
 {
-  "projectRoot": "iistelle"
+  "framework": "nextjs",
+  "installCommand": "cd iistelle && npm install",
+  "buildCommand": "cd iistelle && npm run build",
+  "outputDirectory": "iistelle/.next"
 }

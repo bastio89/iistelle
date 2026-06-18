@@ -1,0 +1,9 @@
+{
+  "name": "iistelle-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Deployment wrapper for the iistelle Next.js app",
+  "scripts": {
+    "vercel-build": "cd iistelle && npm run build"
+  }
+}
