@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { hashApiToken, API_KEY_PREFIX } from "@/lib/auth/api-keys";
 
 /**
  * Öffentliche Lese-API (v1).
@@ -34,20 +35,23 @@ export async function GET(
 
   const auth = req.headers.get("authorization") ?? "";
   const token = auth.replace(/^Bearer\s+/i, "").trim();
-  if (!token.startsWith("iist_")) {
+  if (!token.startsWith(API_KEY_PREFIX)) {
     return NextResponse.json({ error: "API-Key fehlt." }, { status: 401 });
   }
 
   const admin = createClient(supabaseUrl, serviceKey);
   const { data: keyRow } = await admin
     .from("api_keys")
-    .select("company_id")
-    .eq("key", token)
+    .select("id, company_id")
+    .eq("key_hash", hashApiToken(token))
     .maybeSingle();
 
   if (!keyRow) {
     return NextResponse.json({ error: "Ungültiger API-Key." }, { status: 401 });
   }
+
+  // Best-effort usage tracking; never blocks the request.
+  await admin.from("api_keys").update({ last_used_at: new Date().toISOString() }).eq("id", keyRow.id);
 
   const { data, error } = await admin
     .from(resource)

@@ -302,9 +302,16 @@ export default function DocumentGeneratorPage() {
             </div>
 
             {generatedDoc ? (
-              <div className="rounded-lg border border-petrol-200 bg-white p-8 font-mono text-sm">
-                <pre className="whitespace-pre-wrap">{generatedDoc}</pre>
-              </div>
+              <>
+                <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs text-amber-800">
+                  Entwurfsvorschau – noch kein rechtsverbindliches Dokument. Der
+                  PDF-Export und die revisionssichere Ablage werden erst nach
+                  produktionsreifer Dokumentenprüfung aktiviert.
+                </div>
+                <div className="rounded-lg border border-petrol-200 bg-white p-8 font-mono text-sm">
+                  <pre className="whitespace-pre-wrap">{generatedDoc}</pre>
+                </div>
+              </>
             ) : (
               <div className="rounded-lg border border-dashed border-petrol-200 p-12 text-center">
                 <FileText className="mx-auto h-12 w-12 text-petrol-300" />

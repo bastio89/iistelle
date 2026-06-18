@@ -52,16 +52,18 @@ export default function CandidatesPage() {
       )
     )
       return;
-    for (const dup of rest) {
-      await supabase
-        .from("applications")
-        .update({ candidate_id: primary.id })
-        .eq("candidate_id", dup.id);
-      await supabase
-        .from("activities")
-        .update({ candidate_id: primary.id })
-        .eq("candidate_id", dup.id);
-      await supabase.from("candidates").delete().eq("id", dup.id);
+    const res = await fetch("/api/recruiting/merge-candidates", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        primary_id: primary.id,
+        duplicate_ids: rest.map((d) => d.id),
+      }),
+    });
+    if (!res.ok) {
+      const { error } = await res.json().catch(() => ({ error: "Fehler" }));
+      alert(`Zusammenführen fehlgeschlagen: ${error ?? "Unbekannter Fehler"}`);
+      return;
     }
     load();
   }

@@ -50,6 +50,7 @@ export default function SettingsPage() {
   });
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+  const [newKeyToken, setNewKeyToken] = useState<string | null>(null);
   const { isAdmin } = useRole();
   const [loading, setLoading] = useState(true);
 
@@ -68,14 +69,17 @@ export default function SettingsPage() {
       ]);
       setRoles((r as UserRoleRow[]) ?? []);
       setInvites((inv as Invitation[]) ?? []);
-      const [{ data: autos }, { data: logs }, { data: keys }] = await Promise.all([
+      const [{ data: autos }, { data: logs }, keysRes] = await Promise.all([
         supabase.from("automations").select("*").order("created_at"),
         supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(50),
-        supabase.from("api_keys").select("*").order("created_at"),
+        fetch("/api/api-keys"),
       ]);
       setAutomations((autos as Automation[]) ?? []);
       setAuditLogs((logs as AuditLog[]) ?? []);
-      setApiKeys((keys as ApiKey[]) ?? []);
+      if (keysRes.ok) {
+        const { data: keys } = await keysRes.json();
+        setApiKeys((keys as ApiKey[]) ?? []);
+      }
       setLoading(false);
     }
     load();
@@ -133,19 +137,30 @@ export default function SettingsPage() {
   }
 
   async function createApiKey() {
-    const { data, error } = await supabase
-      .from("api_keys")
-      .insert({ name: `Key ${apiKeys.length + 1}` })
-      .select()
-      .single();
-    if (!error && data) {
-      setApiKeys((prev) => [...prev, data as ApiKey]);
-      logAudit({ action: "api_key_created", category: "api", details: (data as ApiKey).name });
+    const res = await fetch("/api/api-keys", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name: `Key ${apiKeys.length + 1}` }),
+    });
+    if (!res.ok) {
+      setMsg({ type: "err", text: "API-Key konnte nicht erstellt werden." });
+      return;
     }
+    const { data } = await res.json();
+    const { token, ...meta } = data as ApiKey & { token: string };
+    setApiKeys((prev) => [...prev, meta as ApiKey]);
+    setNewKeyToken(token);
+    logAudit({ action: "api_key_created", category: "api", details: meta.name });
   }
 
   async function deleteApiKey(id: string) {
-    await supabase.from("api_keys").delete().eq("id", id);
+    const res = await fetch(`/api/api-keys?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      setMsg({ type: "err", text: "API-Key konnte nicht gelöscht werden." });
+      return;
+    }
     setApiKeys((prev) => prev.filter((k) => k.id !== id));
     logAudit({ action: "api_key_deleted", category: "api" });
   }
@@ -181,11 +196,12 @@ export default function SettingsPage() {
   }
 
   async function changeRole(userId: string, role: UserRole) {
-    const { error } = await supabase
-      .from("user_roles")
-      .update({ role })
-      .eq("user_id", userId);
-    if (!error) {
+    const res = await fetch("/api/team/role", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ user_id: userId, role }),
+    });
+    if (res.ok) {
       setRoles((prev) =>
         prev.map((r) => (r.user_id === userId ? { ...r, role } : r))
       );
@@ -201,7 +217,8 @@ export default function SettingsPage() {
       });
       setMsg({ type: "ok", text: "Rolle aktualisiert." });
     } else {
-      setMsg({ type: "err", text: error.message });
+      const { error } = await res.json().catch(() => ({ error: "Fehler" }));
+      setMsg({ type: "err", text: error ?? "Rolle konnte nicht geändert werden." });
     }
   }
 
@@ -754,6 +771,36 @@ export default function SettingsPage() {
               Key erstellen
             </button>
           </div>
+          {newKeyToken && (
+            <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3">
+              <p className="text-sm font-semibold text-emerald-800">
+                Neuer API-Key – jetzt kopieren, er wird nur einmal angezeigt:
+              </p>
+              <div className="mt-2 flex items-center gap-2">
+                <code className="min-w-0 flex-1 truncate rounded bg-white px-2 py-1 text-xs text-petrol-700">
+                  {newKeyToken}
+                </code>
+                <button
+                  className="btn-secondary py-1.5"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(newKeyToken);
+                    setCopiedId("new-token");
+                    setTimeout(() => setCopiedId(null), 2000);
+                  }}
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                  {copiedId === "new-token" ? "Kopiert ✓" : "Kopieren"}
+                </button>
+                <button
+                  className="rounded p-1.5 text-petrol-400 hover:text-petrol-700"
+                  onClick={() => setNewKeyToken(null)}
+                  title="Ausblenden"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
           {apiKeys.length === 0 ? (
             <p className="py-3 text-center text-sm text-petrol-400">
               Noch keine API-Keys.
@@ -764,19 +811,8 @@ export default function SettingsPage() {
                 <div key={k.id} className="flex items-center gap-3 py-3">
                   <span className="text-sm font-semibold text-petrol-900">{k.name}</span>
                   <code className="min-w-0 flex-1 truncate rounded bg-petrol-50 px-2 py-1 text-xs text-petrol-700">
-                    {k.key}
+                    {k.key_prefix}…
                   </code>
-                  <button
-                    className="btn-secondary py-1.5"
-                    onClick={async () => {
-                      await navigator.clipboard.writeText(k.key);
-                      setCopiedId(k.id);
-                      setTimeout(() => setCopiedId(null), 2000);
-                    }}
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                    {copiedId === k.id ? "Kopiert ✓" : "Kopieren"}
-                  </button>
                   <button
                     onClick={() => deleteApiKey(k.id)}
                     className="rounded p-1.5 text-petrol-300 transition hover:bg-rose-50 hover:text-rose-500"

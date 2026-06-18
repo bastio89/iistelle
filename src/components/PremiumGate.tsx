@@ -16,6 +16,9 @@ export function usePremium() {
 /**
  * Sperrt Premium-Inhalte für Starter-Firmen und zeigt stattdessen
  * einen Upgrade-Hinweis. Professional/Enterprise sehen die Inhalte normal.
+ *
+ * UX-only: Diese Komponente blendet lediglich UI aus. Premium-relevante
+ * Server-Endpunkte müssen den Plan zusätzlich serverseitig prüfen.
  */
 export default function PremiumGate({
   feature,

@@ -56,31 +56,48 @@ export default function EmployeesPage() {
       return;
     }
     const rows = lines.slice(1).map((l) => l.split(delim).map((c) => c.trim().replace(/^"|"$/g, "")));
-    const payload = rows
-      .filter((r) => r[iVor] && r[iNach] && r[iMail])
-      .map((r) => ({
+    const validRows = rows.filter((r) => r[iVor] && r[iNach] && r[iMail]);
+    const skipped = rows.length - validRows.length;
+
+    // Track which business-critical fields had to be defaulted so the import
+    // is transparent instead of silently inventing employment data.
+    const defaulted = { position: 0, department: 0, hire_date: 0 };
+    const payload = validRows.map((r) => {
+      const hasPos = iPos >= 0 && r[iPos];
+      const hasDept = iDept >= 0 && r[iDept];
+      const validDate = iDate >= 0 && /^\d{4}-\d{2}-\d{2}$/.test(r[iDate] ?? "");
+      if (!hasPos) defaulted.position++;
+      if (!hasDept) defaulted.department++;
+      if (!validDate) defaulted.hire_date++;
+      return {
         first_name: r[iVor],
         last_name: r[iNach],
         email: r[iMail],
-        position: (iPos >= 0 && r[iPos]) || "Mitarbeiter:in",
-        department: (iDept >= 0 && r[iDept]) || "Operations",
+        position: hasPos ? r[iPos] : "Mitarbeiter:in",
+        department: hasDept ? r[iDept] : "Operations",
         employment_type: "Vollzeit",
         status: "aktiv",
-        hire_date:
-          iDate >= 0 && /^\d{4}-\d{2}-\d{2}$/.test(r[iDate] ?? "")
-            ? r[iDate]
-            : new Date().toISOString().slice(0, 10),
-      }));
+        hire_date: validDate ? r[iDate] : new Date().toISOString().slice(0, 10),
+      };
+    });
     if (payload.length === 0) {
       setImportMsg("Keine gültigen Zeilen in der Datei gefunden.");
     } else {
       const { error } = await supabase.from("employees").insert(payload);
-      setImportMsg(
-        error
-          ? `Import fehlgeschlagen: ${error.message}`
-          : `${payload.length} Mitarbeiter:innen importiert.`
-      );
-      if (!error) load();
+      if (error) {
+        setImportMsg(`Import fehlgeschlagen: ${error.message}`);
+      } else {
+        const notes: string[] = [];
+        if (skipped > 0) notes.push(`${skipped} Zeile(n) ohne Vorname/Nachname/E-Mail übersprungen`);
+        if (defaulted.position) notes.push(`${defaulted.position}× Position auf Standard gesetzt`);
+        if (defaulted.department) notes.push(`${defaulted.department}× Abteilung auf Standard gesetzt`);
+        if (defaulted.hire_date) notes.push(`${defaulted.hire_date}× Eintrittsdatum auf heute gesetzt`);
+        setImportMsg(
+          `${payload.length} Mitarbeiter:innen importiert.` +
+            (notes.length ? ` Hinweis: ${notes.join(", ")}. Bitte prüfen und ggf. korrigieren.` : "")
+        );
+        load();
+      }
     }
     setImporting(false);
     ev.target.value = "";

@@ -1,35 +1,6 @@
 import { createServerSupabase } from "@/lib/supabase/server";
+import { getActorContext, isAdmin, type ActorContext } from "@/lib/auth/server";
 import { NextResponse } from "next/server";
-
-type ActorContext = {
-  userId: string;
-  role: string | null;
-  companyId: string | null;
-};
-
-async function getActorContext(supabase: Awaited<ReturnType<typeof createServerSupabase>>) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return null;
-
-  const { data: role } = await supabase
-    .from("user_roles")
-    .select("role, company_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  return {
-    userId: user.id,
-    role: role?.role ?? null,
-    companyId: role?.company_id ?? null,
-  } satisfies ActorContext;
-}
-
-function isAdmin(actor: ActorContext) {
-  return actor.role === "admin";
-}
 
 function canReadEmployee(actor: ActorContext, employee: { user_id?: string | null; company_id?: string | null }) {
   if (employee.user_id === actor.userId) return true;

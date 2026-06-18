@@ -190,7 +190,8 @@ export interface AuditLog {
 export interface ApiKey {
   id: string;
   name: string;
-  key: string;
+  key_prefix: string;
+  last_used_at?: string | null;
   created_at: string;
 }
 

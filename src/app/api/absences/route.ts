@@ -1,36 +1,6 @@
 import { createServerSupabase } from "@/lib/supabase/server";
+import { getActorContext, isAdmin } from "@/lib/auth/server";
 import { NextResponse } from "next/server";
-
-type ActorContext = {
-  userId: string;
-  role: string | null;
-  companyId: string | null;
-  employeeId: string | null;
-};
-
-async function getActorContext(supabase: Awaited<ReturnType<typeof createServerSupabase>>) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return null;
-
-  const [{ data: role }, { data: employee }] = await Promise.all([
-    supabase.from("user_roles").select("role, company_id").eq("user_id", user.id).maybeSingle(),
-    supabase.from("employees").select("id, company_id").eq("user_id", user.id).maybeSingle(),
-  ]);
-
-  return {
-    userId: user.id,
-    role: role?.role ?? null,
-    companyId: role?.company_id ?? employee?.company_id ?? null,
-    employeeId: employee?.id ?? null,
-  } satisfies ActorContext;
-}
-
-function isAdmin(actor: ActorContext) {
-  return actor.role === "admin";
-}
 
 // =====================================================
 // GET /api/absences - List absences

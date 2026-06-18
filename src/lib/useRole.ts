@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Company, UserRole } from "@/lib/types";
 
-/** Liefert Rolle und Firma des angemeldeten Nutzers. */
+/**
+ * Liefert Rolle und Firma des angemeldeten Nutzers.
+ *
+ * UX-only: Dieser Hook dient ausschließlich der Anzeige-Steuerung. Echte
+ * Autorisierung muss serverseitig erfolgen (Route-Handler unter /api + RLS).
+ * Niemals sensible Aktionen allein auf Basis dieses Werts freigeben.
+ */
 export function useRole() {
   const [role, setRole] = useState<UserRole | null>(null);
   const [company, setCompany] = useState<Company | null>(null);
