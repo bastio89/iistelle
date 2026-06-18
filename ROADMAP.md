@@ -2,6 +2,12 @@
 
 > **Vision:** Das beste HR-Tool der Schweiz – für Personalverantwortliche, die Effizienz, Compliance und Menschlichkeit vereinen wollen.
 
+## Produkt-Haltung
+
+iistelle wird als startup-grade, langfristig wachsendes SaaS-Produkt entwickelt – nicht als MVP, Demo oder Wegwerf-Prototyp.
+
+Jede Umsetzung soll Verlässlichkeit, Skalierbarkeit, Compliance, Sicherheit, Datenschutz, Auditierbarkeit, UX-Qualität und spätere Produktphasen unterstützen. Kurzfristige Vereinfachungen sind erlaubt, müssen aber bewusst gewählt, sichtbar dokumentiert und mit einem Weg zur produktionsreifen Lösung verbunden werden.
+
 ---
 
 ## 📊 Wettbewerbsanalyse Schweiz (Juni 2026)
